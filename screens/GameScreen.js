@@ -15,10 +15,10 @@ import Game from '../model/Game';
 
 import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
+import BatterView from '../components/BatterView.js';
+
 /*
 import GameState from './GameState.js';
-
-import BatterState from './BatterState.js';
 import PlayerStats from './PlayerStats.js';
 import FieldView from './FieldView.js';
 */
@@ -344,13 +344,20 @@ export default class GameScreen extends React.Component {
         <Grid style={styles.container}>
 
         <Row size={10}>
-
+        { this.mGame.myTeamIsBatting == false && 
           <PitcherView 
             onPitcherChange = {this.onPitcherClick} 
             onMachineChange = {this.onMachineChange} 
             isMachinePitch={this.state.machinePitch} 
             pitcher = {this.mGame.fieldingTeam.playerByPos(0)} 
           />
+        }
+        { this.mGame.myTeamIsBatting == true && 
+          <BatterView 
+            battingTeam = {this.mGame.battingTeam}
+            batterClick = {this.onBatterClick}
+          />
+        }
         </Row>
 
         <Row size={5}>

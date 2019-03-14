@@ -25,6 +25,14 @@ export default class Game {
         }
     }
 
+    get myTeamIsBatting() {
+        if (this.battingTeam == this.myTeam) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     get inning() {
         return Math.floor(this.currentInning / 2) + 1;
     }

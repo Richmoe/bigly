@@ -4,7 +4,7 @@ export default class Game {
     awayTeam; //type Team
     //state:
     currentInning; //Current Inning will be 0 based, top of inning = even, bottom = odd
-    innings; //array of Inning objects
+    innings = []; //array of Inning objects
     gameSettings; //param
 
     //stats:

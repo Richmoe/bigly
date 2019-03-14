@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import Team from '../model/Team';
+import GameParams from '../model/GameParams';
+import Game from '../model/Game';
 
 /*
 import PitchControl from './PitchControl.js';
@@ -20,9 +22,10 @@ import PlayerStats from './PlayerStats.js';
 import FieldView from './FieldView.js';
 */
 
-export default class Game extends React.Component {
+export default class GameScreen extends React.Component {
     
     mOnBase;
+    mGame;
 
     constructor(props) {
         console.log("Setting up Game ");
@@ -32,7 +35,7 @@ export default class Game extends React.Component {
         defaultGame = this._testGame();
 
 
-        mGame = this.props.navigation.getParams("game", defaultGame);
+        this.mGame = defaultGame;
 
         //Make sure we sort by battingOrder        
         //gameRoster.sort((a,b) => a.battingOrder - b.battingOrder);
@@ -53,26 +56,22 @@ export default class Game extends React.Component {
         console.log(teamStats);
         */
 
+        console.log(this.mGame);
+
         this.mOnBase = [100,-1,-1,-1];
 
-        /*
+
         this.state = {
-            opponentName: "Opp",
-            inning: 0,
-            machinePitch: gameParams.machinePitch,
+            machinePitch: true,
             score: [],
-            gameParams: gameParams,
             outs: 0, 
             runs: 0,
             balls: 0,
             strikes: 0,
-            currentPitcher: curPitcher,
-            teamData: teamStats,
-            batterUp: 0,
- 
+
         }
 
-
+        /*
         this.pitch = this.pitch.bind(this);
 
         //create 2d array for scores
@@ -99,8 +98,6 @@ export default class Game extends React.Component {
 
 
     setBatter (batter) {
-      
-
       this.mOnBase[0] = batter;
 
       console.log(`mOnBase: ${this.mOnBase}`);
@@ -157,16 +154,19 @@ export default class Game extends React.Component {
 
     scoreRun(player, pitcher, runcount = 1) //Need to figure out RBIs etc.
     {
+      /*
       console.log("Score run " + runcount);
         var newScore = this.state.score;
         newScore[this.state.inning % 2] += runcount;
         this.setState ( {
             score : newScore
         });
+        */
     };
 
     updatePitcherStats = (pitchType) => {
 
+      /*
       //We can't reassign an array element directly, so we have to copy existing pitchCount array
       let tempTeamData = [...this.state.teamData];
 
@@ -179,13 +179,14 @@ export default class Game extends React.Component {
       };
 
       this.setState( {teamData: tempTeamData});
+      */
     }
 
 
 
     pitch = (pitchType) => {
         //Update total pitch count if we're not at bat
-
+      /*
         if (pitchType === 'hit')
         {
 
@@ -232,11 +233,13 @@ export default class Game extends React.Component {
                 balls : curBallCount
             });
         }
+        */
     };
 
     onPitcherClick = () => {
 
       console.log("OPC!");
+      /*
       //Create Roster view data. God this is ugly
       tempExtraData = [];
       for (var i = 0;i < this.state.teamData.length;i++) {
@@ -245,29 +248,32 @@ export default class Game extends React.Component {
       console.log(tempExtraData);
 
       this.props.navigation.navigate('RosterScreen', { roster: this.state.teamData, extraData: tempExtraData, formatRow: [80, 20], callBack: this.onPitcherChange});
+      */
     };
 
 
     onBatterClick = () => {
       //Create Roster view data. God this is ugly
       console.log("OBC!");
+      /*
       tempExtraData = [];
       for (var i = 0;i < this.state.teamData.length;i++) {
         tempExtraData.push({Batting: this.state.teamData[i].battingOrder + 1});
       }
       console.log(tempExtraData);
       this.props.navigation.navigate('RosterScreen', { roster: this.state.teamData, extraData: tempExtraData, formatRow: [80,20]});
-
+      */
    }
 
     setPlayerPosition = (playerIx, fieldPos) => {
-        var temp = [...this.state.teamData];
-        temp[playerIx].positionByInning[this.inningNumber() - 1] = fieldPos;
+        //var temp = [...this.state.teamData];
+        //temp[playerIx].positionByInning[this.inningNumber() - 1] = fieldPos;
     };
 
     onPitcherChange = (newPitcherId) => {
       console.log("Got Pitcher change " + newPitcherId);
 
+      /*
       if (newPitcherId == this.state.currentPitcher) {
         console.log("No change in pitcher!");
         return;
@@ -286,6 +292,7 @@ export default class Game extends React.Component {
       this.setPlayerPosition(newPitcherId, 0);
       this.setState ( { currentPitcher : newPitcherId } );
       console.log(this.state.teamData);
+      */
     }
 
     onMachineChange = () => {      //console.log("got machine change");
@@ -301,6 +308,7 @@ export default class Game extends React.Component {
     }
 
     resolveHit = (runnersOnBase) => {
+      /*
       //This is where we determine who ended where
       if (this.isBatting()) {
         console.log("resolveHit is batting");
@@ -342,11 +350,45 @@ export default class Game extends React.Component {
       } else {
         this.nextBatter();
       }
+      */
     }
 
     render() {
  
-      /*
+      return (
+        <Grid style={styles.container}>
+
+        <Row size={10}>
+        <Image
+              source={
+                __DEV__
+                  ? require('../assets/images/robot-dev.png')
+                  : require('../assets/images/robot-prod.png')
+              }
+            />
+        </Row>
+
+        <Row size={5} style={{backgroundColor: 'red'}}>
+
+        </Row>
+        <Row size={10}>
+
+
+        </Row>
+
+        <Row size={55} style={{backgroundColor: 'red'}}>
+
+        </Row>
+        <Row size={20}>
+
+        </Row>
+        
+      </Grid>
+
+        );
+            
+      
+/*
       return (
         
         <Grid style={styles.container}>
@@ -382,9 +424,9 @@ export default class Game extends React.Component {
           
         </Grid>
       );
-   
+       */
     }
-    */
+
   }
 
   const styles = StyleSheet.create({

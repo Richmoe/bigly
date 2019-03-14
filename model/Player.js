@@ -38,6 +38,7 @@ export default class Player {
 
     constructor(playername, battingOrder, position) {
         //what should I do here?
+        console.log(`Constructing player ${playername}: batting ${battingOrder}, playing ${position}`);
         this.name = playername;
         this.battingOrder = battingOrder;
         this.positionByInning[0] = position;

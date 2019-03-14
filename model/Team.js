@@ -1,4 +1,4 @@
-import { Player } from './Player.js';
+import Player from '../model/Player.js';
 
 export default class Team
 {
@@ -34,8 +34,6 @@ export default class Team
     _createDefaultRoster(names) {
         tempBattingOrder = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11]);
         tempFieldingPos = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11]);
-        console.log(tempBattingOrder);
-        console.log(tempFieldingPos);
         
         defaultRoster = [];
     
@@ -46,14 +44,16 @@ export default class Team
             } else {
                 name = "Player " + tempBattingOrder[i];
             }
-            defaultRoster.push(new Player(name,tempBattingOrder[i],tempFieldingPos[i]));
+            player = new Player(name, tempBattingOrder[i], tempFieldingPos[i])
+
+            defaultRoster.push(player);
         }
     
         return defaultRoster;
     }
     
     _createDefaultMyRoster () {
-        return this.createDefaultRoster(
+        return this._createDefaultRoster(
             [
                 "Alex Merryman",
                 "Ashton Merryman",
@@ -70,14 +70,4 @@ export default class Team
             ]
         );
     }
-    
-
 }
-
-
-
-
-
-
-
-export default 

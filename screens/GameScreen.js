@@ -13,8 +13,8 @@ import Team from '../model/Team';
 import GameParams from '../model/GameParams';
 import Game from '../model/Game';
 
+import PitchControl from '../components/PitchControl.js';
 /*
-import PitchControl from './PitchControl.js';
 import GameState from './GameState.js';
 import PitchState from './PitchState.js';
 import BatterState from './BatterState.js';
@@ -105,7 +105,7 @@ export default class GameScreen extends React.Component {
 
     nextBatter() {
         this.setState( { balls : 0, strikes: 0 });
-        batterUp = this.mGame.nextBatter();
+        batterUp = this.mGame.nextBatter;
         console.log("BatterUp: " + batterUp);
         /*
         if (this.isBatting()) {
@@ -184,56 +184,52 @@ export default class GameScreen extends React.Component {
 
 
 
-    pitch = (pitchType) => {
-        //Update total pitch count if we're not at bat
-      /*
-        if (pitchType === 'hit')
-        {
+    pitchCallback = (pitchType) => {
 
-          this.props.navigation.navigate('HitScreen', { roster: this.state.teamData, baseRunners: this.onBase, resolve: this.resolveHit });
+      //Special case hit???
 
-          return;
+      if (!this.state.machinePitch)  this.updatePitcherStats(pitchType);
+
+      curStrikeCount = this.state.strikes;
+      curBallCount = this.state.balls;
+      curOutCount = this.state.outs;
+
+      if (pitchType === 'strike') {
+        ++curStrikeCount ;
+      } else if (pitchType === 'ball') {
+        ++curBallCount;
+      } else if (pitchType === 'foul') {
+        if (curStrikeCount < 2) {
+            ++curStrikeCount;
         }
+      } else {
+        console.log("error pitch type: " + pitchType);
+      }
 
-        if (!this.isBatting() && !this.state.machinePitch)  this.updatePitcherStats(pitchType);
-
-        curStrikeCount = this.state.strikes;
-        curBallCount = this.state.balls;
-        curOutCount = this.state.outs;
-
-        if (pitchType === 'strike') {
-            ++curStrikeCount ;
-        } else if (pitchType === 'ball') {
-            ++curBallCount;
-        } else if (pitchType === 'foul') {
-            if (curStrikeCount < 2) {
-                ++curStrikeCount;
-            }
+      if (curStrikeCount >= 3)
+      {
+        //strikeout
+        ++curOutCount;
+        if (curOutCount >= 2){
+          console.log(`Strikeout! Retired the side`);
+          this.newInning();
         } else {
-            console.log("error pitch type: " + pitchType);
+          console.log(`Strikeout! Outs: ${curOutCount}`);
+          this.setState( { outs: this.state.outs + 1});
+          this.nextBatter();
         }
+      } else if (curBallCount >= 4) {
+        //Walk
+        console.log(`Walk`);
+        this.nextBatter();
+      } else {
+        console.log(`${pitchType}: ${curBallCount} - ${curStrikeCount}`);
+        this.setState( {
+            strikes: curStrikeCount,
+            balls : curBallCount
+        });
+    }
 
-        if (curStrikeCount >= 3)
-        {
-            //strikeout
-            this.setState( { outs: this.state.outs + 1});
-
-            if (curOutCount >= 2){
-                this.newInning();
-            } else {
-              this.nextBatter();
-            }
-        } else if (curBallCount >= 4) {
-            //Walk
-            this.nextBatter();
-
-        } else {
-            this.setState( {
-                strikes: curStrikeCount,
-                balls : curBallCount
-            });
-        }
-        */
     };
 
     onPitcherClick = () => {
@@ -372,8 +368,7 @@ export default class GameScreen extends React.Component {
 
         </Row>
         <Row size={10}>
-
-
+         <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} />
         </Row>
 
         <Row size={55} style={{backgroundColor: 'red'}}>

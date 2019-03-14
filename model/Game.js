@@ -34,7 +34,7 @@ export default class Game {
     }
 
     get battingTeam() {
-        if (this.isTop()) {
+        if (this.isTop) {
             return this.awayTeam;
         } else {
             return this.homeTeam;
@@ -42,7 +42,7 @@ export default class Game {
     }
 
     get fieldingTeam() {
-        if (this.isTop()) {
+        if (this.isTop) {
             return this.homeTeam;
         } else {
             return this.awayTeam;
@@ -50,11 +50,11 @@ export default class Game {
     }
 
     get isBatting() {
-        return (this.battingTeam() === this.myTeam())
+        return (this.battingTeam === this.myTeam)
     }
 
     get nextBatter() {
-        currentBatter = this.battingTeam().nextBatter();
+        currentBatter = this.battingTeam.nextBatter;
         return currentBatter;
     }
 

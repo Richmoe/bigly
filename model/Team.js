@@ -14,8 +14,13 @@ export default class Team
     }
 
     get nextBatter() {
+
+        console.log(`Hmm. Batting order: ${this.battingOrder.length}`);
         this.currentBatterIx = (this.currentBatterIx + 1) % this.battingOrder.length;
-        return this.battingOrder(this.currentBatterIx);
+
+        console.log("Team Get next batter ix " + this.currentBatterIx);
+
+        return this.battingOrder[this.currentBatterIx];
     }
 
     _shuffleArray = (input) => {
@@ -49,11 +54,13 @@ export default class Team
             defaultRoster.push(player);
         }
     
-        return defaultRoster;
+        this.battingOrder = tempBattingOrder;
+        this.fieldPositions = tempFieldingPos;
+        this.roster = defaultRoster;
     }
     
     _createDefaultMyRoster () {
-        return this._createDefaultRoster(
+        this._createDefaultRoster(
             [
                 "Alex Merryman",
                 "Ashton Merryman",

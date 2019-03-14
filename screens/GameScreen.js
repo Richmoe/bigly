@@ -14,9 +14,10 @@ import GameParams from '../model/GameParams';
 import Game from '../model/Game';
 
 import PitchControl from '../components/PitchControl.js';
+import PitcherView from '../components/PitcherView.js';
 /*
 import GameState from './GameState.js';
-import PitchState from './PitchState.js';
+
 import BatterState from './BatterState.js';
 import PlayerStats from './PlayerStats.js';
 import FieldView from './FieldView.js';
@@ -59,7 +60,6 @@ export default class GameScreen extends React.Component {
         console.log(this.mGame);
 
         this.mOnBase = [100,-1,-1,-1];
-
 
         this.state = {
             machinePitch: true,
@@ -124,20 +124,11 @@ export default class GameScreen extends React.Component {
     newInning() {
 
       this.mGame.newInning();
+      this.setState( { outs: 0 } );
       this.mOnBase = [-1,-1,-1,-1];
       this.nextBatter();
       /*
-        if (this.isBatting()) {
-          //Date and store off next batter
-          batterUp = ((this.state.batterUp + 1 ) % this.state.teamData.length);
-          this.setState( {batterUp: batterUp }) ;
-
-          //onBase for next round:
-          this.onBase = [100,-1,-1,-1];
-        } else {
-          //We're going up to bat:
-         this. onBase = [this.state.batterUp, -1, -1, -1]
-        }
+       
         this.setState ( {
             inning : this.state.inning + 1,
             outs: 0,
@@ -166,20 +157,16 @@ export default class GameScreen extends React.Component {
 
     updatePitcherStats = (pitchType) => {
 
-      /*
-      //We can't reassign an array element directly, so we have to copy existing pitchCount array
-      let tempTeamData = [...this.state.teamData];
+      pitcherPlayer = this.mGame.fieldingTeam.playerByPos(0);
 
       if (['strike','foul','hit'].indexOf(pitchType) >= 0) {
-        tempTeamData[this.state.currentPitcher].pitcherStats.strikes += 1;
+        pitcherPlayer.pitcherStats.strikes += 1;
       } else if (['ball','hbp'].indexOf(pitchType) >= 0) {
-        tempTeamData[this.state.currentPitcher].pitcherStats.balls += 1;
+        pitcherPlayer.pitcherStats.balls += 1;
       } else {
         console.log("Invalid PitchType: " + pitchType);
       };
 
-      this.setState( {teamData: tempTeamData});
-      */
     }
 
 
@@ -210,12 +197,12 @@ export default class GameScreen extends React.Component {
       {
         //strikeout
         ++curOutCount;
-        if (curOutCount >= 2){
+        if (curOutCount >= 3){
           console.log(`Strikeout! Retired the side`);
           this.newInning();
         } else {
           console.log(`Strikeout! Outs: ${curOutCount}`);
-          this.setState( { outs: this.state.outs + 1});
+          this.setState( { outs: curOutCount });
           this.nextBatter();
         }
       } else if (curBallCount >= 4) {
@@ -291,7 +278,7 @@ export default class GameScreen extends React.Component {
       */
     }
 
-    onMachineChange = () => {      //console.log("got machine change");
+    onMachineChange = () => {      
       this.setState ( {machinePitch : !this.state.machinePitch});
     }
 
@@ -350,25 +337,27 @@ export default class GameScreen extends React.Component {
     }
 
     render() {
+      temp = this.mGame.fieldingTeam.playerByPos(0);
+      console.log(temp);
  
       return (
         <Grid style={styles.container}>
 
         <Row size={10}>
-        <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-            />
+
+          <PitcherView 
+            onPitcherChange = {this.onPitcherClick} 
+            onMachineChange = {this.onMachineChange} 
+            isMachinePitch={this.state.machinePitch} 
+            pitcher = {this.mGame.fieldingTeam.playerByPos(0)} 
+          />
         </Row>
 
-        <Row size={5} style={{backgroundColor: 'red'}}>
+        <Row size={5}>
 
         </Row>
         <Row size={10}>
-         <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} />
+          <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} />
         </Row>
 
         <Row size={55} style={{backgroundColor: 'red'}}>

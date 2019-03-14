@@ -4,9 +4,9 @@ export default class Team
 {
     name = "Team Name";
     roster = []; //Array of Players
-    battingOrder = []; //
+    battingOrder = []; //array of batting order. Value = index into roster.
     currentBatterIx = -1; //Start with -1 because we always call nextBatter;
-    fieldPositions = [];
+    fieldPositions = []; //Array of field pos, 0 = pitcher. Value = index into roster.
     //Stats = wins, losses
 
     constructor(teamName) {
@@ -21,6 +21,10 @@ export default class Team
         console.log("Team Get next batter ix " + this.currentBatterIx);
 
         return this.battingOrder[this.currentBatterIx];
+    }
+
+    playerByPos(pos) {
+        return this.roster[this.fieldPositions[pos]];
     }
 
     _shuffleArray = (input) => {
@@ -49,7 +53,7 @@ export default class Team
             } else {
                 name = "Player " + tempBattingOrder[i];
             }
-            player = new Player(name, tempBattingOrder[i], tempFieldingPos[i])
+            player = new Player(name, tempBattingOrder.indexOf(i), tempFieldingPos.indexOf(i));
 
             defaultRoster.push(player);
         }

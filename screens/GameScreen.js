@@ -16,9 +16,9 @@ import Game from '../model/Game';
 import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
 import BatterView from '../components/BatterView.js';
+import GameStateView from '../components/GameStateView.js';
 
 /*
-import GameState from './GameState.js';
 import PlayerStats from './PlayerStats.js';
 import FieldView from './FieldView.js';
 */
@@ -371,7 +371,12 @@ export default class GameScreen extends React.Component {
 
         </Row>
         <Row size={20}>
-
+          <GameStateView style={styles.gamestate}
+              balls = {this.state.balls}
+              strikes = {this.state.strikes}
+              outs = {this.state.outs}
+              game = {this.mGame}
+            />
         </Row>
         
       </Grid>

@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import GameScreen from '../screens/GameScreen';
+import RosterScreen from '../screens/RosterScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -28,6 +29,7 @@ HomeStack.navigationOptions = {
 
 const LinksStack = createStackNavigator({
   Links: GameScreen,
+  Roster: RosterScreen,
 });
 
 LinksStack.navigationOptions = {

@@ -220,62 +220,44 @@ export default class GameScreen extends React.Component {
     };
 
     onPitcherClick = () => {
-
-      console.log("OPC!");
-      /*
-      //Create Roster view data. God this is ugly
-      tempExtraData = [];
-      for (var i = 0;i < this.state.teamData.length;i++) {
-        tempExtraData.push({Pitches: (this.state.teamData[i].pitcherStats.balls + this.state.teamData[i].pitcherStats.strikes)});
-      }
-      console.log(tempExtraData);
-
-      this.props.navigation.navigate('RosterScreen', { roster: this.state.teamData, extraData: tempExtraData, formatRow: [80, 20], callBack: this.onPitcherChange});
-      */
+      this.props.navigation.navigate('Roster', { team: this.mGame.fieldingTeam, view: 'pitching', callBack: this.onPitcherChange});
     };
 
 
     onBatterClick = () => {
-      //Create Roster view data. God this is ugly
-      console.log("OBC!");
-      /*
-      tempExtraData = [];
-      for (var i = 0;i < this.state.teamData.length;i++) {
-        tempExtraData.push({Batting: this.state.teamData[i].battingOrder + 1});
-      }
-      console.log(tempExtraData);
-      this.props.navigation.navigate('RosterScreen', { roster: this.state.teamData, extraData: tempExtraData, formatRow: [80,20]});
-      */
-   }
+      this.props.navigation.navigate('Roster', { team: this.mGame.battingTeam, view: 'batting'});     
+    }
 
-    setPlayerPosition = (playerIx, fieldPos) => {
-        //var temp = [...this.state.teamData];
-        //temp[playerIx].positionByInning[this.inningNumber() - 1] = fieldPos;
-    };
+    onPitcherChange = (newPitcherIx) => {
+      var currentPitcherIx = this.mGame.fieldingTeam.fieldPositions[0];
+      console.log(this.mGame.fieldingTeam.fieldPositions);
+      console.log("Got Pitcher change " + newPitcherIx + " Current: " + currentPitcherIx);
 
-    onPitcherChange = (newPitcherId) => {
-      console.log("Got Pitcher change " + newPitcherId);
-
-      /*
-      if (newPitcherId == this.state.currentPitcher) {
+      
+      if (newPitcherIx == currentPitcherIx) {
         console.log("No change in pitcher!");
         return;
       }
-
-
+  
       //baseline is to swap with other position:
-      var fieldPos = this.state.teamData[newPitcherId].positionByInning[this.inningNumber() - 1];
-      console.log("old position was " + fieldPos);
+      //Update team orders
+      var oldPos = this.mGame.fieldingTeam.roster[newPitcherIx].positionByInning[0];
+      console.log(`Old position for new pitcher was ${oldPos}`);
 
-      //set old pitcher to that position:
-      this.setPlayerPosition(this.state.currentPitcher, fieldPos);
+      //Updated old Player's positionByInning:
+      this.mGame.fieldingTeam.roster[currentPitcherIx].positionByInning[0] = oldPos;
+      //set new player's position to Pitcher:
+      this.mGame.fieldingTeam.roster[newPitcherIx].positionByInning[0] = 0;
 
-      //set up new pitcher
+      //Update fieldPositionsArray
+      this.mGame.fieldingTeam.fieldPositions[oldPos] = this.mGame.fieldingTeam.fieldPositions[0];
+      this.mGame.fieldingTeam.fieldPositions[0] = newPitcherIx;
 
-      this.setPlayerPosition(newPitcherId, 0);
-      this.setState ( { currentPitcher : newPitcherId } );
-      console.log(this.state.teamData);
-      */
+      console.log(this.mGame.fieldingTeam.fieldPositions);
+
+      //Since I'm not tying this to state now, just force the update
+      this.forceUpdate();
+
     }
 
     onMachineChange = () => {      

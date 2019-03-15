@@ -37,14 +37,11 @@ export default class GameStateView extends Component {
         return jsx;
     }
 
-    makeInningScores = (team) => {
+    makeInningScores = (offset) => {
 
         var jsx=[];
-        if (team == this.props.game.awayTeam) {
-            offset = 0;
-        } else {
-            offset = 1;
-        }
+
+        //offset - 0 for away, 1 for home
         totalScore = 0;
 
 
@@ -87,11 +84,11 @@ export default class GameStateView extends Component {
                 </Row>
                 <Row size={25} style={StyleSheet.statusRow2} >
                     <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.awayTeam.name}</Text></Col>
-                    {this.makeInningScores(this.props.game.awayTeam)}
+                    {this.makeInningScores(0)}
                 </Row>
                 <Row size={25} style={StyleSheet.statusRow2} >
                     <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.homeTeam.name}</Text></Col>
-                    {this.makeInningScores(this.props.game.homeTeam)}
+                    {this.makeInningScores(1)}
                 </Row>
            </Grid>
         );

@@ -7,6 +7,10 @@ class PitcherStats {
     strikeOuts = 0;
     hitBatter = 0;
     battersFaced = 0;
+
+    get pitches() {
+        return (this.balls + this.strikes);
+    }
 }
 
 class BatterStats {
@@ -43,6 +47,10 @@ export default class Player {
         this.battingOrder = battingOrder;
         this.positionByInning[0] = position;
         this.abbrev = this.makeAbbrev(playername);
+    }
+
+    get currentPosition() {
+        return this.positionByInning[0];
     }
 
     makeAbbrev = (name) => {

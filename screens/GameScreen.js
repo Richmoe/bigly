@@ -325,7 +325,7 @@ export default class GameScreen extends React.Component {
       return (
         <Grid style={styles.container}>
 
-        <Row size={10}>
+        <Row size={12} >
         { this.mGame.myTeamIsBatting == false && 
           <PitcherView 
             onPitcherChange = {this.onPitcherClick} 
@@ -342,14 +342,12 @@ export default class GameScreen extends React.Component {
         }
         </Row>
 
-        <Row size={5}>
-
-        </Row>
-        <Row size={10}>
+        
+        <Row size={10} style={{backgroundColor: 'green'}}>
           <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} />
         </Row>
 
-        <Row size={55} style={{backgroundColor: 'red'}}>
+        <Row size={58} style={{backgroundColor: 'red'}}>
 
         </Row>
         <Row size={20}>

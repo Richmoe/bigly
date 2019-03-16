@@ -21,19 +21,19 @@ export default class PitcherView extends Component {
             <Col size={15}>
                 <TouchableOpacity onPress={() => this.props.onMachineChange()}>  
                     {true && <Image 
-                        style={{marginTop: 20, marginLeft: 5, width: 75, height: 75}} 
+                        style={{marginTop: 2, marginLeft: 2, width: 65, height: 65, resizeMode: 'contain'}} 
                         source={this.props.isMachinePitch ? require("../assets/images/pitchingMachine.png") : require("../assets/images/small-baseball.png")} 
                     />
                     }
                 </TouchableOpacity>
             </Col>
-            <Col size={60}>
+            <Col size={55}>
                 <TouchableOpacity onPress={() => this.props.onPitcherChange()}>       
                     <Text style={styles.pitcherName}>{this.props.pitcher.name}</Text>
                 </TouchableOpacity>   
             </Col>
-            {this.props.isMachinePitch && <Col size={25} />}
-            {!this.props.isMachinePitch && <Col size={25} >
+            {this.props.isMachinePitch && <Col size={30} />}
+            {!this.props.isMachinePitch && <Col size={30} >
                 <Row >
                     <Col>
                         <Text style={styles.pitchdata}>Balls:</Text>
@@ -69,22 +69,22 @@ export default class PitcherView extends Component {
 
   const styles = StyleSheet.create({
     container: {
-
+        alignItems: 'center',
 
     },
     pitcherName: {
 
-      fontSize: 32,
+      fontSize: 24,
       textAlign: 'left',
       textAlignVertical: 'center',
       margin: 10,
       height: '100%',
     },
     pitchdata: {
-        fontSize: 24,
+        fontSize: 18,
     },
     totaldata: {
-        fontSize: 28,
+        fontSize: 20,
         fontWeight: 'bold',
     },
   });

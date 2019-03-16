@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     },
     elementStyle: {
         flex: 1,
-        fontSize: 30,
+        fontSize: 20,
     },
     box: {
         borderColor: 'black',

@@ -77,19 +77,26 @@ export default class Game {
         }
     }
 
+    addScore(scoreCount) {
+
+        this.innings[this.currentInning].runs += scoreCount;
+
+    }
+
     get score() {
         //Walk the innings array to add scores. Could use reduce but I like to see it spelled out.
         awayScore = 0;
         homeScore = 0;
         for (var i = 0; i < this.innings.length; i++) {
             if (i % 2 == 0) {
-                awayScore += this.innings.runs;
+                awayScore += this.innings[i].runs;
             } else {
-                homeScore += this.innings.runs;
+                homeScore += this.innings[i].runs;
             }
         }
 
-        return awayScore, homeScore;
+
+        return {away: awayScore, home: homeScore} ;
     }
 }
 

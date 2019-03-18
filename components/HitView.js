@@ -25,8 +25,6 @@ export default class HitView extends Component {
     fieldWidth;
     fieldHeight;
 
-    battingTeam;
-
     constructor(props){
         console.log("Construct HitView");
   
@@ -36,14 +34,6 @@ export default class HitView extends Component {
         //battingTeam - Team object
         //resolve - resolveCB
 
-        //Runner at Base contains baseRunner array IDs
-        //this.runnerAtBase = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
-
-        //this.runnerAtBase = this.props.baseRunners;
-        this.battingTeam = this.props.battingTeam;
-        //this.resolveCB = this.props.navigation.getParam("resolve", null),
-        //put runners at their bases:
-        //this.resetRunners();
         //test
         //this.runnerAtBase = [0,1,2,3,4,5,6,7,8,9,10];
 
@@ -160,7 +150,7 @@ export default class HitView extends Component {
 
     getAbbrev = (positionIx) => {
       var runnerIx = this.props.baseRunners[positionIx];
-      return this.battingTeam.roster[runnerIx].abbrev;
+      return this.props.battingTeam.roster[runnerIx].abbrev;
     }
 
     getFName = (positionIx) => {
@@ -169,12 +159,12 @@ export default class HitView extends Component {
         return "";
       } else {
         //For our team, just pull first naem
-        if (this.battingTeam.myTeam) {
-          var names = this.battingTeam.roster[runnerIx].name.split(" ");
+        if (this.props.battingTeam.myTeam) {
+          var names = this.props.battingTeam.roster[runnerIx].name.split(" ");
           return names[0];
         } else {
           //return just the full name of the opponent team
-          return this.battingTeam.roster[runnerIx].name;
+          return this.props.battingTeam.roster[runnerIx].name;
         }        
       }
     }

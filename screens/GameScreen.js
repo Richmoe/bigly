@@ -52,7 +52,8 @@ export default class GameScreen extends Component {
 
         this.state = {
             machinePitch: true,
-            score: [],
+            awayScore: 0,
+            homeScore: 0,
             outs: 0, 
             runs: 0,
             balls: 0,
@@ -123,21 +124,25 @@ export default class GameScreen extends Component {
         });
         */
 
-
-
         console.log(`New inning: ${this.mGame.inning} (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}`);
     };
 
     scoreRun(player, pitcher, runcount = 1) //Need to figure out RBIs etc.
     {
-      /*
+
       console.log("Score run " + runcount);
-        var newScore = this.state.score;
-        newScore[this.state.inning % 2] += runcount;
-        this.setState ( {
-            score : newScore
-        });
-        */
+      /*
+      var newScore = this.state.score;
+      newScore[this.state.inning % 2] += runcount;
+      this.setState ( {
+          score : newScore
+      });
+      */
+      this.mGame.addScore(runcount);
+      let {away, home} = this.mGame.score;
+      console.log(`Score: ${away} - ${home}`);
+      this.setState ({awayScore: away, homeScore: home});
+
     };
 
     updatePitcherStats = (pitchType) => {
@@ -204,7 +209,7 @@ export default class GameScreen extends Component {
             balls : curBallCount
         });
     }
-    titleStr = `Inning: ${this.mGame.inning} ${curBallCount}-${curStrikeCount} Outs: ${curOutCount} Score: 0-0`;
+    titleStr = `Inning: ${this.mGame.inning} ${curBallCount}-${curStrikeCount} Outs: ${curOutCount} Score: ${this.state.awayScore}-${this.state.homeScore}`;
 
     this.props.navigation.setParams({title: titleStr});
 
@@ -369,41 +374,7 @@ export default class GameScreen extends Component {
             />
         </Row>
 
-      return (
-        
-        <Grid style={styles.container}>
-
-          <Row size={10}>
-            {!this.isBatting() ? 
-              <PitchState onPitcherChange = {this.onPitcherClick} onMachineChange = {this.onMachineChange} isMachinePitch={this.state.machinePitch} currentPitcher = {this.state.teamData[this.state.currentPitcher]} />
-              :
-              <BatterState roster={this.state.teamData} onClick = {this.onBatterClick} curBatter= {this.state.batterUp}/>
-            }
-          </Row>
-
-          <Row size={5}>
-
-          </Row>
-          <Row size={10}>
-
-
-          <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitch} />
-          </Row>
-
-          <Row size={55}>
-            { true && <FieldView baseRunners={this.onBase} />}
-          </Row>
-          <Row size={20}>
-          <GameState style={styles.gamestate}
-            balls = {this.state.balls}
-            strikes = {this.state.strikes}
-            outs = {this.state.outs}
-            inning = {this.state.inning}
-          />
-          </Row>
-          
-        </Grid>
-      );
+     
        */
     }
 

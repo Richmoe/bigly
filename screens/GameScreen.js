@@ -17,15 +17,24 @@ import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
 import BatterView from '../components/BatterView.js';
 import GameStateView from '../components/GameStateView.js';
+import FieldView from '../components/FieldView.js';
+import HitView from '../components/HitView.js';
+
 
 /*
 import PlayerStats from './PlayerStats.js';
-import FieldView from './FieldView.js';
 */
 
-export default class GameScreen extends React.Component {
-    
-    mOnBase;
+export default class GameScreen extends Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: navigation.getParam('title', 'Dragons'),
+    };
+  };
+
+
+    mBaseRunners;
+    mBaseRunnersPreHit; //Store off copy of pre-hit UX runners in case we need to reset
     mGame;
 
     constructor(props) {
@@ -37,29 +46,9 @@ export default class GameScreen extends React.Component {
 
 
         this.mGame = defaultGame;
+        //console.log(this.mGame);
+        batterUp = this.mGame.nextBatter;
 
-        //Make sure we sort by battingOrder        
-        //gameRoster.sort((a,b) => a.battingOrder - b.battingOrder);
-
-        /*
-        //Create teamStats:
-        teamStats = [];
-        for (var i = 0;i<gameRoster.length;i++)
-        {
-          teamStats.push(new PlayerStats(gameRoster[i].name, gameRoster[i].battingOrder, gameRoster[i].fieldingPos));
-          //Store off current pitcher IX
-          if (gameRoster[i].fieldingPos == 0)
-          {
-            console.log("starting pitcher is ix " + i);
-            curPitcher = i;
-          }
-        }
-        console.log(teamStats);
-        */
-
-        console.log(this.mGame);
-
-        this.mOnBase = [100,-1,-1,-1];
 
         this.state = {
             machinePitch: true,
@@ -68,23 +57,20 @@ export default class GameScreen extends React.Component {
             runs: 0,
             balls: 0,
             strikes: 0,
+            inHittingUX: false,
+            batterUp: batterUp
 
         }
 
-        /*
-        this.pitch = this.pitch.bind(this);
-
-        //create 2d array for scores
-        var scoreInit = new Array(5).fill(0);
-        this.state.score.push(scoreInit);
-        this.state.score.push(scoreInit);
-        */
+        this.mBaseRunners = [batterUp,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
+        
     }
 
 
     _testGame () {
       homeTeam = new Team("Dragons");
       homeTeam._createDefaultMyRoster();
+      homeTeam.myTeam = true;
 
       awayTeam = new Team("Opponent");
       awayTeam._createDefaultRoster();
@@ -98,9 +84,9 @@ export default class GameScreen extends React.Component {
 
 
     setBatter (batter) {
-      this.mOnBase[0] = batter;
+      this.mBaseRunners[0] = batter;
 
-      console.log(`mOnBase: ${this.mOnBase}`);
+      console.log(`mBaseRunners: ${this.mBaseRunners}`);
     }
 
     nextBatter() {
@@ -116,16 +102,15 @@ export default class GameScreen extends React.Component {
         }
                 */
         this.setState( {batterUp: batterUp }) ;
-        this.setBatter(batterUp);
-
-
+        this.mBaseRunners[0] = batterUp;
     };
 
     newInning() {
 
       this.mGame.newInning();
       this.setState( { outs: 0 } );
-      this.mOnBase = [-1,-1,-1,-1];
+
+      this.mBaseRunners = [-1, -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
       this.nextBatter();
       /*
        
@@ -140,7 +125,7 @@ export default class GameScreen extends React.Component {
 
 
 
-        console.log(`New inning: ${this.mGame.inning} (TOP: ${this.mGame.isTop}), starting onBase: ${this.mOnBase}`);
+        console.log(`New inning: ${this.mGame.inning} (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}`);
     };
 
     scoreRun(player, pitcher, runcount = 1) //Need to figure out RBIs etc.
@@ -169,11 +154,8 @@ export default class GameScreen extends React.Component {
 
     }
 
-
-
     pitchCallback = (pitchType) => {
 
-      //Special case hit???
 
       if (!this.state.machinePitch)  this.updatePitcherStats(pitchType);
 
@@ -189,6 +171,12 @@ export default class GameScreen extends React.Component {
         if (curStrikeCount < 2) {
             ++curStrikeCount;
         }
+      } else if (pitchType === 'done') {
+        this.resolveHit();
+        this.setState( {inHittingUX: false});
+      } else if (pitchType == 'reset') {
+        this.mBaseRunners = [...this.mBaseRunnersPreHit];
+        this.setState( {inHittingUX: false});
       } else {
         console.log("error pitch type: " + pitchType);
       }
@@ -216,6 +204,9 @@ export default class GameScreen extends React.Component {
             balls : curBallCount
         });
     }
+    titleStr = `Inning: ${this.mGame.inning} ${curBallCount}-${curStrikeCount} Outs: ${curOutCount} Score: 0-0`;
+
+    this.props.navigation.setParams({title: titleStr});
 
     };
 
@@ -226,6 +217,12 @@ export default class GameScreen extends React.Component {
 
     onBatterClick = () => {
       this.props.navigation.navigate('Roster', { team: this.mGame.battingTeam, view: 'batting'});     
+    }
+
+    onHitClick = () => {
+      console.log("OHC!");
+      this.mBaseRunnersPreHit = [...this.mBaseRunners];
+      this.setState({inHittingUX : true});
     }
 
     onPitcherChange = (newPitcherIx) => {
@@ -265,36 +262,30 @@ export default class GameScreen extends React.Component {
     }
 
     totalRunners = (total, num) => {
-      if (num > 0) {
+      if (num >= 0) {
         return (total + 1);
       } else {
         return total;
       }
     }
 
-    resolveHit = (runnersOnBase) => {
-      /*
+    resolveHit = () => {
+      
       //This is where we determine who ended where
-      if (this.isBatting()) {
+      if (this.mGame.myTeamIsBatting) {
         console.log("resolveHit is batting");
       } else {
         console.log("resolveHit is fielding");
       }
-      console.log(runnersOnBase);
+      console.log(this.mBaseRunners);
 
       //Store current Batter:
-
-      //Get updated onBase
-      this.onBase = runnersOnBase.slice(0,4);
-
-      console.log(`onBase: ${this.onBase}`);
-
       //Find batter:
-      var batterLoc = runnersOnBase.indexOf(this.state.batterUp);
+      var batterLoc = this.mBaseRunners.indexOf(this.state.batterUp);
       console.log(`batter advanced to ${batterLoc}`);
 
       //get runs:
-      var runs = runnersOnBase.slice(4,8);
+      var runs = this.mBaseRunners.slice(4,8);
       var runCount = runs.reduce(this.totalRunners,0);
       console.log("runCount " + runCount);
       console.log(runs);
@@ -302,7 +293,7 @@ export default class GameScreen extends React.Component {
 
 
       //get outs:
-      var outs = runnersOnBase.slice(8,11);
+      var outs = this.mBaseRunners.slice(8,11);
       var outCount = outs.reduce(this.totalRunners,0);
       if (outCount > 0) {
         var curOutCount = this.state.outs + outCount;
@@ -315,17 +306,35 @@ export default class GameScreen extends React.Component {
       } else {
         this.nextBatter();
       }
-      */
+
+      //Clean out extra status:
+      this.mBaseRunners.fill(-1,4);
+      
     }
 
+    onLayout = (event) => {
+      this.fieldX = Math.floor(event.nativeEvent.layout.x);
+      this.fieldY = Math.floor(event.nativeEvent.layout.y);
+      this.fieldWidth = Math.floor(event.nativeEvent.layout.width);
+      this.fieldHeight = Math.floor(event.nativeEvent.layout.height);
+      console.log(`Field Dims: ${this.fieldWidth} x ${this.fieldHeight} at ${this.fieldX},${this.fieldY}`);
+  }
+
     render() {
-      temp = this.mGame.fieldingTeam.playerByPos(0);
-      console.log(temp);
+      console.log(this.mBaseRunners);
  
       return (
         <Grid style={styles.container}>
 
-        <Row size={12} >
+        
+        <Row size={80} onLayout = {(event) => this.onLayout(event)}>
+          <HitView baseRunners = {this.mBaseRunners} battingTeam={this.mGame.battingTeam} clickCB={this.onHitClick} />
+        </Row>
+        
+        <Row size={10} >
+          <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} isHitting= {this.state.inHittingUX} />
+        </Row>
+        <Row size={10} >
         { this.mGame.myTeamIsBatting == false && 
           <PitcherView 
             onPitcherChange = {this.onPitcherClick} 
@@ -342,22 +351,7 @@ export default class GameScreen extends React.Component {
         }
         </Row>
 
-        
-        <Row size={10} style={{backgroundColor: 'green'}}>
-          <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} />
-        </Row>
 
-        <Row size={58} style={{backgroundColor: 'red'}}>
-
-        </Row>
-        <Row size={20}>
-          <GameStateView style={styles.gamestate}
-              balls = {this.state.balls}
-              strikes = {this.state.strikes}
-              outs = {this.state.outs}
-              game = {this.mGame}
-            />
-        </Row>
         
       </Grid>
 
@@ -365,6 +359,16 @@ export default class GameScreen extends React.Component {
             
       
 /*
+
+        <Row size={0}>
+          <GameStateView style={styles.gamestate}
+              balls = {this.state.balls}
+              strikes = {this.state.strikes}
+              outs = {this.state.outs}
+              game = {this.mGame}
+            />
+        </Row>
+
       return (
         
         <Grid style={styles.container}>
@@ -407,16 +411,16 @@ export default class GameScreen extends React.Component {
 
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      flexDirection: 'column',
+      //flex: 1,
+      //flexDirection: 'column',
 
     },
     pitchcontrol: {
-        flex: .5,
+        //flex: .5,
         backgroundColor: 'yellow',
     },
     gamestate: {
-        flex: 3,
+        //flex: 3,
         backgroundColor: 'green',
     }
   });

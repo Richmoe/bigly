@@ -13,33 +13,45 @@ export default class PitchControl extends Component {
 
     return (
       <Grid>
-          <Row>
+        {this.props.isHitting && 
+        <Row>
+
+          <Col style={styles.container}>
+            <TouchableOpacity onPress={() => this.props.clickHandler("done")}>
+              <Text style={styles.buttonish}>Done</Text>
+            </TouchableOpacity>
+          </Col>
             <Col style={styles.container}>
-                <TouchableOpacity onPress={() => this.props.clickHandler("strike")}>
-                  <Text style={styles.buttonish}>Strike</Text>
-                </TouchableOpacity>
-            </Col>
-            <Col style={styles.container}>
-                <TouchableOpacity onPress={() => this.props.clickHandler("ball")}>
-                  <Text style={styles.buttonish}>Ball</Text>
-                </TouchableOpacity>
-            </Col>
-            <Col style={styles.container}>
-                <TouchableOpacity onPress={() => this.props.clickHandler("foul")}>
-                  <Text style={styles.buttonish}>Foul</Text>
-                </TouchableOpacity>
-            </Col>
-            <Col style={styles.container}>
-                <TouchableOpacity onPress={() => this.props.clickHandler("hbp")}>
-                  <Text style={styles.buttonish}>HBP</Text>
-                </TouchableOpacity>
-            </Col>
-            <Col style={styles.container}>
-                <TouchableOpacity onPress={() => this.props.clickHandler("hit")}>
-                  <Text style={styles.buttonish}>Hit</Text>
-                </TouchableOpacity>
-            </Col>
-          </Row>
+              <TouchableOpacity onPress={() => this.props.clickHandler("reset")}>
+                <Text style={styles.buttonish}>Reset</Text>
+              </TouchableOpacity>
+          </Col>
+        </Row>
+        }
+        {!this.props.isHitting &&
+        <Row>
+          <Col style={styles.container}>
+              <TouchableOpacity onPress={() => this.props.clickHandler("strike")}>
+                <Text style={styles.buttonish}>Strike</Text>
+              </TouchableOpacity>
+          </Col>
+          <Col style={styles.container}>
+              <TouchableOpacity onPress={() => this.props.clickHandler("ball")}>
+                <Text style={styles.buttonish}>Ball</Text>
+              </TouchableOpacity>
+          </Col>
+          <Col style={styles.container}>
+              <TouchableOpacity onPress={() => this.props.clickHandler("foul")}>
+                <Text style={styles.buttonish}>Foul</Text>
+              </TouchableOpacity>
+          </Col>
+          <Col style={styles.container}>
+              <TouchableOpacity onPress={() => this.props.clickHandler("hbp")}>
+                <Text style={styles.buttonish}>HBP</Text>
+              </TouchableOpacity>
+          </Col>
+        </Row>
+         }
       </Grid>
     );
   }

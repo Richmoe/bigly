@@ -13,7 +13,6 @@ export default class GameStateView extends Component {
     //Props:
     // game - Game object
     // outs, balls, strikes
-
     
     getInningText = () => {
         returnString = this.props.game.inning;
@@ -72,7 +71,7 @@ export default class GameStateView extends Component {
 
     render() {
         return (
-             <Grid style= { styles.statusStyle } >
+            <Grid style= { styles.statusStyle } >
                 <Row size = {25} style= {styles.statusRow1} >
                     <Text style = { [styles.elementStyle, styles.L]}>{this.getInningText()}</Text>
                     <Text style = { [styles.elementStyle, styles.C]}>Outs: {this.props.outs}</Text>  
@@ -90,7 +89,7 @@ export default class GameStateView extends Component {
                     <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.homeTeam.name}</Text></Col>
                     {this.makeInningScores(1)}
                 </Row>
-           </Grid>
+            </Grid>
         );
     }
 };
@@ -99,12 +98,7 @@ export default class GameStateView extends Component {
 const styles = StyleSheet.create({
 
     statusStyle: {
-        /*flex: 1,
-        flexDirection: 'column',
-        backgroundColor: 'white',
-        borderColor: 'blue',
-        borderWidth: 2,
-        */
+
     },
     statusRow1: {
 

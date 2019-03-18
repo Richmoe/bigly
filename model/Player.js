@@ -41,12 +41,18 @@ export default class Player {
     positionByInning = new Array(5).fill(0);
 
     constructor(playername, battingOrder, position) {
-        //what should I do here?
 
-        this.name = playername;
+        //If they don't have a name, generate one
+        if (playername == "") {
+            this.name = "Player " + battingOrder;
+            this.abbrev = "P" + battingOrder;
+        } else {
+            this.name = playername;
+            this.abbrev = this.makeAbbrev(playername);
+        }
         this.battingOrder = battingOrder;
         this.positionByInning[0] = position;
-        this.abbrev = this.makeAbbrev(playername);
+
     }
 
     get currentPosition() {

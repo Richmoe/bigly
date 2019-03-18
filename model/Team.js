@@ -7,6 +7,7 @@ export default class Team
     battingOrder = []; //array of batting order. Value = index into roster.
     currentBatterIx = -1; //Start with -1 because we always call nextBatter;
     fieldPositions = []; //Array of field pos, 0 = pitcher. Value = index into roster.
+    myTeam = false;
     //Stats = wins, losses
 
     constructor(teamName) {
@@ -51,7 +52,7 @@ export default class Team
             if (names) {
                 name = names[i];
             } else {
-                name = "Player " + tempBattingOrder[i];
+                name = "";
             }
             player = new Player(name, tempBattingOrder.indexOf(i), tempFieldingPos.indexOf(i));
 

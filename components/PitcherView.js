@@ -21,7 +21,7 @@ export default class PitcherView extends Component {
             <Col size={15}>
                 <TouchableOpacity onPress={() => this.props.onMachineChange()}>  
                     {true && <Image 
-                        style={{marginTop: 2, marginLeft: 2, width: 65, height: 65, resizeMode: 'contain'}} 
+                        style={{marginTop: 2, marginLeft: 2, width: 30, height: 30, resizeMode: 'contain'}} 
                         source={this.props.isMachinePitch ? require("../assets/images/pitchingMachine.png") : require("../assets/images/small-baseball.png")} 
                     />
                     }
@@ -74,17 +74,17 @@ export default class PitcherView extends Component {
     },
     pitcherName: {
 
-      fontSize: 24,
+      fontSize: 20,
       textAlign: 'left',
       textAlignVertical: 'center',
       margin: 10,
       height: '100%',
     },
     pitchdata: {
-        fontSize: 18,
+        fontSize: 14,
     },
     totaldata: {
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: 'bold',
     },
   });

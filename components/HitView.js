@@ -44,12 +44,13 @@ export default class HitView extends Component {
           stylesPos[i].top *= REF_XSCALER/400;
         }
 
+        /*
         this.state = { 
           menuOpen: false,
           selectedPosition: 0,
 
         };
-       
+       */
         console.log(`HitView onBase: ${this.props.baseRunners}`);
     }
 
@@ -59,15 +60,6 @@ export default class HitView extends Component {
         this.fieldWidth = Math.floor(event.nativeEvent.layout.width);
         this.fieldHeight = Math.floor(event.nativeEvent.layout.height);
         console.log(`Field Dims: ${this.fieldWidth} x ${this.fieldHeight} at ${this.fieldX},${this.fieldY}`);
-    }
-
-
-    resetRunners = () => {
-      //This will reset the runner-at-base array which is:
-      // 0-3 = Original starting baserunners
-      // 4-7 = Runs scored
-      // 8-10 = Outs (max 3)
-      //this.props.baseRunners = [...this.baseRunners, -1,-1,-1,-1,  -1,-1,-1];
     }
    
     advanceRunner = (ix) => {
@@ -129,23 +121,27 @@ export default class HitView extends Component {
         }
       }
 
+      /*
       this.setState( {
         menuOpen: !this.state.menuOpen,
         selectedPosition: -1
       });
+      */
 
     }
 
     onPress = (position) => {
-      this.props.clickCB();
+      this.props.clickCB(position);
+      /*
       this.setState( 
         {menuOpen: !this.state.menuOpen,
         selectedPosition: position });
-
+          */
     }
 
     onMenuSelect = (value) => {
-      this.resolveRunners(this.state.selectedPosition, value);
+      this.resolveRunners(this.props.clickPos, value);
+      this.props.clickCB(-1);
     }
 
     getAbbrev = (positionIx) => {
@@ -193,7 +189,7 @@ export default class HitView extends Component {
     }
 
     renderMenuOptions = () => {
-      if (this.state.selectedPosition == 0)
+      if (this.props.clickPos == 0)
       { 
         return (
           <View >
@@ -206,9 +202,9 @@ export default class HitView extends Component {
         );
       } else {
         menuJSX = [];
-        if (this.state.selectedPosition < 2) menuJSX.push(<MenuOption key={1} text="1st" value={1} />);  
-        if (this.state.selectedPosition < 3) menuJSX.push(<MenuOption key={2} text="2nd" value={2} />);
-        if (this.state.selectedPosition < 4) menuJSX.push(<MenuOption key={3} text="3rd" value={3} />);
+        if (this.props.clickPos < 2) menuJSX.push(<MenuOption key={1} text="1st" value={1} />);  
+        if (this.props.clickPos < 3) menuJSX.push(<MenuOption key={2} text="2nd" value={2} />);
+        if (this.props.clickPos < 4) menuJSX.push(<MenuOption key={3} text="3rd" value={3} />);
         menuJSX.push(<MenuOption key={4} text="Run" value={4} />);
         menuJSX.push(<MenuOption key={5} text="Out" value={5} />);
 
@@ -229,16 +225,13 @@ export default class HitView extends Component {
 
                 {this.renderBaserunners()}
                
-                <Menu opened={this.state.menuOpen} onSelect={(value) => this.onMenuSelect(value)}>
+                <Menu opened={this.props.showMenu} onSelect={(value) => this.onMenuSelect(value)}>
                   <MenuTrigger customStyles={trigStyles} disabled={true}/>
                   <MenuOptions customStyles={optionStyles}>
-                    <MenuOption disabled={true}><Text style={{fontSize: 28, fontWeight: 'bold'}}>{this.getFName(this.state.selectedPosition)}</Text></MenuOption>
+                    <MenuOption disabled={true}><Text style={{fontSize: 28, fontWeight: 'bold'}}>{this.getFName(this.props.clickPos)}</Text></MenuOption>
                     {this.renderMenuOptions()}
                   </MenuOptions>
                 </Menu>
-                <TouchableOpacity style = {styles.resetButton} onPress = {() => this.resetRunners()}> 
-                  <Text style ={styles.buttonText}>Reset</Text>
-              </TouchableOpacity >
               </ImageBackground>
             </View>
           </MenuProvider>

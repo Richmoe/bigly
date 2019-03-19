@@ -42,8 +42,8 @@ export default class Team
 
 
     _createDefaultRoster(names) {
-        tempBattingOrder = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11]);
-        tempFieldingPos = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11]);
+        tempBattingOrder = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        tempFieldingPos = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         
         defaultRoster = [];
     
@@ -75,7 +75,6 @@ export default class Team
                 "Gunner O'Neill",
                 "Hayden Hilpert",
                 "Hunter Rose",
-                "June Pierce",
                 "Leon Sievers",
                 "Sherif El-Shimi",
                 "Trent Sislow",

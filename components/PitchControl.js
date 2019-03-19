@@ -41,6 +41,11 @@ export default class PitchControl extends Component {
               </TouchableOpacity>
           </Col>
           <Col style={styles.container}>
+              <TouchableOpacity onPress={() => this.props.clickHandler("hit")}>
+                <Text style={styles.buttonish}>Hit</Text>
+              </TouchableOpacity>
+          </Col>
+          <Col style={styles.container}>
               <TouchableOpacity onPress={() => this.props.clickHandler("foul")}>
                 <Text style={styles.buttonish}>Foul</Text>
               </TouchableOpacity>

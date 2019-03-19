@@ -59,7 +59,9 @@ export default class GameScreen extends Component {
             balls: 0,
             strikes: 0,
             inHittingUX: false,
-            batterUp: batterUp
+            batterUp: batterUp,
+            hitSelected: -1,
+            hitMenu: false
 
         }
 
@@ -160,8 +162,7 @@ export default class GameScreen extends Component {
     }
 
     pitchCallback = (pitchType) => {
-
-
+      
       if (!this.state.machinePitch)  this.updatePitcherStats(pitchType);
 
       curStrikeCount = this.state.strikes;
@@ -176,14 +177,19 @@ export default class GameScreen extends Component {
         if (curStrikeCount < 2) {
             ++curStrikeCount;
         }
+      } else if (pitchType === 'hit') {
+        this.onHitClick(0); //trigger batter click
+        return;
       } else if (pitchType === 'hbp') {
         this.mBaseRunners.unshift(-1);
         this.mBaseRunners.pop();
-        this.resolveHit(true);
+        resolved = this.resolveHit(true);
         curStrikeCount = 0;
         curBallCount = 0;
       } else if (pitchType === 'done') {
-        this.resolveHit();
+        resolved = this.resolveHit();
+        //get current outs?
+
         this.setState( {inHittingUX: false});
       } else if (pitchType == 'reset') {
         this.mBaseRunners = [...this.mBaseRunnersPreHit];
@@ -238,10 +244,17 @@ export default class GameScreen extends Component {
       this.props.navigation.navigate('Roster', { team: this.mGame.battingTeam, view: 'batting'});     
     }
 
-    onHitClick = () => {
-      console.log("OHC!");
-      this.mBaseRunnersPreHit = [...this.mBaseRunners];
-      this.setState({inHittingUX : true});
+    onHitClick = (position) => {
+      console.log("OHC! " + position);
+      if (position == -1) {
+        //hide menu
+        this.setState({ hitSelected: -1, hitMenu: false});
+      } else {
+        //show menu
+        this.mBaseRunnersPreHit = [...this.mBaseRunners];
+        this.setState({ inHittingUX : true, hitSelected: position, hitMenu: true});
+      }
+
     }
 
     onPitcherChange = (newPitcherIx) => {
@@ -316,6 +329,7 @@ export default class GameScreen extends Component {
         var curOutCount = this.state.outs + outCount;
         this.setState( { outs: curOutCount });
         if (curOutCount >= 2){
+          curOutCount = 0;
           this.newInning();
         } else {
           this.nextBatter();
@@ -327,6 +341,7 @@ export default class GameScreen extends Component {
       //Clean out extra status, ix 4-11
       this.mBaseRunners.fill(-1,4);
       
+      return { runs: runCount, outs: curOutCount};
     }
 
     onLayout = (event) => {
@@ -345,7 +360,13 @@ export default class GameScreen extends Component {
 
         
         <Row size={80} onLayout = {(event) => this.onLayout(event)}>
-          <HitView baseRunners = {this.mBaseRunners} battingTeam={this.mGame.battingTeam} clickCB={this.onHitClick} />
+          <HitView 
+            baseRunners = {this.mBaseRunners} 
+            battingTeam={this.mGame.battingTeam} 
+            clickCB={this.onHitClick}
+            showMenu={this.state.hitMenu} 
+            clickPos={this.state.hitSelected}
+          />
         </Row>
         
         <Row size={10} >
@@ -368,13 +389,10 @@ export default class GameScreen extends Component {
         }
         </Row>
 
-
-        
       </Grid>
 
         );
-            
-      
+           
 /*
 
         <Row size={0}>

@@ -66,11 +66,12 @@ export default class GameScreen extends Component {
             batterUp: batterUp,
             hitSelected: -1,
             hitMenu: false
-
         }
 
         this.mBaseRunners = [batterUp,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
         
+        titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"}  ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
+        this.props.navigation.setParams({title: titleStr});
     }
 
 
@@ -85,15 +86,6 @@ export default class GameScreen extends Component {
       gameSettings = new GameParams(10,true,true);
 
       return new Game(homeTeam, awayTeam, gameSettings);
-
-
-    }
-
-
-    setBatter (batter) {
-      this.mBaseRunners[0] = batter;
-
-      console.log(`mBaseRunners: ${this.mBaseRunners}`);
     }
 
     nextBatter() {
@@ -101,15 +93,7 @@ export default class GameScreen extends Component {
         this.mGameState.strikes = 0;
 
         batterUp = this.mGame.nextBatter;
-        console.log("BatterUp: " + batterUp);
-        /*
-        if (this.isBatting()) {
-          batterUp = ((this.state.batterUp + 1 ) % this.state.teamData.length);
 
-        } else {
-          batterUp = 100;
-        }
-                */
         this.setState( {batterUp: batterUp }) ;
         this.mBaseRunners[0] = batterUp;
     };
@@ -123,18 +107,7 @@ export default class GameScreen extends Component {
 
       this.mBaseRunners = [-1, -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
       this.nextBatter();
-      /*
-       
-        this.setState ( {
-            inning : this.state.inning + 1,
-            outs: 0,
-            runs: 0,
-            balls: 0,
-            strikes: 0,
-        });
-        */
-
-        console.log(`New inning: ${this.mGame.inning} (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}`);
+      console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}`);
     };
 
     scoreRun(player, pitcher, runcount = 1) //Need to figure out RBIs etc.
@@ -220,19 +193,12 @@ export default class GameScreen extends Component {
         this.mBaseRunners.pop();
         this.resolveHit(true);
 
-      } else {
-        /*
-        console.log(`${pitchType}: ${curBallCount} - ${curStrikeCount}`);
-        this.setState( {
-            strikes: curStrikeCount,
-            balls : curBallCount
-        });
-        */
-    }
-    titleStr = `Inning: ${this.mGame.inning} ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
-    console.log(titleStr);
+      }
 
-    this.props.navigation.setParams({title: titleStr});
+      titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"} ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
+      console.log(titleStr);
+
+      this.props.navigation.setParams({title: titleStr});
 
     };
 
@@ -260,10 +226,7 @@ export default class GameScreen extends Component {
 
     onPitcherChange = (newPitcherIx) => {
       var currentPitcherIx = this.mGame.fieldingTeam.fieldPositions[0];
-      console.log(this.mGame.fieldingTeam.fieldPositions);
-      console.log("Got Pitcher change " + newPitcherIx + " Current: " + currentPitcherIx);
-
-      
+   
       if (newPitcherIx == currentPitcherIx) {
         console.log("No change in pitcher!");
         return;
@@ -351,43 +314,40 @@ export default class GameScreen extends Component {
   }
 
     render() {
-      console.log(this.mBaseRunners);
  
       return (
         <Grid style={styles.container}>
+          <Row size={80} onLayout = {(event) => this.onLayout(event)}>
+            <HitView 
+              baseRunners = {this.mBaseRunners} 
+              battingTeam={this.mGame.battingTeam} 
+              clickCB={this.onHitClick}
+              showMenu={this.state.hitMenu} 
+              clickPos={this.state.hitSelected}
+            />
+          </Row>
+          
+          <Row size={10} >
+            <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} isHitting= {this.state.inHittingUX} />
+          </Row>
+          <Row size={10} >
+          { this.mGame.myTeamIsBatting == false && 
+            <PitcherView 
+              onPitcherChange = {this.onPitcherClick} 
+              onMachineChange = {this.onMachineChange} 
+              isMachinePitch={this.state.machinePitch} 
+              pitcher = {this.mGame.fieldingTeam.playerByPos(0)} 
+            />
+          }
+          { this.mGame.myTeamIsBatting == true && 
+            <BatterView 
+              battingTeam = {this.mGame.battingTeam}
+              batterClick = {this.onBatterClick}
+            />
+          }
+          </Row>
 
-        
-        <Row size={80} onLayout = {(event) => this.onLayout(event)}>
-          <HitView 
-            baseRunners = {this.mBaseRunners} 
-            battingTeam={this.mGame.battingTeam} 
-            clickCB={this.onHitClick}
-            showMenu={this.state.hitMenu} 
-            clickPos={this.state.hitSelected}
-          />
-        </Row>
-        
-        <Row size={10} >
-          <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} isHitting= {this.state.inHittingUX} />
-        </Row>
-        <Row size={10} >
-        { this.mGame.myTeamIsBatting == false && 
-          <PitcherView 
-            onPitcherChange = {this.onPitcherClick} 
-            onMachineChange = {this.onMachineChange} 
-            isMachinePitch={this.state.machinePitch} 
-            pitcher = {this.mGame.fieldingTeam.playerByPos(0)} 
-          />
-        }
-        { this.mGame.myTeamIsBatting == true && 
-          <BatterView 
-            battingTeam = {this.mGame.battingTeam}
-            batterClick = {this.onBatterClick}
-          />
-        }
-        </Row>
-
-      </Grid>
+        </Grid>
 
         );
            

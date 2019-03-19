@@ -176,6 +176,12 @@ export default class GameScreen extends Component {
         if (curStrikeCount < 2) {
             ++curStrikeCount;
         }
+      } else if (pitchType === 'hbp') {
+        this.mBaseRunners.unshift(-1);
+        this.mBaseRunners.pop();
+        this.resolveHit(true);
+        curStrikeCount = 0;
+        curBallCount = 0;
       } else if (pitchType === 'done') {
         this.resolveHit();
         this.setState( {inHittingUX: false});
@@ -188,11 +194,14 @@ export default class GameScreen extends Component {
 
       if (curStrikeCount >= 3)
       {
+        curStrikeCount = 0;
+        curBallCount = 0;
         //strikeout
         ++curOutCount;
         if (curOutCount >= 3){
           console.log(`Strikeout! Retired the side`);
           this.newInning();
+          curOutCount = 0;
         } else {
           console.log(`Strikeout! Outs: ${curOutCount}`);
           this.setState( { outs: curOutCount });
@@ -200,8 +209,12 @@ export default class GameScreen extends Component {
         }
       } else if (curBallCount >= 4) {
         //Walk
-        console.log(`Walk`);
-        this.nextBatter();
+        //Update the baserunners: simply insert -1 to move the runner to 1st, then trim the last element (Out3 which is -1)
+        this.mBaseRunners.unshift(-1);
+        this.mBaseRunners.pop();
+        this.resolveHit(true);
+        curBallCount = 0;
+        curStrikeCount = 0;
       } else {
         console.log(`${pitchType}: ${curBallCount} - ${curStrikeCount}`);
         this.setState( {
@@ -210,6 +223,7 @@ export default class GameScreen extends Component {
         });
     }
     titleStr = `Inning: ${this.mGame.inning} ${curBallCount}-${curStrikeCount} Outs: ${curOutCount} Score: ${this.state.awayScore}-${this.state.homeScore}`;
+    console.log(titleStr);
 
     this.props.navigation.setParams({title: titleStr});
 
@@ -274,15 +288,13 @@ export default class GameScreen extends Component {
       }
     }
 
-    resolveHit = () => {
+    resolveHit = (walk) => {
       
-      //This is where we determine who ended where
-      if (this.mGame.myTeamIsBatting) {
-        console.log("resolveHit is batting");
-      } else {
-        console.log("resolveHit is fielding");
+      if (walk == null) {
+        console.log("resolveHit Hit");
+      }else {
+        console.log("resolveHit WALK");
       }
-      console.log(this.mBaseRunners);
 
       //Store current Batter:
       //Find batter:
@@ -297,7 +309,7 @@ export default class GameScreen extends Component {
       if (runCount > 0)  this.scoreRun(0,0,runCount);
 
 
-      //get outs:
+      //get outs - mBaseRunners ix 8-11
       var outs = this.mBaseRunners.slice(8,11);
       var outCount = outs.reduce(this.totalRunners,0);
       if (outCount > 0) {
@@ -312,7 +324,7 @@ export default class GameScreen extends Component {
         this.nextBatter();
       }
 
-      //Clean out extra status:
+      //Clean out extra status, ix 4-11
       this.mBaseRunners.fill(-1,4);
       
     }

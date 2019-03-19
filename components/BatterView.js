@@ -66,19 +66,19 @@ export default class BatterView extends Component {
     batImage: {
         marginTop: 2, 
         marginLeft: 2, 
-        width: 65, 
-        height: 65,
+        width: 30, 
+        height: 30,
         resizeMode: 'contain',
     },
     batter: {
-      fontSize: 24,
+      fontSize: 20,
       textAlign: 'left',
       textAlignVertical: 'center',
       margin: 10,
       height: '100%',
     },
     onDeck: {
-        fontSize: 20,
+        fontSize: 16,
         textAlign: 'left',
         textAlignVertical: 'center',
     },

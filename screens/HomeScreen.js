@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Button,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
@@ -35,17 +36,7 @@ export default class HomeScreen extends React.Component {
           </View>
 
           <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>Get started by opening</Text>
-
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
-
-            <Text style={styles.getStartedText}>
-              I'm reloading! !{Layout.window.width}!
-            </Text>
+              <Button title="Start Game" onPress={this._startGamePress}></Button>
           </View>
 
           <View style={styles.helpContainer}>
@@ -66,6 +57,21 @@ export default class HomeScreen extends React.Component {
     );
   }
 
+
+  /*
+              {this._maybeRenderDevelopmentModeWarning()}
+
+
+            <Text style={styles.getStartedText}>Get started by opening</Text>
+
+            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
+              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
+            </View>
+
+            <Text style={styles.getStartedText}>
+              I'm reloading! !{Layout.window.width}!
+            </Text>
+            */
   _maybeRenderDevelopmentModeWarning() {
     if (__DEV__) {
       const learnMoreButton = (
@@ -97,6 +103,13 @@ export default class HomeScreen extends React.Component {
     WebBrowser.openBrowserAsync(
       'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
     );
+  };
+
+
+
+  _startGamePress = () => {
+    this.props.navigation.navigate('Game');
+ 
   };
 }
 

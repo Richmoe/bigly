@@ -11,6 +11,8 @@ import RosterScreen from '../screens/RosterScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
+  Game: GameScreen,
+  Roster: RosterScreen,
 });
 
 HomeStack.navigationOptions = {

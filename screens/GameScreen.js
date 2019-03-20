@@ -182,8 +182,9 @@ export default class GameScreen extends Component {
           //Walk
           event.type = 'walk'; //overwrite
           //Update the baserunners: simply insert -1 to move the runner to 1st, then trim the last element (Out3 which is -1)
-          this.mBaseRunners.unshift(-1);
-          this.mBaseRunners.pop();
+          //this.mBaseRunners.unshift(-1);
+          //this.mBaseRunners.pop();
+          this.advanceRunner(1);
           this.resolveHit(true);
         }
 
@@ -192,8 +193,10 @@ export default class GameScreen extends Component {
             ++this.mGameState.strikes;
         }
       } else if (pitchType === 'hbp') {
-        this.mBaseRunners.unshift(-1);
-        this.mBaseRunners.pop();
+        //this.mBaseRunners.unshift(-1);
+        //this.mBaseRunners.pop();
+        //should be same as a walk
+        this.advanceRunner(1);
         resolved = this.resolveHit(true);
 
       } else if (pitchType === 'done') {
@@ -278,6 +281,17 @@ export default class GameScreen extends Component {
         return total;
       }
     }
+
+    advanceRunner = (ix) => {
+      if (this.mBaseRunners[(ix)] != -1) {
+        this.advanceRunner(ix+1);
+      }
+        
+      this.mBaseRunners[(ix)] = this.mBaseRunners[ix-1];
+      this.mBaseRunners[ix-1] = -1;
+      
+    }
+
 
     resolveHit = (walk) => {
       

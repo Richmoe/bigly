@@ -44,24 +44,10 @@ export default class HitView extends Component {
           stylesPos[i].top *= REF_XSCALER/400;
         }
 
-        /*
-        this.state = { 
-          menuOpen: false,
-          selectedPosition: 0,
-
-        };
-       */
         console.log(`HitView onBase: ${this.props.baseRunners}`);
     }
 
-    onLayout = (event) => {
-        this.fieldX = Math.floor(event.nativeEvent.layout.x);
-        this.fieldY = Math.floor(event.nativeEvent.layout.y);
-        this.fieldWidth = Math.floor(event.nativeEvent.layout.width);
-        this.fieldHeight = Math.floor(event.nativeEvent.layout.height);
-        console.log(`Field Dims: ${this.fieldWidth} x ${this.fieldHeight} at ${this.fieldX},${this.fieldY}`);
-    }
-   
+ 
     advanceRunner = (ix) => {
       if (this.props.baseRunners[(ix)] != -1) {
         this.advanceRunner(ix+1);
@@ -121,22 +107,10 @@ export default class HitView extends Component {
         }
       }
 
-      /*
-      this.setState( {
-        menuOpen: !this.state.menuOpen,
-        selectedPosition: -1
-      });
-      */
-
     }
 
     onPress = (position) => {
       this.props.clickCB(position);
-      /*
-      this.setState( 
-        {menuOpen: !this.state.menuOpen,
-        selectedPosition: position });
-          */
     }
 
     onMenuSelect = (value) => {
@@ -216,7 +190,7 @@ export default class HitView extends Component {
 
          return (
           <MenuProvider>
-            <View style={styles.container} onLayout = {(event) => this.onLayout(event)} >
+            <View style={styles.container} >
 
               <ImageBackground 
                 source={require('../assets/images/baseballDiamond.png')} 

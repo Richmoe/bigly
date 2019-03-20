@@ -5,7 +5,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
-
+import GameConst from "../constants/GameConst.js";
 
 export default class RosterScreen extends React.Component {
 
@@ -89,7 +89,7 @@ export default class RosterScreen extends React.Component {
         player = this.team.roster[val];
 
         if (this.view == "batting") {
-            return this.rowJSX(ix, (ix+1), player.name, player.currentPosition);
+            return this.rowJSX(ix, (ix+1), player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
         } else if (this.view == "pitching") {
             return this.rowJSX(ix, player.currentPosition, player.name, player.pitcherStats.pitches);
         } else {

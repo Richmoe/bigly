@@ -14,6 +14,14 @@ export default class Team
         this.name = teamName;
     }
 
+    get currentBatter() {
+        return this.roster[this.battingOrder[this.currentBatterIx]];
+    }
+
+    get currentPitcher() {
+        return this.roster[this.fieldPositions[0]];
+    }
+
     get nextBatter() {
 
         console.log(`Hmm. Batting order: ${this.battingOrder.length}`);

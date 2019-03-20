@@ -2,7 +2,7 @@ class PitcherStats {
     balls = 0;
     strikes = 0;
     hits = 0;
-    runsAgains = 0;
+    runsAgainst = 0;
     walks = 0;
     strikeOuts = 0;
     hitBatter = 0;

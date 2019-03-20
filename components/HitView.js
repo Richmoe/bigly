@@ -213,8 +213,7 @@ export default class HitView extends Component {
     }
 
     render() {
-      console.log("HV Render:");
-      console.log(this.props.baseRunners);
+
          return (
           <MenuProvider>
             <View style={styles.container} onLayout = {(event) => this.onLayout(event)} >

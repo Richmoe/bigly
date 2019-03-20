@@ -20,11 +20,6 @@ import GameStateView from '../components/GameStateView.js';
 import FieldView from '../components/FieldView.js';
 import HitView from '../components/HitView.js';
 
-
-/*
-import PlayerStats from './PlayerStats.js';
-*/
-
 export default class GameScreen extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -33,7 +28,7 @@ export default class GameScreen extends Component {
   };
 
 
-    mBaseRunners;
+    mBaseRunners; //Array (11 elements) containing IXs of players before and after a play. 0 = batter, 1-3 base, 4-8 are runs, 9-11 are outs
     mBaseRunnersPreHit; //Store off copy of pre-hit UX runners in case we need to reset
     mGame;
     mGameState;
@@ -49,6 +44,8 @@ export default class GameScreen extends Component {
         this.mGame = defaultGame;
         //console.log(this.mGame);
         batterUp = this.mGame.nextBatter;
+
+        this.mGame.parseEvent({type: 'atbat'});
 
         this.mGameState = {
           awayScore: 0,
@@ -83,9 +80,9 @@ export default class GameScreen extends Component {
       awayTeam = new Team("Opponent");
       awayTeam._createDefaultRoster();
       
-      gameSettings = new GameParams(10,true,true);
+      gameSettings = new GameParams(10,false,true);
 
-      return new Game(homeTeam, awayTeam, gameSettings);
+      return new Game(awayTeam, homeTeam, gameSettings);
     }
 
     nextBatter() {
@@ -96,6 +93,8 @@ export default class GameScreen extends Component {
 
         this.setState( {batterUp: batterUp }) ;
         this.mBaseRunners[0] = batterUp;
+
+        this.mGame.parseEvent({type: 'atbat'});
     };
 
     newInning() {
@@ -145,54 +144,66 @@ export default class GameScreen extends Component {
 
     pitchCallback = (pitchType) => {
 
+      //Special cases:
+      if (pitchType == 'reset') {
+        this.mBaseRunners = [...this.mBaseRunnersPreHit];
+        this.setState( {inHittingUX: false});
+        return;
+      } else if (pitchType === 'hit') {
+        this.onHitClick(0); //trigger batter click
+        return;
+      }
+
       if (!this.state.machinePitch)  this.updatePitcherStats(pitchType);
+
+      event = new Object();
+      event.type = pitchType
 
       if (pitchType === 'strike') {
         ++this.mGameState.strikes ;
+
+        if (this.mGameState.strikes >= 3) {
+          //strikeout
+          event.type = 'strikeout'; //overwrite
+          ++this.mGameState.outs;
+          if (this.mGameState.outs > 2){
+            console.log(`Strikeout! Retired the side`);
+  
+            this.newInning();
+          } else {
+            console.log(`Strikeout! Outs: ${this.mGameState.outs}`);
+            //this.setState( { outs: curOutCount });
+            this.nextBatter();
+          }
+        }
       } else if (pitchType === 'ball') {
         ++this.mGameState.balls;
+        if (this.mGameState.balls >= 4) {
+          //Walk
+          event.type = 'walk'; //overwrite
+          //Update the baserunners: simply insert -1 to move the runner to 1st, then trim the last element (Out3 which is -1)
+          this.mBaseRunners.unshift(-1);
+          this.mBaseRunners.pop();
+          this.resolveHit(true);
+        }
+
       } else if (pitchType === 'foul') {
         if (this.mGameState.strikes < 2) {
             ++this.mGameState.strikes;
         }
-      } else if (pitchType === 'hit') {
-        this.onHitClick(0); //trigger batter click
-        return;
       } else if (pitchType === 'hbp') {
         this.mBaseRunners.unshift(-1);
         this.mBaseRunners.pop();
         resolved = this.resolveHit(true);
+
       } else if (pitchType === 'done') {
         resolved = this.resolveHit();
         //get current outs?
 
         this.setState( {inHittingUX: false});
-      } else if (pitchType == 'reset') {
-        this.mBaseRunners = [...this.mBaseRunnersPreHit];
-        this.setState( {inHittingUX: false});
+        event = null; //We don't need to pass through the type since we handle the event in the Resolve
       } else {
         console.log("error pitch type: " + pitchType);
-      }
-
-      if (this.mGameState.strikes >= 3)
-      {
-        //strikeout
-        ++this.mGameState.outs;
-        if (this.mGameState.outs > 2){
-          console.log(`Strikeout! Retired the side`);
-          this.newInning();
-        } else {
-          console.log(`Strikeout! Outs: ${this.mGameState.outs}`);
-          //this.setState( { outs: curOutCount });
-          this.nextBatter();
-        }
-      } else if (this.mGameState.balls >= 4) {
-        //Walk
-        //Update the baserunners: simply insert -1 to move the runner to 1st, then trim the last element (Out3 which is -1)
-        this.mBaseRunners.unshift(-1);
-        this.mBaseRunners.pop();
-        this.resolveHit(true);
-
       }
 
       titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"} ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
@@ -200,6 +211,8 @@ export default class GameScreen extends Component {
 
       this.props.navigation.setParams({title: titleStr});
 
+      if (event != null) this.mGame.parseEvent(event);
+      //this.logEvent(event);
     };
 
     onPitcherClick = () => {
@@ -254,7 +267,8 @@ export default class GameScreen extends Component {
     }
 
     onMachineChange = () => {      
-      this.setState ( {machinePitch : !this.state.machinePitch});
+      //this.setState ( {machinePitch : !this.state.machinePitch});
+      this.mGame.isMachinePitching = !this.mGame.isMachinePitching;
     }
 
     totalRunners = (total, num) => {
@@ -268,7 +282,7 @@ export default class GameScreen extends Component {
     resolveHit = (walk) => {
       
       if (walk == null) {
-        console.log("resolveHit Hit");
+        console.log("resolveHit Hit " + this.mGame.battingTeam.battingOrder[this.mGame.battingTeam.currentBatterIx] + ", BatterUP: " + this.state.batterUp);
       }else {
         console.log("resolveHit WALK");
       }
@@ -278,11 +292,37 @@ export default class GameScreen extends Component {
       var batterLoc = this.mBaseRunners.indexOf(this.state.batterUp);
       console.log(`batter advanced to ${batterLoc}`);
 
+      if (batterLoc == 1)
+      {
+        this.mGame.parseEvent({type: 'single'});
+      } else if (batterLoc == 2) {
+        this.mGame.parseEvent({type: 'double'});
+      } else if (batterLoc == 3) {
+        this.mGame.parseEvent({type: 'triple'});
+      } else if (batterLoc > 7) {
+        //This assume batter hit the ball but was thrown out.
+        //batter is out, just count the pitch itself
+        this.mGame.parseEvent({type: 'strike'});
+      }
+
       //get runs:
-      var runs = this.mBaseRunners.slice(4,8);
-      var runCount = runs.reduce(this.totalRunners,0);
-      console.log("runCount " + runCount);
-      console.log(runs);
+      var runCount = 0;
+      //loop though:
+      for (var i = 4; i < 8;i++) {
+        if (this.mBaseRunners[i] != -1) {
+          ++runCount;
+
+          if (this.mBaseRunners[i] == this.state.batterUp)
+          {
+            this.mGame.parseEvent({type: 'homerun'});
+          } else {
+            this.mGame.parseEvent({type: 'run', other: this.mBaseRunners[i]});
+          }
+        }
+      }
+      //var runCount = runs.reduce(this.totalRunners,0);
+      //console.log("runCount " + runCount);
+      //console.log(runs);
       if (runCount > 0)  this.scoreRun(0,0,runCount);
 
 
@@ -305,19 +345,12 @@ export default class GameScreen extends Component {
       this.mBaseRunners.fill(-1,4);
     }
 
-    onLayout = (event) => {
-      this.fieldX = Math.floor(event.nativeEvent.layout.x);
-      this.fieldY = Math.floor(event.nativeEvent.layout.y);
-      this.fieldWidth = Math.floor(event.nativeEvent.layout.width);
-      this.fieldHeight = Math.floor(event.nativeEvent.layout.height);
-      console.log(`Field Dims: ${this.fieldWidth} x ${this.fieldHeight} at ${this.fieldX},${this.fieldY}`);
-  }
 
     render() {
  
       return (
         <Grid style={styles.container}>
-          <Row size={80} onLayout = {(event) => this.onLayout(event)}>
+          <Row size={80} >
             <HitView 
               baseRunners = {this.mBaseRunners} 
               battingTeam={this.mGame.battingTeam} 
@@ -335,7 +368,7 @@ export default class GameScreen extends Component {
             <PitcherView 
               onPitcherChange = {this.onPitcherClick} 
               onMachineChange = {this.onMachineChange} 
-              isMachinePitch={this.state.machinePitch} 
+              isMachinePitch={this.mGame.isMachinePitching} 
               pitcher = {this.mGame.fieldingTeam.playerByPos(0)} 
             />
           }

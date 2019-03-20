@@ -1,3 +1,21 @@
+//Keeping TODOs here:
+//Todo - set roster
+//Todo - arrange batting order
+//Todo - Set fielding order
+//Todo - randomize fielding order
+//Todo - Fielder view
+//Todo - stats view
+//Todo - clean up UX for the hitterview
+//Todo - check out alignment across iphone / android
+//Todo - run experience
+//Todo - Gamelog
+//Todo - scoreboard view
+//Todo - set game params view
+//Todo - figure out right approach for bottom bar
+//Todo - what about tracking hit but thrown out at a 2nd?
+//Todo - HBP is broken - runners advance???
+
+
 export default class Game {
 
     homeTeam; //type Team
@@ -6,6 +24,7 @@ export default class Game {
     currentInning; //Current Inning will be 0 based, top of inning = even, bottom = odd
     innings = []; //array of Inning objects
     gameSettings; //param
+    isMachinePitching;
 
     //stats:
     constructor(home, away, gameSettings) {
@@ -14,6 +33,7 @@ export default class Game {
         this.gameSettings = gameSettings;
         this.currentInning = 0;
         this.innings.push(new Inning());
+        this.isMachinePitching = true;
     }
 
 
@@ -98,6 +118,87 @@ export default class Game {
 
         return {away: awayScore, home: homeScore} ;
     }
+
+    parseEvent (event) {
+        console.log("In ParseEvent for event " + event.type );
+        //Shortcut:
+        var batterStats = this.battingTeam.currentBatter.batterStats;
+        var pitcherStats;
+        pitcherStats = this.battingTeam.currentPitcher.pitcherStats;
+        console.log("currently at bat is: " + this.battingTeam.currentBatter.name);
+        console.log("currently pitching is: " + this.fieldingTeam.currentPitcher.name);
+        switch (event.type) {
+            case 'atbat':
+                ++pitcherStats.battersFaced;
+                ++batterStats.atBats;
+                break;
+            case 'strike':
+                //this.battingTeam.currentPitcher.
+                ++pitcherStats.strikes;
+                break;
+            case 'foul':
+                ++pitcherStats.strikes;
+                break;
+            case 'strikeout':
+                ++pitcherStats.strikes;
+                ++pitcherStats.strikeOuts;
+                ++batterStats.strikeOuts;
+                break;        
+            case 'ball':
+                ++pitcherStats.balls;
+                break;        
+            case 'walk':
+                ++pitcherStats.balls;
+                ++pitcherStats.walks;
+                ++batterStats.walks;
+                break;
+            case 'hbp':
+                ++pitcherStats.balls;
+                ++pitcherStats.hitBatter;
+                ++batterStats.hitBatter;
+                //--batterStats.atBats; ???
+                break;
+            case 'single':
+                ++pitcherStats.strikes;
+                ++pitcherStats.hits;
+                ++batterStats.singles;
+                break;
+            case 'double':
+                ++pitcherStats.strikes;
+                ++batterStats.doubles;
+                break;        
+            case 'triple':
+                ++pitcherStats.strikes;
+                ++batterStats.triples;
+                break;        
+            case 'homerun':
+                ++pitcherStats.strikes;
+                ++pitcherStats.runsAgainst;
+                ++batterStats.homeRuns;
+                ++batterStats.runs;
+                ++batterStats.RBIs;
+                break;
+            case 'run':
+                ++pitcherStats.runsAgainst;
+                ++batterStats.RBIs;
+
+                //Get the other runner here
+                ++this.battingTeam.roster[event.other].batterStats.runs;
+                break;
+            case 'out':
+                break;
+            case 'error':
+                break;
+            case 'doubleplay':
+                break;
+            default:
+                break;
+        } 
+        
+        console.log(batterStats);
+        console.log(pitcherStats);
+    }
+
 }
 
 

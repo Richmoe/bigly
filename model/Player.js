@@ -59,6 +59,10 @@ export default class Player {
         return this.positionByInning[0];
     }
 
+    setPosition(pos) {
+        this.positionByInning[0] = pos;
+    }
+
     makeAbbrev = (name) => {
         names = name.split(" ");
         abbrev = "";

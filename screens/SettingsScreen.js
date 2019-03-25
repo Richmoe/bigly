@@ -8,23 +8,35 @@ import {
   Switch,
   FlatList,
   Button,
-
   Image,
   ImageBackground,
   TouchableOpacity,
 } from 'react-native';
 import Player from '../model/Player.js';
+import * as Util from '../util/SaveLoad.js';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
     title: 'Team Settings',
   };
 
-
+  currentTeam;
+  currentParams;
 
   constructor(props) {
     console.log("Creating Settings");
     super(props);
+
+    //We should have passed in team here and game params here. We assume we loaded on launch:
+    //TODO Refactor so team has params
+
+    currentTeam = this.props.navigation.getParam("team",[]);
+    currentParams = this.props.navigation.getParams("settings", {inn})
+
+
+
+
+
     //local copy of roster:
     roster = [];
     roster.push(new Player("Test Player",0,0));

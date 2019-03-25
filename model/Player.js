@@ -59,7 +59,7 @@ export default class Player {
         return this.positionByInning[0];
     }
 
-    setPosition(pos) {
+    set currentPosition(pos) {
         this.positionByInning[0] = pos;
     }
 

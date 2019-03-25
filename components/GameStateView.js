@@ -82,11 +82,11 @@ export default class GameStateView extends Component {
                     {this.makeInningNumbers()}
                 </Row>
                 <Row size={25} style={StyleSheet.statusRow2} >
-                    <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.awayTeam.name}</Text></Col>
+                    <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.awayTeam.teamName}</Text></Col>
                     {this.makeInningScores(0)}
                 </Row>
                 <Row size={25} style={StyleSheet.statusRow2} >
-                    <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.homeTeam.name}</Text></Col>
+                    <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.homeTeam.teamName}</Text></Col>
                     {this.makeInningScores(1)}
                 </Row>
             </Grid>

@@ -31,7 +31,7 @@ export default class SettingsScreen extends React.Component {
     //TODO Refactor so team has params
 
     currentTeam = this.props.navigation.getParam("team",[]);
-    currentParams = this.props.navigation.getParams("settings", {inn})
+    currentParams = this.props.navigation.getParam("settings", {});
 
 
 

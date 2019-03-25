@@ -88,7 +88,7 @@ export default class RosterScreen extends React.Component {
     };
 
     makeRow = (ix, val) => {
-        player = this.team.roster[val];
+        player = this.team.team.roster[val];
 
         if (this.view == "batting") {
             return this.rowJSX(ix, (ix+1), player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
@@ -115,8 +115,8 @@ export default class RosterScreen extends React.Component {
         var orderOfModalIx = this.order.indexOf(modalIx);
 
         if (this.view == 'pitching') {
-            oldPlayer = this.team.roster[originalValueAtSelectedOrder];
-            newPlayer = this.team.roster[modalIx];
+            oldPlayer = this.team.team.roster[originalValueAtSelectedOrder];
+            newPlayer = this.team.team.roster[modalIx];
             oldPlayer.setPosition(newPlayer.currentPosition);
             newPlayer.setPosition(this.state.selectedOrder);
         }
@@ -140,7 +140,7 @@ export default class RosterScreen extends React.Component {
             return (
                 <View>
                 <Text key={99} style={styles.headerText}>{header}</Text>
-                { this.team.roster.map((object, i) => {
+                { this.team.team.roster.map((object, i) => {
                     let style = (i % 2 ? [styles.rowOdd, styles.rowText] : styles.rowText);
                     return (
                         <TouchableHighlight key={i} onPress = {() => this.selectedModal(i)}>
@@ -159,7 +159,7 @@ export default class RosterScreen extends React.Component {
             return (
                 <View>
                 <Text key={99} style={styles.headerText}>{header}</Text>
-                { this.team.roster.map((object, i) => {
+                { this.team.team.roster.map((object, i) => {
                     let style = (i % 2 ? [styles.rowOdd, styles.rowText] : styles.rowText);
                     return (
                         <TouchableHighlight key={i} onPress = {() => this.selectedModal(i)}>

@@ -13,13 +13,13 @@
 //Todo - set game params view
 //Todo - figure out right approach for bottom bar
 //Todo - what about tracking hit but thrown out at a 2nd?
-//Todo - HBP is broken - runners advance???
+
 
 
 export default class Game {
 
-    homeTeam; //type Team
-    awayTeam; //type Team
+    homeTeam; //type LineUp
+    awayTeam; //type LineUp
     //state:
     currentInning; //Current Inning will be 0 based, top of inning = even, bottom = odd
     innings = []; //array of Inning objects
@@ -123,8 +123,7 @@ export default class Game {
         console.log("In ParseEvent for event " + event.type );
         //Shortcut:
         var batterStats = this.battingTeam.currentBatter.batterStats;
-        var pitcherStats;
-        pitcherStats = this.battingTeam.currentPitcher.pitcherStats;
+        var pitcherStats = this.fieldingTeam.currentPitcher.pitcherStats;
         console.log("currently at bat is: " + this.battingTeam.currentBatter.name);
         console.log("currently pitching is: " + this.fieldingTeam.currentPitcher.name);
         switch (event.type) {
@@ -183,7 +182,7 @@ export default class Game {
                 ++batterStats.RBIs;
 
                 //Get the other runner here
-                ++this.battingTeam.roster[event.other].batterStats.runs;
+                ++this.battingTeam.team.roster[event.other].batterStats.runs;
                 break;
             case 'out':
                 break;
@@ -194,9 +193,7 @@ export default class Game {
             default:
                 break;
         } 
-        
-        console.log(batterStats);
-        console.log(pitcherStats);
+
     }
 
 }

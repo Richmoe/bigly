@@ -21,15 +21,17 @@ export default class BatterView extends Component {
     batterNameAndOrder = (batterNum) => {
       
       var num = batterNum % this.props.battingTeam.battingOrder.length;
-      var batterIx = this.props.battingTeam.battingOrder[num];
-      name = this.props.battingTeam.roster[batterIx].name;
-      if (batterNum != this.props.battingTeam.currentBatterIx) {
+ 
+      batter = this.props.battingTeam.batterByOrder(num);
+
+      name = batter.name;
+      if (num != this.props.battingTeam.currentBatterIx) {
         //first name
         name = name.split(" ")[0];
       }
 
       return (num+1) + ". " + name;
- 
+
     }
  
     render() {

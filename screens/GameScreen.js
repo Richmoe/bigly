@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
-import Team from '../model/Team';
+import Team, { LineUp } from '../model/Team';
 import GameParams from '../model/GameParams';
 import Game from '../model/Game';
 
@@ -73,16 +73,21 @@ export default class GameScreen extends Component {
 
 
     _testGame () {
-      homeTeam = new Team("Dragons");
-      homeTeam._createDefaultMyRoster();
-      homeTeam.myTeam = true;
+      
+      t1 = new Team("Dragons");
+      t1._createDefaultMyRoster();
+      t1.myTeam = true;
+      l1 = new LineUp(t1);
+      l1._createDefaultLineup();
 
-      awayTeam = new Team("Opponent");
-      awayTeam._createDefaultRoster();
+      t2 = new Team("Opponent");
+      t2._createDefaultRoster();
+      l2 = new LineUp(t2);
+      l2._createDefaultLineup();
       
       gameSettings = new GameParams(10,false,true);
 
-      return new Game(awayTeam, homeTeam, gameSettings);
+      return new Game(l2, l1, gameSettings);
     }
 
     nextBatter() {
@@ -247,16 +252,17 @@ export default class GameScreen extends Component {
         console.log("No change in pitcher!");
         return;
       }
-  
+
+      //TODO Refactor
       //baseline is to swap with other position:
       //Update team orders
-      var oldPos = this.mGame.fieldingTeam.roster[newPitcherIx].positionByInning[0];
+      var oldPos = this.mGame.fieldingTeam.getPlayer(newPitcherIx).positionByInning[0];
       console.log(`Old position for new pitcher was ${oldPos}`);
 
       //Updated old Player's positionByInning:
-      this.mGame.fieldingTeam.roster[currentPitcherIx].positionByInning[0] = oldPos;
+      this.mGame.fieldingTeam.getPlayer(currentPitcherIx).positionByInning[0] = oldPos;
       //set new player's position to Pitcher:
-      this.mGame.fieldingTeam.roster[newPitcherIx].positionByInning[0] = 0;
+      this.mGame.fieldingTeam.getPlayer(newPitcherIx).positionByInning[0] = 0;
 
       //Update fieldPositionsArray
       this.mGame.fieldingTeam.fieldPositions[oldPos] = this.mGame.fieldingTeam.fieldPositions[0];

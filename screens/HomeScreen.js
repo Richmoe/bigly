@@ -38,7 +38,9 @@ export default class HomeScreen extends React.Component {
           <View style={styles.getStartedContainer}>
               <Button title="Start Game" onPress={this._startGamePress}></Button>
           </View>
-
+          <View style={styles.getStartedContainer}>
+              <Button title="Settings" onPress={this._settingsPress}></Button>
+          </View>
           <View style={styles.helpContainer}>
             <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
               <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
@@ -110,6 +112,10 @@ export default class HomeScreen extends React.Component {
   _startGamePress = () => {
     this.props.navigation.navigate('Game');
  
+  };
+
+  _settingsPress = () => {
+    this.props.navigation.navigate('TeamSettings');
   };
 }
 

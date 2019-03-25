@@ -13,6 +13,7 @@ const HomeStack = createStackNavigator({
   Home: HomeScreen,
   Game: GameScreen,
   Roster: RosterScreen,
+  TeamSettings: SettingsScreen
 });
 
 HomeStack.navigationOptions = {
@@ -62,5 +63,5 @@ SettingsStack.navigationOptions = {
 export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
-  SettingsStack,
+  //SettingsStack,
 });

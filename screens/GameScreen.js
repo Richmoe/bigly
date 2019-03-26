@@ -85,7 +85,8 @@ export default class GameScreen extends Component {
       l2 = new LineUp(t2);
       l2._createDefaultLineup();
       
-      gameSettings = new GameParams(10,false,true);
+      //Extract game settings from team. Do I want to do this? TODO
+      gameSettings = new GameParams(t1);
 
       return new Game(l2, l1, gameSettings);
     }

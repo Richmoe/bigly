@@ -4,13 +4,16 @@ export default class Team  {
     name = "Team Name";
     roster = []; //Array of Players
     myTeam = false;
-    leagueName = "AA";
-    leagueSettings;
+    //leagueName = "AA";
+    maxInnings = 5;
+    maxFieldPlayers = 11;
+    maxRunsPerInning = 5;
+    machinePitch = true;
+
     
-    constructor(teamName, leagueSettings)
+    constructor(teamName)
     {
         this.name = teamName;
-        this.leagueSettings = leagueSettings;
     }
 
     _createDefaultRoster(names) {

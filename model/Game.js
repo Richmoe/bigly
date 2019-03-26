@@ -33,12 +33,12 @@ export default class Game {
         this.gameSettings = gameSettings;
         this.currentInning = 0;
         this.innings.push(new Inning());
-        this.isMachinePitching = true;
+        this.isMachinePitching = gameSettings.allowMachinePitch;
     }
 
 
     get myTeam() {
-        if (this.gameSettings.isHome) {
+        if (this.homeTeam.myTeam == true) {
             return this.homeTeam;
         } else {
             return this.awayTeam;

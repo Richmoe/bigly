@@ -21,42 +21,31 @@ export default class SettingsScreen extends React.Component {
   };
 
   currentTeam;
-  currentParams;
+
 
   constructor(props) {
     console.log("Creating Settings");
     super(props);
 
     //We should have passed in team here and game params here. We assume we loaded on launch:
-    //TODO Refactor so team has params
-
-    currentTeam = this.props.navigation.getParam("team",[]);
-    currentParams = this.props.navigation.getParam("settings", {});
-
-
-
-
-
-    //local copy of roster:
-    roster = [];
-    roster.push(new Player("Test Player",0,0));
-    
+    this.currentTeam = this.props.navigation.getParam("team",null);
 
     this.state = { 
-      text: '', 
-      inningCount: 5, 
-      isMachinePitch: true,
-      roster: roster
+      name: this.currentTeam.name, 
+      maxInnings: this.currentTeam.maxInnings, 
+      machinePitch: this.currentTeam.machinePitch,
+      maxRunsPerInning: this.currentTeam.maxRunsPerInning,
+      maxFieldPlayers: this.currentTeam.maxFieldPlayers,
+      roster: this.currentTeam.roster.slice(0)
     };
   }
 
   toggleSwitch = (value) => {
-    this.setState( {isMachinePitch: value});
+    this.setState( {machinePitch: value});
   }
 
   _playerNameChange(text, index) {
 
-    console.log(text + ", " + index);
     roster = this.state.roster;
     roster[index].name = text;
     this.setState({roster: roster});
@@ -65,7 +54,6 @@ export default class SettingsScreen extends React.Component {
   _delPressed(text, index) {
 
     console.log("DEL: " + text + ", " + index);
-    console.log(text);
 
     //TODO: We need a warning/confirmation
     roster = this.state.roster;
@@ -97,59 +85,127 @@ export default class SettingsScreen extends React.Component {
   _addPlayer() {
     console.log("state roster was:");
     console.log(this.state.roster);
-    roster = this.state.roster;
-    roster.push(new Player("",0,0));
-    this.setState({roster: roster});
-    console.log(roster);
+    var r = this.state.roster;
+    r.push(new Player("",0,0));
+    this.setState({roster: r});
+    console.log(r);
+  }
+
+  changeInning(text) {
+    if (text > "") {
+      num = parseInt(text);      
+    } else {
+      num = 0;
+    }
+    this.setState({maxInnings: num});
+  }
+
+  changeMaxRuns(text) {
+    if (text > "") {
+      num = parseInt(text);
+    } else {
+      num = 0;
+    }
+    this.setState({maxRunsPerInning: num});
+    
+  }
+
+  changeMaxFielders(text) {
+    if (text > "") {
+      num = parseInt(text);
+    } else {
+      num = 0;
+    }
+    this.setState({maxFieldPlayers: num});
+    
+  }
+
+  saveTeam() {
+
+    //See if we need to save:
+    this.currentTeam.name = this.state.name;
+    this.currentTeam.maxInnings = this.state.maxInnings; 
+    this.currentTeam.machinePitch = this.state.machinePitch,
+    this.currentTeam.roster = this.state.roster;
+    this.currentTeam.maxRunsPerInning = this.state.maxRunsPerInning;
+    this.currentTeam.maxFieldPlayers = this.state.maxFieldPlayers;
+
+    Util.saveData("DefaultTeam", this.currentTeam);
+    console.log("Saving team:");
+    console.log(this.currentTeam);
   }
 
   componentWillUnmount() {
     console.log('UNMOUNTED');
+
+    //test
+    this.saveTeam();
   }
   
   render() {
     return (
       <View style={{flex: 1, flexDirection: "column"}}>
-        <View style={{flex: 1, flexDirection: "column"}}>
-          <View style={{flexDirection: "row"}}>
-            <Text style={styles.textLabel}>Team Name:</Text>
-            <TextInput
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({text})}
-              placeholder = "team name"
-              value={ this.state.text}
-            />
-          </View>
-          <View style={{flexDirection: "row"}}>
-            <Text style={styles.textLabel}>Inning Count:</Text>
-            <TextInput
-              style={styles.textInput}
-              onChangeText={(text) => this.changeText(text)}
-              value={ this.state.inningCount.toString()}
-            />
-          </View>
-          <View style={{flexDirection: "row"}}>
-            <Text style={styles.textLabel}>Pitching Machine:</Text>
+        
+        <View style={{flexDirection: "row"}}>
+          <Text style={[styles.textLabel, {flex: 1}]}>Team Name:</Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => this.setState({name: text})}
+            placeholder = "team name"
+            value={ this.state.name}
+          />
+        </View>
+        <View style={{flexDirection: "row"}}>
+          <Text style={[styles.textLabel, {flex: 1}]}>Inning Count:</Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => this.changeInning(text)}
+            keyboardType='numeric'
+            value={ this.state.maxInnings.toString()}
+          />
+        </View>
+        <View style={{flexDirection: "row"}}>
+          <Text style={[styles.textLabel, {flex: 1}]}>Max runs/inning:</Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => this.changeMaxRuns(text)}
+            keyboardType='numeric'
+            value={ this.state.maxRunsPerInning.toString()}
+          />
+        </View>
+        <View style={{flexDirection: "row"}}>
+          <Text style={[styles.textLabel, {flex: 1}]}>Max on field:</Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => this.changeMaxFielders(text)}
+            keyboardType='numeric'
+            value={ this.state.maxFieldPlayers.toString()}
+          />
+        </View>
+        <View style={{flexDirection: "row"}}>
+          <Text style={[styles.textLabel, {flex: 1}]}>Pitching Machine:</Text>
+          <View style={{alignItems: 'flex-start'}}>
             <Switch
               style={styles.switch}
               onValueChange={this.toggleSwitch}
-              value={ this.state.isMachinePitch}
+              value={ this.state.machinePitch}
+              
             />
           </View>
         </View>
-        <View style={{flex: 6, flexDirection: "column", justifyContent: 'flex-start'}}>
-          <Text style={styles.textLabel}>Players:</Text>
-          <FlatList
-            keyExtractor={this.keyExtractor}
-            data={this.state.roster}
-            renderItem={this.renderItem}
-            extraData={this.state}
-            />
-            <View>
-            <Button title="Add Player" onPress={() => this._addPlayer()}></Button>
-            </View>
-          </View>
+      
+        <Text style={styles.textLabel}>Players:</Text>
+        <FlatList
+          keyExtractor={this.keyExtractor}
+          data={this.state.roster}
+          renderItem={this.renderItem}
+          extraData={this.state}
+        />
+        <View>
+          <Button title="Add Player" onPress={() => this._addPlayer()}></Button>
+        </View>
       </View>
+     
 
     );
   }
@@ -163,14 +219,14 @@ const styles = StyleSheet.create({
 
   },
   textLabel: {
-    flex: 1,
-    fontSize: 22,
+
+    fontSize: 16,
     fontWeight: 'bold',
     textAlignVertical: 'center',
   },
   textInput: {
       flex: 1,
-      fontSize: 22,
+      fontSize: 16,
       //backgroundColor: 'yellow',
       borderStyle: 'solid',
       borderColor: 'black',
@@ -178,6 +234,7 @@ const styles = StyleSheet.create({
   },
   switch: {
       flex: 1,
+      alignItems: 'center',
       //backgroundColor: 'green',
   },
   buttonish: {
@@ -187,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlign: 'center',
     textAlignVertical: 'center',
-    fontSize: 20,
+    fontSize: 18,
     borderStyle: 'solid',
     borderColor: 'black',
     borderWidth: 2,

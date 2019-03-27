@@ -15,10 +15,35 @@ import { MonoText } from '../components/StyledText';
 
 import Layout from '../constants/Layout';
 
+import * as Util from '../util/SaveLoad';
+import Team from '../model/Team';
+
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
+
+  defaultTeam;
+
+  constructor(props)
+  {
+    super(props);
+
+    this._loadDefaultTeam();
+
+  }
+
+  async _loadDefaultTeam() {
+
+    this.defaultTeam = await Util.retrieveData("DefaultTeam");
+    if (this.defaultTeam == null) {
+      this.defaultTeam = new Team("New Team");
+    }
+    console.log("default Team is: ");
+    console.log(this.defaultTeam);
+    
+
+  }
 
   render() {
     return (
@@ -115,7 +140,7 @@ export default class HomeScreen extends React.Component {
   };
 
   _settingsPress = () => {
-    this.props.navigation.navigate('TeamSettings');
+    this.props.navigation.navigate('TeamSettings', { team: this.defaultTeam});
   };
 }
 

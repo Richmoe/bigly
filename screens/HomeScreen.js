@@ -68,7 +68,7 @@ export default class HomeScreen extends React.Component {
   }
 
   _startGamePress = () => {
-    this.props.navigation.navigate('Game');
+    this.props.navigation.navigate('PreGame', {myTeam: this.defaultTeam});
  
   };
 

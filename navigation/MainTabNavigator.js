@@ -8,9 +8,11 @@ import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import GameScreen from '../screens/GameScreen';
 import RosterScreen from '../screens/RosterScreen';
+import PreGameScreen from '../screens/PreGameScreen';
 
 export default  createStackNavigator({
   Home: HomeScreen,
+  PreGame: PreGameScreen,
   Game: GameScreen,
   Roster: RosterScreen,
   TeamSettings: SettingsScreen,

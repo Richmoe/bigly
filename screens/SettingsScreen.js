@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import Player from '../model/Player.js';
 import * as Util from '../util/SaveLoad.js';
+import Team from '../model/Team.js';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
@@ -116,9 +117,30 @@ export default class SettingsScreen extends React.Component {
     } else {
       num = 0;
     }
+
+    //Cheater:
+    if (num == 99)
+    {
+      //preload roster
+      this.preloadDragons();
+    }
     this.setState({maxFieldPlayers: num});
-    
   }
+
+  preloadDragons() {
+    //Total hack for debug purposes:
+    //this.currentTeam._createDefaultMyRoster();
+    test = new Team();
+    test._createDefaultMyRoster();
+
+    var r = [];
+    for (var i = 0;i < test.roster.length; i++) {
+      r.push(test.roster[i]);
+    }
+    this.setState({roster: r});
+
+  }
+
 
   saveTeam() {
 
@@ -184,7 +206,7 @@ export default class SettingsScreen extends React.Component {
         </View>
         <View style={{flexDirection: "row"}}>
           <Text style={[styles.textLabel, {flex: 1}]}>Pitching Machine:</Text>
-          <View style={{alignItems: 'flex-start'}}>
+          <View style={{alignItems: 'flex-start', flex: 1}}>
             <Switch
               style={styles.switch}
               onValueChange={this.toggleSwitch}
@@ -236,6 +258,7 @@ const styles = StyleSheet.create({
       flex: 1,
       alignItems: 'center',
       //backgroundColor: 'green',
+      transform: [{ scaleX: .7  }, { scaleY: .7}] ,
   },
   buttonish: {
     backgroundColor: 'cyan',

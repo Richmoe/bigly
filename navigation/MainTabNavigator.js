@@ -9,26 +9,28 @@ import SettingsScreen from '../screens/SettingsScreen';
 import GameScreen from '../screens/GameScreen';
 import RosterScreen from '../screens/RosterScreen';
 
-const HomeStack = createStackNavigator({
+export default  createStackNavigator({
   Home: HomeScreen,
   Game: GameScreen,
   Roster: RosterScreen,
-  TeamSettings: SettingsScreen
+  TeamSettings: SettingsScreen,
+  navigationOptions: ({navigation}) => ({
+    tabBarLabel: 'Home',
+    tabBarIcon: ({ focused }) => (
+      <TabBarIcon
+        focused={focused}
+        name={
+          Platform.OS === 'ios'
+            ? `ios-information-circle${focused ? '' : '-outline'}`
+            : 'md-information-circle'
+        }
+      />
+    ),
+  }),
 });
 
-HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
-      }
-    />
-  ),
-};
+
+/*
 
 const LinksStack = createStackNavigator({
   Links: GameScreen,
@@ -60,8 +62,11 @@ SettingsStack.navigationOptions = {
   ),
 };
 
+
 export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
   //SettingsStack,
 });
+*/
+

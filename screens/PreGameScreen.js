@@ -5,6 +5,7 @@ import {
   Text, 
   View,
   TextInput,
+  KeyboardAvoidingView,
   Switch,
   FlatList,
   Button,
@@ -15,7 +16,9 @@ import {
 import Buttonish from '../components/Buttonish';
 import Player from '../model/Player.js';
 
-import Team from '../model/Team.js';
+import Team, { LineUp } from '../model/Team.js';
+import GameConst from '../constants/GameConst';
+import GameParams from '../model/GameParams';
 
 export default class PreGameScreen extends React.Component {
     static navigationOptions = {
@@ -29,74 +32,134 @@ export default class PreGameScreen extends React.Component {
 
         //We should have passed in team here and game params here. We assume we loaded on launch:
         this.myTeam = this.props.navigation.getParam("myTeam",null);
+        this.myTeam.myTeam = true;
+        this.myLineup = new LineUp(this.myTeam);
 
         //We need to create our opponent. For now let's just default to 11:
-        this.opponentTeam = new Team();
-        this.opponentTeam._createDefaultRoster();
+        opponentTeam = new Team();
+        opponentTeam._createDefaultRoster();
+
+        this.opponentLineUp = new LineUp(opponentTeam);
 
         this.state = {
-            homeTeam: true,
+            myTeamIsHome: true,
+            startingLineUpReviewed: false,
         }
     }
 
+    buildLineup() {
+        //walk the roster to create batting and fieldingPos arrays:
+        //Reset lineups:
+        this.myLineup.battingOrder = [];
+        this.myLineup.fieldPositions = [];
+
+
+        for (var i = 0;i < this.myLineup.team.roster.length;i++) {
+            //Check to see if we should skip:
+            if (this.myLineup.team.roster[i].currentPosition == GameConst.FIELD_POS_OUT){
+                console.log("Skipping " + this.myLineup.team.roster[i].name);
+            } else {
+                //Add to lineup lists:
+                this.myLineup.battingOrder[this.myLineup.team.roster[i].battingOrder] = i;
+                this.myLineup.fieldPositions[this.myLineup.team.roster[i].currentPosition] = i;
+            }
+        }
+
+    }
+
+    onLineupChange = () => {
+
+    }
+
     onHomeAway = () => {
-        this.setState({homeTeam: !this.state.homeTeam});
+        this.setState({myTeamIsHome: !this.state.myTeamIsHome});
+    }
+
+    onStartingLineUp = () => {
+        this.setState({startingLineUpReviewed: true});
+        this.props.navigation.navigate('Roster', { team: this.myLineup, view: 'lineup', callBack: this.onLineupChange});
+    }
+
+
+    onPlayBall = () => {
+        //this.props.navigation.navigate('Roster', { team: this.myLineup, view: 'lineup', callBack: this.onLineupChange});
+        this.buildLineup();
+
+        console.log("Play Ball:");
+
+        console.log(this.myLineup);
+
+        homeTeam = (this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
+        awayTeam = (!this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
+        gameParams = new GameParams(this.myTeam);
+
+        this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameParams});
+
+
     }
 
     render() {
         return (
-            <View style={styles.container}>
-                <View style={{flex:10, backgroundColor: 'red'}}>
-                    <View style={{flex: 5, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center'}}>
+            <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+                <View style={{flex:10}}>
+                    <View style={{flex: 5, alignItems: 'center', justifyContent: 'center'}}>
                         <Text style={{fontSize: 48, fontWeight: 'bold'}}>{this.myTeam.name}</Text>
-                        {this.state.homeTeam && <Text style={{fontSize: 22}}>(Home)</Text>}
-                        {!this.state.homeTeam && <Text style={{fontSize: 22}}>(Away)</Text>}
+                        {this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Home)</Text>}
+                        {!this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Away)</Text>}
                     </View>
-                    <View style={{flex: 2, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center'}}>
-                        {this.state.homeTeam && 
+                    <View style={{flex: 2, alignItems: 'center', justifyContent: 'center'}}>
+                        {this.state.myTeamIsHome && 
                             <Buttonish 
                                 title="VS"
-                                buttonStyle={{fontSize: 24, fontWeight: 'bold'}}
+                                titleStyle={{fontSize: 24, fontWeight: 'bold'}}
                                 onPress={this.onHomeAway}
                             />
                         }
-                        {!this.state.homeTeam &&
+                        {!this.state.myTeamIsHome &&
                             <Buttonish 
                                 title="AT"
-                                buttonStyle={{fontSize: 24, fontWeight: 'bold'}}
+                                titleStyle={{fontSize: 24, fontWeight: 'bold'}}
                                 onPress={this.onHomeAway}
                             />
                         }                
                     </View>
-                    <View style={{flex: 5, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={{flex: 5, alignItems: 'center', justifyContent: 'center'}}>
                         
                         <TextInput
                             style={styles.textInput}
-                            onChangeText={(text) => this.opponentTeam.name = text}
+                            onChangeText={(text) => this.opponentLineUp.teamName = text}
                             placeholder = "team name"
-                            value={ this.opponentTeam.name}
+                            value={ this.opponentLineUp.teamName}
                         />
 
 
 
-                        {!this.state.homeTeam && <Text style={{fontSize: 22}}>(Home)</Text>}
-                        {this.state.homeTeam && <Text style={{fontSize: 22}}>(Away)</Text>}
+                        {!this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Home)</Text>}
+                        {this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Away)</Text>}
                     </View>
                 </View>
-                <View style={{flex:3, backgroundColor: 'green'}}>
-                <Text style={{fontSize: 18}}>MachinePitch: Yes</Text>
-                <Text style={{fontSize: 18}}>Max Innings: 5</Text>
-                <Text style={{fontSize: 18}}>Max Runs/Inning: 5</Text>
-                <Text style={{fontSize: 18}}>Max Fielders: 11</Text>
-
+                <View style={{flex:3}}>
+                    <Text style={styles.settings}>MachinePitch: {this.myTeam.machinePitch ? "Yes" : "No"}</Text>
+                    <Text style={styles.settings}>Max Innings: {this.myTeam.maxInnings}</Text>
+                    <Text style={styles.settings}>Max Runs/Inning: {this.myTeam.maxRunsPerInning}</Text>
+                    <Text style={styles.settings}>Max Fielders: {this.myTeam.maxFieldPlayers}</Text>
                 </View>
-                <View style={{flex:2, backgroundColor: 'yellow', alignItems: 'center', justifyContent: 'center'}}>
+                <View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
                     <Buttonish 
                         title="Starting Line Up"
-                        buttonStyle={{fontSize: 24, fontWeight: 'bold'}}
+                        titleStyle={{fontSize: 24, fontWeight: 'bold'}}
+                        onPress={this.onStartingLineUp}
                     />
                 </View>
-            </View>
+                <View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
+                    <Buttonish 
+                        title="Play Ball!"
+                        titleStyle={{fontSize: 24, fontWeight: 'bold'}}
+                        onPress={this.onPlayBall}
+                        disabled={!this.state.startingLineUpReviewed}
+                    />
+                </View>
+            </KeyboardAvoidingView>
         );
     }
 }
@@ -116,11 +179,11 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
 
   },
-  textLabel: {
+  settings: {
 
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    textAlignVertical: 'center',
+    marginLeft: 15,
   },
   textInput: {
       //flex: 1,

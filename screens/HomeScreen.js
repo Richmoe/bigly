@@ -15,6 +15,8 @@ import { MonoText } from '../components/StyledText';
 
 import Layout from '../constants/Layout';
 
+import Buttonish from '../components/Buttonish';
+
 import * as Util from '../util/SaveLoad';
 import Team from '../model/Team';
 
@@ -56,12 +58,12 @@ export default class HomeScreen extends React.Component {
             />
           </View>
 
-          <View style={styles.getStartedContainer}>
-              <Button title="Start Game" onPress={this._startGamePress}></Button>
-          </View>
-          <View style={styles.getStartedContainer}>
-              <Button title="Settings" onPress={this._settingsPress}></Button>
-          </View>
+          <Buttonish 
+              title="Start Game" onPress={this._startGamePress}
+          />
+          <Buttonish
+              title="Settings" onPress={this._settingsPress}
+          />
         </ScrollView>
       </View>
     );

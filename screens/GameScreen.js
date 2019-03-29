@@ -38,11 +38,23 @@ export default class GameScreen extends Component {
         super(props);
 
         //Init Game
-        defaultGame = this._testGame();
+        //defaultGame = this._testGame();
+        this.homeLineUp = this.props.navigation.getParam("homeLineUp");
+        this.awayLineUp = this.props.navigation.getParam('awayLineUp');
+        this.params = this.props.navigation.getParam('gameParams');
 
+        this.mGame = new Game(this.homeLineUp, this.awayLineUp, this.params);
 
-        this.mGame = defaultGame;
+        console.log(`my team is batting: ${this.mGame.myTeamIsBatting}, home team: ${this.mGame.homeTeam.teamName}, away team : ${this.mGame.awayTeam.teamName}`);
+        console.log('-----------------');
         //console.log(this.mGame);
+        console.log(`isTop = ${this.mGame.isTop} , batting team = ${this.mGame.battingTeam.teamName}. myTeam =  ${this.mGame.myTeam.teamName}`);
+        // /console.log(this.mGame.battingTeam);
+        console.log(`AwayTeamMy = ${this.mGame.awayTeam.myTeam}, HomeTeamMy = ${this.mGame.awayTeam.myTeam}`);
+        console.log('-----------------');
+
+
+
         batterUp = this.mGame.nextBatter;
 
         this.mGame.parseEvent({type: 'atbat'});

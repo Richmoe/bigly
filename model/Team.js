@@ -77,10 +77,21 @@ export class LineUp
 
     constructor(team) {
         this.team = team;
+
+        //We need to create a starting order which is the whole team, in Roster order:
+        this._createDefaultLineUp();
+    }
+
+    get myTeam() {
+        return this.team.myTeam;
     }
 
     get teamName() {
         return this.team.name;
+    }
+
+    set teamName(name) {
+        this.team.name = name;
     }
 
     get currentBatter() {
@@ -119,7 +130,29 @@ export class LineUp
         return this.team.roster[ix];
     }
 
+    _createDefaultLineUp() {
+
+        //reset arrays:
+        this.battingOrder = [];
+        this.fieldPositions = [];
+        //walk the roster and assign position and order to IX
+        for (var i = 0; i < this.team.roster.length; i++)
+        {
+            player = this.team.roster[i];
+
+            player.battingOrder = i;
+            player.currentPosition = i;
+            console.log(player);
+            this.battingOrder.push(i);
+            this.fieldPositions.push(i);
+        }
+
+        console.log(this.battingOrder);
+        console.log(this.fieldPositions);
+    }
+
     _shuffleArray = (input) => {
+        
         for (var i = input.length-1; i >=0; i--) {
          
           var randomIndex = Math.floor(Math.random()*(i+1)); 
@@ -132,7 +165,7 @@ export class LineUp
       };
 
 
-    _createDefaultLineup() {
+    _createRandomLineup() {
         tempBattingOrder = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         tempFieldingPos = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         

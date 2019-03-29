@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import GameConst from "../constants/GameConst.js";
+import Buttonish from "../components/Buttonish";
 
 export default class RosterScreen extends React.Component {
 
@@ -23,11 +24,11 @@ export default class RosterScreen extends React.Component {
         console.log("Construct RosterView");
 
         super(props);
+
         this.team = this.props.navigation.getParam("team",[]);
         this.callBack = this.props.navigation.getParam("callBack", null);
         this.view = this.props.navigation.getParam("view",null);
 
-        console.log(`Roster team: ${this.team}`);
         if (this.view == "batting") {
             this.formatRow = [10,80,10];
             this.header = ["#", "Name", "Pos"];
@@ -36,6 +37,10 @@ export default class RosterScreen extends React.Component {
             this.formatRow = [10,80,10];
             this.header = ["Pos", "Name", "PC"];
             this.order = this.team.fieldPositions;
+        } else if (this.view == "lineup") {
+            this.formatRow = [25,50,25];
+            this.header = ["#", "Name", "Pos"];
+            this.order = this.team.team.roster;
         } else {
             this.formatRow = [10,80,10];
             this.header = ["#", "Name", "Pos"];
@@ -46,7 +51,16 @@ export default class RosterScreen extends React.Component {
     }
 
     selectedOrder  (ix){
-        console.log("At OnPress with " + ix + " which is player ix: " + this.order[ix]);
+        console.log("At OnPress with " + ix + " which is player ix: " + this.order[ix] );
+        //this.modalView = 'nameToBatting';
+        this.modalView = 'batToName';
+        this.setModalVisible(true);
+        this.setState({selectedOrder: ix});
+    }
+
+    selectedPos (ix) {
+        console.log("At OnPress for Pos " + ix + " which is player ix: " + this.order[ix]);
+        this.modalView = 'posToName';
         this.setModalVisible(true);
         this.setState({selectedOrder: ix});
     }
@@ -57,21 +71,55 @@ export default class RosterScreen extends React.Component {
 
         //assert args.length = formatRow.length
         for (var i = 0; i < this.formatRow.length;i++) {
-            if (this.callBack != null) {
-                jsx = [...jsx, 
-                    <Col key={i} size={this.formatRow[i]}>
-                        <TouchableOpacity onPress={() => this.selectedOrder(ix)}>
+            if (this.view == 'lineup') {
+                // we have two clicks:
+                if (i == 0) {
+                    //Change batting order
+                    col = i;
+                    jsx = [...jsx, 
+                        <Col key={i} size={this.formatRow[i]}>
+                            <Buttonish onPress = {()=>this.selectedOrder(ix)} 
+                                title ={args[i]} 
+                                titleStyle={styles.buttonRowText}
+                            />
+                        </Col>
+                    ];
+                } else if (i == 2) {
+                    //Change fieldPos
+                    jsx = [...jsx, 
+                        <Col key={i} size={this.formatRow[i]}>
+                            <Buttonish onPress={() => this.selectedPos(ix)} 
+                                title={args[i]} 
+                                titleStyle={styles.buttonRowText}
+                            />
+                        </Col>
+                    ];
+            
+                } else {
+                    jsx = [...jsx, 
+                        <Col key={i} size={this.formatRow[i]}>
                             <Text style={styles.rowText}>{args[i]}</Text>
-                        </TouchableOpacity>
-                    </Col>
-                ];
+                        </Col>
+                    ];
+                }
+
             } else {
-                jsx = [...jsx, 
-                    <Col key={i} size={this.formatRow[i]}>
-                        <Text style={styles.rowText}>{args[i]}</Text>
-                    </Col>
-                ];            
-            } 
+                if (this.callBack != null) {
+                    jsx = [...jsx, 
+                        <Col key={i} size={this.formatRow[i]}>
+                            <TouchableOpacity onPress={() => this.selectedOrder(ix)}>
+                                <Text style={styles.rowText}>{args[i]}</Text>
+                            </TouchableOpacity>
+                        </Col>
+                    ];
+                } else {
+                    jsx = [...jsx, 
+                        <Col key={i} size={this.formatRow[i]}>
+                            <Text style={styles.rowText}>{args[i]}</Text>
+                        </Col>
+                    ];            
+                } 
+            }
         }
 
         return jsx;
@@ -88,13 +136,18 @@ export default class RosterScreen extends React.Component {
     };
 
     makeRow = (ix, val) => {
-        player = this.team.team.roster[val];
 
-        if (this.view == "batting") {
+        if (this.view == "batting" ) {
+            player = this.team.team.roster[val];
             return this.rowJSX(ix, (ix+1), player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
         } else if (this.view == "pitching") {
+            player = this.team.team.roster[val];
             return this.rowJSX(ix, GameConst.fieldPosAbbrev[player.currentPosition], player.name, player.pitcherStats.pitches);
+        } else if (this.view == "lineup") {
+            player = this.team.team.roster[ix];
+            return this.rowJSX(ix, (player.battingOrder) + 1, player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
         } else {
+            player = this.team.team.roster[val];
             return this.rowJSX(ix, (ix+1), player.name, player.currentPosition);
         }
     }
@@ -104,35 +157,138 @@ export default class RosterScreen extends React.Component {
         this.setState({modalVisible: visible});
     }
 
+
+    fixUpRoster() {
+        //walk the roster to create batting and fieldingPos arrays:
+        //Reset lineups:
+        tempBattingOrder = new Array(this.team.team.roster.length).fill(-1);
+        tempFieldPositions = new Array(this.team.team.roster.length).fill(-1);
+
+        for (var i = 0;i < this.team.team.roster.length;i++) {
+            //Check to see if we should skip:
+            player = this.team.team.roster[i];
+            //Add to lineup lists:
+            console.log("Player: " + player.name + " batting: " + player.battingOrder + ", field: " + player.currentPosition);
+            if (player.battingOrder == -1 || player.currentPosition == GameConst.FIELD_POS_OUT) {
+                //skip
+            } else {
+                tempBattingOrder[player.battingOrder] = i;
+                tempFieldPositions[player.currentPosition] = i;
+            }
+        }
+
+        //Remove the -1s, giving us new batting order and position assignments. Basically slides everyone below the -1s up.
+        tempB2 = tempBattingOrder.filter(ix => ix >= 0);
+        tempF2 = tempFieldPositions.filter(ix => ix >= 0);
+
+        //Reset all player positions:
+        for (var i = 0;i < tempB2.length; i++) {
+            this.team.team.roster[tempB2[i]].battingOrder = i;
+            this.team.team.roster[tempF2[i]].currentPosition = i;
+        }
+    }
+
+    swapPlayerPosition(toPos) {
+        selectedPlayer = this.team.team.roster[this.state.selectedOrder];
+
+        console.log("FieldPos: " + toPos);
+        //cases:
+
+        //Swap out
+        if (toPos >= this.team.team.roster.length) { 
+            //Swap Out
+            selectedPlayer.battingOrder = -1;
+        } else {
+            if (selectedPlayer.currentPosition == GameConst.FIELD_POS_OUT) { 
+                //Swap back in
+                selectedPlayer.battingOrder = this.team.team.roster.length - 1; //put him back in last spot which should be empty
+                swapToPos = this.team.team.maxFieldPlayers-1;
+            } else {
+                swapToPos = selectedPlayer.currentPosition;
+            }
+            //Swap with player if one was there:
+
+            let swapWithPlayer = this.team.team.roster.find(o => o.currentPosition == toPos);
+            if (swapWithPlayer) {
+                swapWithPlayer.currentPosition = swapToPos;
+            }
+        }
+
+        selectedPlayer.currentPosition = toPos;
+        this.fixUpRoster();
+    }
+
+    swapBatterPosition(toPos) {
+        selectedPlayer = this.team.team.roster[this.state.selectedOrder];
+
+        console.log("Batting Order: " + toPos);
+        console.log(selectedPlayer);
+        //Cases:
+        if (toPos >= this.team.team.roster.length) { 
+            // not playing 
+            selectedPlayer.currentPosition = GameConst.FIELD_POS_OUT;
+            selectedPlayer.battingOrder = -1;
+        } else {
+            if (selectedPlayer.battingOrder == -1) {
+                //Back in
+                selectedPlayer.currentPosition = this.team.team.maxFieldPlayers - 1; //put him back in bench spot which should be empty
+                swapToPos = this.team.team.roster.length - 1;
+            } else {
+                swapToPos = selectedPlayer.battingOrder;
+            }
+            //Swap with player if one was there:
+ 
+            let swapWithPlayer = this.team.team.roster.find(o => o.battingOrder == toPos);
+            if (swapWithPlayer) {
+                swapWithPlayer.battingOrder = swapToPos;
+            }
+            selectedPlayer.battingOrder = toPos;
+        }
+        this.fixUpRoster();
+    }
+
     selectedModal(modalIx) {
 
         this.setModalVisible(false);
 
-        //Here is where we swap
         let originalValueAtSelectedOrder = this.order[this.state.selectedOrder];
 
-        //Find where the modal selected value is in the order:
-        var orderOfModalIx = this.order.indexOf(modalIx);
+        //Here is where we swap
+        if (this.modalView == 'posToName') {
 
-        if (this.view == 'pitching') {
-            oldPlayer = this.team.team.roster[originalValueAtSelectedOrder];
-            newPlayer = this.team.team.roster[modalIx];
-            oldPlayer.setPosition(newPlayer.currentPosition);
-            newPlayer.setPosition(this.state.selectedOrder);
+            this.swapPlayerPosition(modalIx);
+
+        } else if (this.modalView == 'batToName') {
+            this.swapBatterPosition(modalIx);
+
+        } else {
+
+        
+  
+            //Find where the modal selected value is in the order:
+            var orderOfModalIx = this.order.indexOf(modalIx);
+
+            if (this.view == 'pitching') {
+                oldPlayer = this.team.team.roster[originalValueAtSelectedOrder];
+                newPlayer = this.team.team.roster[modalIx];
+                oldPlayer.setPosition(newPlayer.currentPosition);
+                newPlayer.setPosition(this.state.selectedOrder);
+            }
+
+            //Selected order slot is now the selected modal value
+            this.order[this.state.selectedOrder] = modalIx;
+
+            //Where the selected modeal was now gets the original Value
+            this.order[orderOfModalIx] = originalValueAtSelectedOrder;
         }
-
-        //Selected order slot is now the selected modal value
-        this.order[this.state.selectedOrder] = modalIx;
-
-        //Where the selected modeal was now gets the original Value
-        this.order[orderOfModalIx] = originalValueAtSelectedOrder;
 
         this.setState({selectedOrder: -1});
     }
 
     renderModal() {
         header = "Unknown";
-        if (this.view == 'batting') {
+        if (this.modalView == 'nameToBatting') {
+            //Assign name to order
             if (this.state.selectedOrder > -1) {
                 header = "Batter " + (this.state.selectedOrder + 1);
             }
@@ -151,7 +307,8 @@ export default class RosterScreen extends React.Component {
                 }
                 </View>
             );
-        } else if (this.view == "pitching") {
+        } else if (this.modalView == "nameToPos") {
+            //Assign name to pos:
             if (this.state.selectedOrder > -1) {
                
                 header = GameConst.fieldPos[this.state.selectedOrder];
@@ -170,12 +327,42 @@ export default class RosterScreen extends React.Component {
                 }
                 </View>
             );
-        } else {
+        } else if (this.modalView == "posToName") {
+            //Assign pos to Name:
+            if (this.state.selectedOrder > -1) {
+                header = this.team.team.roster[this.state.selectedOrder].name;
+            }
             //
             return (
                 <View>
                 <Text key={99} style={styles.headerText}>{header}</Text>
                 { GameConst.fieldPos.map((object, i) => {
+                    let style = (i % 2 ? [styles.rowOdd, styles.rowText] : styles.rowText);
+                    return (
+                        <TouchableHighlight key={i} onPress = {() => this.selectedModal(i)}>
+                            <Text style={style}>{object}</Text>
+                        </TouchableHighlight> 
+                    );
+                })
+                }
+                </View>
+            );
+        } else if (this.modalView == "batToName") {
+            //Assign pos to Name:
+            if (this.state.selectedOrder > -1) {
+                header = this.team.team.roster[this.state.selectedOrder].name;
+            }
+            //
+            tempArray = [];
+            for (var i = 0;i < this.team.team.roster.length;i++){
+                tempArray.push("Batting " + (i + 1));
+            }
+            tempArray.push("Not Playing");
+            console.log(tempArray);
+            return (
+                <View>
+                <Text key={99} style={styles.headerText}>{header}</Text>
+                { tempArray.map((object, i) => {
                     let style = (i % 2 ? [styles.rowOdd, styles.rowText] : styles.rowText);
                     return (
                         <TouchableHighlight key={i} onPress = {() => this.selectedModal(i)}>
@@ -226,9 +413,13 @@ export default class RosterScreen extends React.Component {
 
     },
     rowText: {
-        fontSize: 24,
+        fontSize: 22,
         textAlign: 'left',
         margin: 5,
+    },
+    buttonRowText: {
+        fontSize: 22,
+        textAlign: 'left',
     },
     rowOdd: {
         backgroundColor: '#ddd',

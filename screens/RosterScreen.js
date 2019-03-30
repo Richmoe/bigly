@@ -59,8 +59,15 @@ export default class RosterScreen extends React.Component {
     }
 
     selectedPos (ix) {
-        console.log("At OnPress for Pos " + ix + " which is player ix: " + this.order[ix]);
+        console.log("SelectedPos: At OnPress for Pos " + ix + " which is player ix: " + this.order[ix]);
         this.modalView = 'posToName';
+        this.setModalVisible(true);
+        this.setState({selectedOrder: ix});
+    }
+
+    selectedPlayer (ix) {
+        console.log("SelectedPlayer: At OnPress for Pos " + ix + " which is player ix: " + this.order[ix]);
+        this.modalView = 'nameToPos';
         this.setModalVisible(true);
         this.setState({selectedOrder: ix});
     }
@@ -107,7 +114,7 @@ export default class RosterScreen extends React.Component {
                 if (this.callBack != null) {
                     jsx = [...jsx, 
                         <Col key={i} size={this.formatRow[i]}>
-                            <TouchableOpacity onPress={() => this.selectedOrder(ix)}>
+                            <TouchableOpacity onPress={() => this.selectedPlayer(ix)}>
                                 <Text style={styles.rowText}>{args[i]}</Text>
                             </TouchableOpacity>
                         </Col>
@@ -142,6 +149,9 @@ export default class RosterScreen extends React.Component {
             return this.rowJSX(ix, (ix+1), player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
         } else if (this.view == "pitching") {
             player = this.team.team.roster[val];
+            //console.log(`makeRow: ${ix}, ${val}`);
+            //console.log(player);
+            //console.log(player.pitcherStats.pitches);
             return this.rowJSX(ix, GameConst.fieldPosAbbrev[player.currentPosition], player.name, player.pitcherStats.pitches);
         } else if (this.view == "lineup") {
             player = this.team.team.roster[ix];
@@ -261,28 +271,21 @@ export default class RosterScreen extends React.Component {
         } else if (this.modalView == 'batToName') {
             this.swapBatterPosition(modalIx);
 
-        } else {
+        } else /* if (this.modalView == 'nameToPos')*/ {
 
-        
-  
-            //Find where the modal selected value is in the order:
-            var orderOfModalIx = this.order.indexOf(modalIx);
-
-            if (this.view == 'pitching') {
-                oldPlayer = this.team.team.roster[originalValueAtSelectedOrder];
-                newPlayer = this.team.team.roster[modalIx];
-                oldPlayer.setPosition(newPlayer.currentPosition);
-                newPlayer.setPosition(this.state.selectedOrder);
-            }
-
-            //Selected order slot is now the selected modal value
-            this.order[this.state.selectedOrder] = modalIx;
-
-            //Where the selected modeal was now gets the original Value
-            this.order[orderOfModalIx] = originalValueAtSelectedOrder;
+            this.swapPositionPlayer(modalIx);
+            
         }
 
+        if (this.callBack) this.callBack();
+
         this.setState({selectedOrder: -1});
+    }
+
+    swapPositionPlayer(playerIx) {
+
+        //Find where the modal selected value is in the order:
+        this.team.setPlayerPos(playerIx, this.state.selectedOrder);
     }
 
     renderModal() {

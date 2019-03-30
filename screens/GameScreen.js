@@ -70,7 +70,7 @@ export default class GameScreen extends Component {
 
         this.state = {
             machinePitch: true,
-
+            currentPitcher: this.mGame.homeTeam.currentPitcher,
             inHittingUX: false,
             batterUp: batterUp,
             hitSelected: -1,
@@ -148,7 +148,7 @@ export default class GameScreen extends Component {
 
     updatePitcherStats = (pitchType) => {
 
-      pitcherPlayer = this.mGame.fieldingTeam.playerByPos(0);
+      pitcherPlayer = this.mGame.fieldingTeam.getPlayerByPos(0);
 
       if (['strike','foul','hit'].indexOf(pitchType) >= 0) {
         pitcherPlayer.pitcherStats.strikes += 1;
@@ -237,7 +237,7 @@ export default class GameScreen extends Component {
     };
 
     onPitcherClick = () => {
-      this.props.navigation.navigate('Roster', { team: this.mGame.fieldingTeam, view: 'pitching', callBack: this.onPitcherChange});
+      this.props.navigation.navigate('Roster', { team: this.mGame.fieldingTeam, view: 'pitching', callBack: this.cbPitcherChange});
     };
 
 
@@ -258,38 +258,15 @@ export default class GameScreen extends Component {
 
     }
 
-    onPitcherChange = (newPitcherIx) => {
-      var currentPitcherIx = this.mGame.fieldingTeam.fieldPositions[0];
-   
-      if (newPitcherIx == currentPitcherIx) {
-        console.log("No change in pitcher!");
-        return;
-      }
+    cbPitcherChange = () => {
 
-      //TODO Refactor
-      //baseline is to swap with other position:
-      //Update team orders
-      var oldPos = this.mGame.fieldingTeam.getPlayer(newPitcherIx).positionByInning[0];
-      console.log(`Old position for new pitcher was ${oldPos}`);
-
-      //Updated old Player's positionByInning:
-      this.mGame.fieldingTeam.getPlayer(currentPitcherIx).positionByInning[0] = oldPos;
-      //set new player's position to Pitcher:
-      this.mGame.fieldingTeam.getPlayer(newPitcherIx).positionByInning[0] = 0;
-
-      //Update fieldPositionsArray
-      this.mGame.fieldingTeam.fieldPositions[oldPos] = this.mGame.fieldingTeam.fieldPositions[0];
-      this.mGame.fieldingTeam.fieldPositions[0] = newPitcherIx;
-
-      console.log(this.mGame.fieldingTeam.fieldPositions);
-
-      //Since I'm not tying this to state now, just force the update
-      this.forceUpdate();
+      console.log(`cbPitcherChange `);
+      this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher});
 
     }
 
     onMachineChange = () => {      
-      //this.setState ( {machinePitch : !this.state.machinePitch});
+      this.setState ( {machinePitch : !this.state.machinePitch});
       this.mGame.isMachinePitching = !this.mGame.isMachinePitching;
     }
 
@@ -401,8 +378,8 @@ export default class GameScreen extends Component {
             <PitcherView 
               onPitcherChange = {this.onPitcherClick} 
               onMachineChange = {this.onMachineChange} 
-              isMachinePitch={this.mGame.isMachinePitching} 
-              pitcher = {this.mGame.fieldingTeam.playerByPos(0)} 
+              isMachinePitch={this.state.machinePitch} 
+              pitcher = {this.mGame.fieldingTeam.getPlayerByPos(0)} 
             />
           }
           { this.mGame.myTeamIsBatting == true && 

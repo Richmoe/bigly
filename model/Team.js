@@ -102,6 +102,10 @@ export class LineUp
         return this.team.roster[this.fieldPositions[0]];
     }
 
+    set currentPitcher(ix) {
+        this.team.roster[this.fieldPositions[0]] = ix;
+    }
+
     get nextBatter() {
 
         console.log(`Hmm. Batting order: ${this.battingOrder.length}`);
@@ -119,8 +123,27 @@ export class LineUp
         return this.team.roster[this.battingOrder[pos]];
     }
 
-    playerByPos(pos) {
+    getPlayerByPos(pos) {
         return this.team.roster[this.fieldPositions[pos]];
+    }
+
+    setPlayerPos(playerIx, newPos) {
+
+        console.log(`SetPlayerPos (${playerIx}, ${newPos})`);
+        console.log(this.fieldPositions);
+
+        //Set the fieldPos at pos to be playerIx. move the player there to the pos where playerIx was.
+        playerOldPos = this.team.roster[playerIx].currentPosition;
+        swapPlayerIx = this.fieldPositions[newPos];
+        if (swapPlayerIx != -1) {
+            this.team.roster[swapPlayerIx].currentPosition = playerOldPos;
+            this.fieldPositions[playerOldPos] = swapPlayerIx;
+        }
+        //Set my info here:
+        this.fieldPositions[newPos] = playerIx;
+        this.team.roster[playerIx].currentPosition = newPos;
+        console.log("After:");
+        console.log(this.fieldPositions);
     }
 
     getPlayer(ix) {

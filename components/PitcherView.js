@@ -20,16 +20,15 @@ export default class PitcherView extends Component {
           <Row size={1} style={styles.container}>
             <Col size={15}>
                 <TouchableOpacity onPress={() => this.props.onMachineChange()}>  
-                    {true && <Image 
+                    <Image 
                         style={{marginTop: 2, marginLeft: 2, width: 30, height: 30, resizeMode: 'contain'}} 
                         source={this.props.isMachinePitch ? require("../assets/images/pitchingMachine.png") : require("../assets/images/small-baseball.png")} 
                     />
-                    }
                 </TouchableOpacity>
             </Col>
             <Col size={55}>
                 <TouchableOpacity onPress={() => this.props.onPitcherChange()}>       
-                    <Text style={styles.pitcherName}>{this.props.pitcher.name}</Text>
+                    <Text style={styles.pitcherName}>{this.props.isMachinePitch ? "Machine Pitch" : this.props.pitcher.name}</Text>
                 </TouchableOpacity>   
             </Col>
             {this.props.isMachinePitch && <Col size={30} />}

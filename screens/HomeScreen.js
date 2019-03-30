@@ -18,7 +18,8 @@ import Layout from '../constants/Layout';
 import Buttonish from '../components/Buttonish';
 
 import * as Util from '../util/SaveLoad';
-import Team from '../model/Team';
+import Team, { LineUp } from '../model/Team';
+import GameParams from '../model/GameParams';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -60,9 +61,19 @@ export default class HomeScreen extends React.Component {
 
           <Buttonish 
               title="Start Game" onPress={this._startGamePress}
+              titleStyle={styles.buttonText}
           />
           <Buttonish
-              title="Settings" onPress={this._settingsPress}
+              title="Settings" onPress={this._settingsPress}              
+              titleStyle={styles.buttonText}
+          />
+          <Buttonish
+              title="Debug Home Game" onPress={this._debugHome}
+              titleStyle={styles.buttonText}
+          />
+          <Buttonish
+              title="Debug Away Game" onPress={this._debugHome}
+              titleStyle={styles.buttonText}
           />
         </ScrollView>
       </View>
@@ -77,6 +88,45 @@ export default class HomeScreen extends React.Component {
   _settingsPress = () => {
     this.props.navigation.navigate('TeamSettings', { team: this.defaultTeam});
   };
+
+  _debugHome = () => {
+    this.debugGame(true);
+  }
+
+  _debugAway = () => {
+    this.debugGame(false);
+  }
+
+
+  debugGame(isHome) {
+    //Going to make a quick game here:
+
+    t1 = new Team("Dragons");
+    t1._createDefaultMyRoster();
+    t1.myTeam = true;
+    l1 = new LineUp(t1);
+    //l1._createDefaultLineup();
+
+    t2 = new Team("Opponent");
+    t2._createDefaultRoster();
+    l2 = new LineUp(t2);
+    //l2._createDefaultLineup();
+
+    //Extract game settings from team. Do I want to do this? TODO
+    gameSettings = new GameParams(t1);
+
+    if (isHome) {
+      homeTeam = l1;
+      awayTeam = l2;
+    } else {
+      homeTeam = l2;
+      awayTeam = l1;
+    }
+
+    this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameSettings});
+
+  }
+
 }
 
 const styles = StyleSheet.create({
@@ -157,4 +207,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
+  buttonText: {
+    fontSize: 22,
+  }
 });

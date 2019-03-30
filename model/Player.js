@@ -1,3 +1,5 @@
+"use strict";
+
 class PitcherStats {
     balls = 0;
     strikes = 0;
@@ -64,8 +66,8 @@ export default class Player {
     }
 
     makeAbbrev = (name) => {
-        names = name.split(" ");
-        abbrev = "";
+        var names = name.split(" ");
+        var abbrev = "";
         for (const s of names) {
             abbrev += s[0];
         }

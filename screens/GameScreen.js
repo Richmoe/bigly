@@ -1,12 +1,8 @@
+"use strict";
+
 import React, {Component} from 'react';
 import {
-  Platform, 
   StyleSheet, 
-  Text, 
-  View,
-  Image,
-  ImageBackground,
-  TouchableOpacity,
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import Team, { LineUp } from '../model/Team';
@@ -16,8 +12,6 @@ import Game from '../model/Game';
 import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
 import BatterView from '../components/BatterView.js';
-import GameStateView from '../components/GameStateView.js';
-import FieldView from '../components/FieldView.js';
 import HitView from '../components/HitView.js';
 
 export default class GameScreen extends Component {
@@ -39,11 +33,18 @@ export default class GameScreen extends Component {
 
         //Init Game
         //defaultGame = this._testGame();
-        this.homeLineUp = this.props.navigation.getParam("homeLineUp");
-        this.awayLineUp = this.props.navigation.getParam('awayLineUp');
-        this.params = this.props.navigation.getParam('gameParams');
+        var homeLineUp = this.props.navigation.getParam("homeLineUp");
+        var awayLineUp = this.props.navigation.getParam('awayLineUp');
+        var params = this.props.navigation.getParam('gameParams');
 
-        this.mGame = new Game(this.homeLineUp, this.awayLineUp, this.params);
+        this.mGame = new Game(homeLineUp, awayLineUp, params);
+        this.mGameState = {
+          awayScore: 0,
+          homeScore: 0,
+          outs: 0, 
+          balls: 0,
+          strikes: 0,
+        };
 
         console.log(`my team is batting: ${this.mGame.myTeamIsBatting}, home team: ${this.mGame.homeTeam.teamName}, away team : ${this.mGame.awayTeam.teamName}`);
         console.log('-----------------');
@@ -53,20 +54,9 @@ export default class GameScreen extends Component {
         console.log(`AwayTeamMy = ${this.mGame.awayTeam.myTeam}, HomeTeamMy = ${this.mGame.awayTeam.myTeam}`);
         console.log('-----------------');
 
-
-
-        batterUp = this.mGame.nextBatter;
-
+        var batterUp = this.mGame.nextBatter;
         this.mGame.parseEvent({type: 'atbat'});
-
-        this.mGameState = {
-          awayScore: 0,
-          homeScore: 0,
-          outs: 0, 
-          balls: 0,
-          strikes: 0,
-        };
-
+   
 
         this.state = {
             machinePitch: true,
@@ -79,26 +69,26 @@ export default class GameScreen extends Component {
 
         this.mBaseRunners = [batterUp,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
         
-        titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"}  ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
+        var titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"}  ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
         this.props.navigation.setParams({title: titleStr});
     }
 
 
     _testGame () {
       
-      t1 = new Team("Dragons");
+      var t1 = new Team("Dragons");
       t1._createDefaultMyRoster();
       t1.myTeam = true;
-      l1 = new LineUp(t1);
+      var l1 = new LineUp(t1);
       l1._createDefaultLineup();
 
-      t2 = new Team("Opponent");
+      var t2 = new Team("Opponent");
       t2._createDefaultRoster();
-      l2 = new LineUp(t2);
+      var l2 = new LineUp(t2);
       l2._createDefaultLineup();
       
       //Extract game settings from team. Do I want to do this? TODO
-      gameSettings = new GameParams(t1);
+      var gameSettings = new GameParams(t1);
 
       return new Game(l2, l1, gameSettings);
     }
@@ -107,7 +97,7 @@ export default class GameScreen extends Component {
         this.mGameState.balls = 0;
         this.mGameState.strikes = 0;
 
-        batterUp = this.mGame.nextBatter;
+        var batterUp = this.mGame.nextBatter;
 
         this.setState( {batterUp: batterUp }) ;
         this.mBaseRunners[0] = batterUp;
@@ -122,22 +112,18 @@ export default class GameScreen extends Component {
       this.mGameState.balls = 0;
       this.mGameState.strikes = 0;
 
+      this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher });
+
       this.mBaseRunners = [-1, -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
       this.nextBatter();
-      console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}`);
+      console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}, pitcher: ${this.mGame.fieldingTeam.currentPitcher.name}`);
     };
 
     scoreRun(player, pitcher, runcount = 1) //Need to figure out RBIs etc.
     {
 
       console.log("Score run " + runcount);
-      /*
-      var newScore = this.state.score;
-      newScore[this.state.inning % 2] += runcount;
-      this.setState ( {
-          score : newScore
-      });
-      */
+
       this.mGame.addScore(runcount);
       let {away, home} = this.mGame.score;
       console.log(`Score: ${away} - ${home}`);
@@ -146,19 +132,6 @@ export default class GameScreen extends Component {
 
     };
 
-    updatePitcherStats = (pitchType) => {
-
-      pitcherPlayer = this.mGame.fieldingTeam.getPlayerByPos(0);
-
-      if (['strike','foul','hit'].indexOf(pitchType) >= 0) {
-        pitcherPlayer.pitcherStats.strikes += 1;
-      } else if (['ball','hbp'].indexOf(pitchType) >= 0) {
-        pitcherPlayer.pitcherStats.balls += 1;
-      } else {
-        console.log("Invalid PitchType: " + pitchType);
-      };
-
-    }
 
     pitchCallback = (pitchType) => {
 
@@ -172,10 +145,8 @@ export default class GameScreen extends Component {
         return;
       }
 
-      if (!this.state.machinePitch)  this.updatePitcherStats(pitchType);
-
-      event = new Object();
-      event.type = pitchType
+      var event = new Object();
+      event.type = pitchType;
 
       if (pitchType === 'strike') {
         ++this.mGameState.strikes ;
@@ -199,9 +170,7 @@ export default class GameScreen extends Component {
         if (this.mGameState.balls >= 4) {
           //Walk
           event.type = 'walk'; //overwrite
-          //Update the baserunners: simply insert -1 to move the runner to 1st, then trim the last element (Out3 which is -1)
-          //this.mBaseRunners.unshift(-1);
-          //this.mBaseRunners.pop();
+
           this.advanceRunner(1);
           this.resolveHit(true);
         }
@@ -211,14 +180,13 @@ export default class GameScreen extends Component {
             ++this.mGameState.strikes;
         }
       } else if (pitchType === 'hbp') {
-        //this.mBaseRunners.unshift(-1);
-        //this.mBaseRunners.pop();
+
         //should be same as a walk
         this.advanceRunner(1);
-        resolved = this.resolveHit(true);
+        this.resolveHit(true);
 
       } else if (pitchType === 'done') {
-        resolved = this.resolveHit();
+        this.resolveHit();
         //get current outs?
 
         this.setState( {inHittingUX: false});
@@ -227,7 +195,7 @@ export default class GameScreen extends Component {
         console.log("error pitch type: " + pitchType);
       }
 
-      titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"} ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
+      var titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"} ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
       console.log(titleStr);
 
       this.props.navigation.setParams({title: titleStr});

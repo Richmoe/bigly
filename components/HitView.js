@@ -1,3 +1,4 @@
+"use strict";
 
 import React, {Component} from 'react';
 import {
@@ -14,7 +15,6 @@ import {
 import { Menu, MenuProvider, MenuOptions, MenuOption, MenuTrigger} from "react-native-popup-menu";
 
 const OUTOFFSET=8;
-const OPPONENTHITTER = 100;
 const REF_XSCALER = 443;   //These are the default values for which the stylesPos #s are set
 const REF_YSCALER = 443;
 
@@ -24,6 +24,7 @@ export default class HitView extends Component {
     fieldY;
     fieldWidth;
     fieldHeight;
+    stylesPos;
 
     constructor(props){
         console.log("Construct HitView");
@@ -34,14 +35,14 @@ export default class HitView extends Component {
         //battingTeam - LineUp object
         //resolve - resolveCB
 
-        //test
-        //this.runnerAtBase = [0,1,2,3,4,5,6,7,8,9,10];
 
         //update positions of bases:
-        for (var i = 0;i < stylesPos.length;i++)
+        this.stylesPos = JSON.parse(JSON.stringify(stylesPosBase));
+
+        for (var i = 0;i < this.stylesPos.length;i++)
         {
-          stylesPos[i].left *= REF_YSCALER/400;
-          stylesPos[i].top *= REF_XSCALER/400;
+          this.stylesPos[i].left *= REF_YSCALER/400;
+          this.stylesPos[i].top *= REF_XSCALER/400;
         }
 
         console.log(`HitView onBase: ${this.props.baseRunners}`);
@@ -141,7 +142,8 @@ export default class HitView extends Component {
 
     renderBaserunners = () =>
     {
-      runnerJSX = [];
+      var runnerJSX = [];
+      var stylesColor;
       for (let i = 0;i < this.props.baseRunners.length;i++)
       {
         var baseRunnerIx = this.props.baseRunners[i];
@@ -153,7 +155,7 @@ export default class HitView extends Component {
           else /*default*/ stylesColor = {     backgroundColor: 'yellow'};
 
           runnerJSX = [...runnerJSX,
-              <TouchableOpacity key={i} style = {[styles.circleButton, stylesColor, stylesPos[i]]} onPress = {() => this.onPress(i)}> 
+              <TouchableOpacity key={i} style = {[styles.circleButton, stylesColor, this.stylesPos[i]]} onPress = {() => this.onPress(i)}> 
                   <Text style ={styles.buttonText}>{this.getAbbrev(i)}</Text>
               </TouchableOpacity >
           ];
@@ -163,8 +165,7 @@ export default class HitView extends Component {
     }
 
     renderMenuOptions = () => {
-      if (this.props.clickPos == 0)
-      { 
+      if (this.props.clickPos == 0) { 
         return (
           <View >
             <MenuOption text='Single' value={1}/>
@@ -175,7 +176,7 @@ export default class HitView extends Component {
           </View>
         );
       } else {
-        menuJSX = [];
+        var menuJSX = [];
         if (this.props.clickPos < 2) menuJSX.push(<MenuOption key={1} text="1st" value={1} />);  
         if (this.props.clickPos < 3) menuJSX.push(<MenuOption key={2} text="2nd" value={2} />);
         if (this.props.clickPos < 4) menuJSX.push(<MenuOption key={3} text="3rd" value={3} />);
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
 });
 
 
-stylesPos = [
+const stylesPosBase = [
   {
     //Home:
     position: 'absolute',

@@ -1,3 +1,5 @@
+"use strict";
+
 import React from 'react';
 import {
   Image,
@@ -42,8 +44,8 @@ export default class HomeScreen extends React.Component {
     if (this.defaultTeam == null) {
       this.defaultTeam = new Team("New Team");
     }
-    console.log("default Team is: ");
-    console.log(this.defaultTeam);
+    //console.log("default Team is: ");
+    //console.log(this.defaultTeam);
     
 
   }
@@ -72,7 +74,7 @@ export default class HomeScreen extends React.Component {
               titleStyle={styles.buttonText}
           />
           <Buttonish
-              title="Debug Away Game" onPress={this._debugHome}
+              title="Debug Away Game" onPress={this._debugAway}
               titleStyle={styles.buttonText}
           />
         </ScrollView>
@@ -101,20 +103,21 @@ export default class HomeScreen extends React.Component {
   debugGame(isHome) {
     //Going to make a quick game here:
 
-    t1 = new Team("Dragons");
+    var t1 = new Team("Dragons");
     t1._createDefaultMyRoster();
     t1.myTeam = true;
-    l1 = new LineUp(t1);
+    var l1 = new LineUp(t1);
     //l1._createDefaultLineup();
 
-    t2 = new Team("Opponent");
+    var t2 = new Team("Opponent");
     t2._createDefaultRoster();
-    l2 = new LineUp(t2);
+    var l2 = new LineUp(t2);
     //l2._createDefaultLineup();
 
     //Extract game settings from team. Do I want to do this? TODO
-    gameSettings = new GameParams(t1);
+    var gameSettings = new GameParams(t1);
 
+    var homeTeam, awayTeam;
     if (isHome) {
       homeTeam = l1;
       awayTeam = l2;

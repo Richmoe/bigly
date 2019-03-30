@@ -1,7 +1,6 @@
+"use strict";
+
 //Keeping TODOs here:
-//Todo - set roster
-//Todo - arrange batting order
-//Todo - Set fielding order
 //Todo - randomize fielding order
 //Todo - Fielder view
 //Todo - stats view
@@ -10,11 +9,10 @@
 //Todo - run experience
 //Todo - Gamelog
 //Todo - scoreboard view
-//Todo - set game params view
 //Todo - figure out right approach for bottom bar
 //Todo - what about tracking hit but thrown out at a 2nd?
 
-
+import Player from '../model/Player.js';
 
 export default class Game {
 
@@ -82,7 +80,7 @@ export default class Game {
     }
 
     get nextBatter() {
-        currentBatter = this.battingTeam.nextBatter;
+        var currentBatter = this.battingTeam.nextBatter;
         return currentBatter;
     }
 
@@ -105,8 +103,8 @@ export default class Game {
 
     get score() {
         //Walk the innings array to add scores. Could use reduce but I like to see it spelled out.
-        awayScore = 0;
-        homeScore = 0;
+        var awayScore = 0;
+        var homeScore = 0;
         for (var i = 0; i < this.innings.length; i++) {
             if (i % 2 == 0) {
                 awayScore += this.innings[i].runs;
@@ -115,15 +113,21 @@ export default class Game {
             }
         }
 
-
         return {away: awayScore, home: homeScore} ;
     }
 
     parseEvent (event) {
-        console.log("In ParseEvent for event " + event.type );
+        console.log(`In ParseEvent for event ${event.type}, machinePitching: ${this.isMachinePitching}` );
         //Shortcut:
         var batterStats = this.battingTeam.currentBatter.batterStats;
         var pitcherStats = this.fieldingTeam.currentPitcher.pitcherStats;
+
+        //Swallow events if machinepitch:
+        if (this.isMachinePitching) {
+            var fakePlayer = new Player("machine",0,0);
+            pitcherStats = fakePlayer.pitcherStats;
+        }
+
         console.log("currently at bat is: " + this.battingTeam.currentBatter.name);
         console.log("currently pitching is: " + this.fieldingTeam.currentPitcher.name);
         switch (event.type) {

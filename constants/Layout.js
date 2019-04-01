@@ -9,4 +9,6 @@ export default {
     height,
   },
   isSmallDevice: width < 375,
+  HEADER_HEIGHT: 65,
+  TABBAR_HEIGHT: 65,
 };

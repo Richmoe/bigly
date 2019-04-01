@@ -11,66 +11,59 @@ import { Col, Row, Grid } from 'react-native-easy-grid';
 export default class GameStateView extends Component {
 
     //Props:
-    // game - Game object
-    // outs, balls, strikes
+    //gameState: 
+    // - currentInning
+    // -homeLineUp
+    // -awayLineUp
+
+    /*inningState: = gameState = {
+        awayScore: 0,
+        homeScore: 0,
+        outs: 0, 
+        balls: 0,
+        strikes: 0,
+      };
+    */
     
     getInningText = () => {
-        returnString = this.props.game.inning;
-        returnString += (this.props.game.isTop ? "˄" : "˅" );
+        var returnString = (this.props.gameState.isTop ? "Top " : "Bot " );
+        returnString += (this.props.gameState.inning);
         return (returnString);
     }
 
-    makeInningNumbers = () => {
-        var jsx = [];
-        for (var i = 1;i < 6;i++) {
-            jsx = [...jsx, 
-                <Col key={i} size={10}>
-                    <Text style={styles.scoreboard2}>{i}</Text>
-                </Col>];          
-        }
-        jsx = [...jsx, 
-            <Col key={i} size={10}>
-                <Text style={styles.scoreboard2}>R</Text>
-            </Col>];    
-
-        return jsx;
-    }
-
-    makeInningScores = (offset) => {
-
-        var jsx=[];
-
-        //offset - 0 for away, 1 for home
-        totalScore = 0;
-
-
-        for (var i = 0;i < 5;i++) {
-            inningval = i*2 + offset;
-            if ( this.props.game.innings[inningval] === undefined ) {
-                jsx = [...jsx, 
-                    <Col key={i} size={10}>
-                        <Text style={ [styles.scoreboard, styles.box] }> </Text>
-                    </Col>]; 
-            } else {
-                totalScore += this.props.game.innings[inningval].runs;
-                jsx = [...jsx, 
-                    <Col key={i} size={10}>
-                        <Text style={ [styles.scoreboard, styles.box] }> {this.props.game.innings[inningval].runs} </Text>
-                    </Col>];
-            }
-        }
-
-        jsx = [...jsx, 
-            <Col key={6} size={10}>
-                <Text style={ [styles.scoreboard, styles.box] }>{totalScore}</Text>
-            </Col>];
-
-        return jsx;
-
+    getPitchCount = () => {
+        return `${this.props.inningState.balls}-${this.props.inningState.strikes} Outs: ${this.props.inningState.outs}`;
     }
 
     render() {
         return (
+            <Grid>
+                <Row style={{backgroundColor: "#d3d3d3"}}>
+                    <Col>
+                        <Row>
+                            <Text style={styles.scores}>{this.props.gameState.awayLineUp.teamName} {this.props.inningState.awayScore}</Text>
+                        </Row>
+                        <Row>
+                            <Text style={styles.scores}>{this.props.gameState.homeLineUp.teamName} {this.props.inningState.homeScore}</Text>
+                        </Row>
+                    </Col>
+                    <Col>
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={styles.inningState}>{this.getInningText()}  {this.getPitchCount()}</Text>
+                        </View>
+
+                    </Col>
+
+                </Row>
+
+            </Grid>
+
+        );
+    }
+};
+
+/*
+
             <Grid style= { styles.statusStyle } >
                 <Row size = {25} style= {styles.statusRow1} >
                     <Text style = { [styles.elementStyle, styles.L]}>{this.getInningText()}</Text>
@@ -90,9 +83,7 @@ export default class GameStateView extends Component {
                     {this.makeInningScores(1)}
                 </Row>
             </Grid>
-        );
-    }
-};
+            */
 
 
 const styles = StyleSheet.create({
@@ -106,15 +97,16 @@ const styles = StyleSheet.create({
     statusRow2: {
         justifyContent: 'center',
     },  
-    scoreboard: {
-        fontSize: 20,
+    scores: {
+        //padding: 10,
+        marginLeft: 10,
+        fontSize: 18,
         textAlign: 'center',
     } ,
-    scoreboard2: {
+    inningState: {
         fontSize: 20,
         textAlign: 'center',
         fontWeight: 'bold',
-        width: '75%',
     } ,
     teamName: {
         flex: 6,  

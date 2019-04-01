@@ -13,12 +13,11 @@ import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
 import BatterView from '../components/BatterView.js';
 import HitView from '../components/HitView.js';
+import GameStateView from '../components/GameStateView'
 
 export default class GameScreen extends Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: navigation.getParam('title', 'Dragons'),
-    };
+  static navigationOptions = {
+    header: null,
   };
 
 
@@ -46,12 +45,12 @@ export default class GameScreen extends Component {
           strikes: 0,
         };
 
-        console.log(`my team is batting: ${this.mGame.myTeamIsBatting}, home team: ${this.mGame.homeTeam.teamName}, away team : ${this.mGame.awayTeam.teamName}`);
+        console.log(`my team is batting: ${this.mGame.myTeamIsBatting}, home team: ${this.mGame.homeLineUp.teamName}, away team : ${this.mGame.awayLineUp.teamName}`);
         console.log('-----------------');
         //console.log(this.mGame);
         console.log(`isTop = ${this.mGame.isTop} , batting team = ${this.mGame.battingTeam.teamName}. myTeam =  ${this.mGame.myTeam.teamName}`);
         // /console.log(this.mGame.battingTeam);
-        console.log(`AwayTeamMy = ${this.mGame.awayTeam.myTeam}, HomeTeamMy = ${this.mGame.awayTeam.myTeam}`);
+        console.log(`AwayTeamMy = ${this.mGame.awayLineUp.myTeam}, HomeTeamMy = ${this.mGame.homeLineUp.myTeam}`);
         console.log('-----------------');
 
         var batterUp = this.mGame.nextBatter;
@@ -60,7 +59,7 @@ export default class GameScreen extends Component {
 
         this.state = {
             machinePitch: true,
-            currentPitcher: this.mGame.homeTeam.currentPitcher,
+            currentPitcher: this.mGame.homeLineUp.currentPitcher,
             inHittingUX: false,
             batterUp: batterUp,
             hitSelected: -1,
@@ -328,6 +327,13 @@ export default class GameScreen extends Component {
  
       return (
         <Grid style={styles.container}>
+          <Row style= {{height: 20}} />
+          <Row style={{height: 45}}>
+            <GameStateView
+              gameState={this.mGame}
+              inningState={this.mGameState}
+            /> 
+          </Row>
           <Row size={80} >
             <HitView 
               baseRunners = {this.mBaseRunners} 
@@ -356,6 +362,14 @@ export default class GameScreen extends Component {
               batterClick = {this.onBatterClick}
             />
           }
+          </Row>
+          <Row style={{height: 65}} >
+            <Col style = {{backgroundColor: "yellow"}}>
+            </Col>
+            <Col style = {{backgroundColor: "red"}}>
+            </Col >
+            <Col style = {{backgroundColor: "green"}}>
+            </Col>
           </Row>
 
         </Grid>

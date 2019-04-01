@@ -16,8 +16,8 @@ import Player from '../model/Player.js';
 
 export default class Game {
 
-    homeTeam; //type LineUp
-    awayTeam; //type LineUp
+    homeLineUp; //type LineUp
+    awayLineUp; //type LineUp
     //state:
     currentInning; //Current Inning will be 0 based, top of inning = even, bottom = odd
     innings = []; //array of Inning objects
@@ -26,8 +26,8 @@ export default class Game {
 
     //stats:
     constructor(home, away, gameSettings) {
-        this.homeTeam = home;
-        this.awayTeam = away;
+        this.homeLineUp = home;
+        this.awayLineUp = away;
         this.gameSettings = gameSettings;
         this.currentInning = 0;
         this.innings.push(new Inning());
@@ -36,10 +36,10 @@ export default class Game {
 
 
     get myTeam() {
-        if (this.homeTeam.myTeam == true) {
-            return this.homeTeam;
+        if (this.homeLineUp.myTeam == true) {
+            return this.homeLineUp;
         } else {
-            return this.awayTeam;
+            return this.awayLineUp;
         }
     }
 
@@ -61,17 +61,17 @@ export default class Game {
 
     get battingTeam() {
         if (this.isTop) {
-            return this.awayTeam;
+            return this.awayLineUp;
         } else {
-            return this.homeTeam;
+            return this.homeLineUp;
         }
     }
 
     get fieldingTeam() {
         if (this.isTop) {
-            return this.homeTeam;
+            return this.homeLineUp;
         } else {
-            return this.awayTeam;
+            return this.awayLineUp;
         }
     }
 

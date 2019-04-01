@@ -84,8 +84,8 @@ export default class SettingsScreen extends React.Component {
   keyExtractor = (item, index) => index.toString()
 
   _addPlayer() {
-    console.log("state roster was:");
-    console.log(this.state.roster);
+    //console.log("state roster was:");
+    //console.log(this.state.roster);
     var r = this.state.roster;
     r.push(new Player("",0,0));
     this.setState({roster: r});

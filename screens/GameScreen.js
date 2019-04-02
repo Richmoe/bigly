@@ -13,7 +13,8 @@ import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
 import BatterView from '../components/BatterView.js';
 import HitView from '../components/HitView.js';
-import GameStateView from '../components/GameStateView'
+import GameStateView from '../components/GameStateView';
+import Buttonish from '../components/Buttonish';
 
 export default class GameScreen extends Component {
   static navigationOptions = {
@@ -365,8 +366,13 @@ export default class GameScreen extends Component {
           </Row>
           <Row style={{height: 65}} >
             <Col style = {{backgroundColor: "yellow"}}>
+            
             </Col>
             <Col style = {{backgroundColor: "red"}}>
+              <Buttonish 
+                title="Fielding" 
+                onPress={() => this.props.navigation.navigate('Roster', { team: this.mGame.myTeam, view: 'fielding', callBack: this.cbPitcherChange})}
+              />
             </Col >
             <Col style = {{backgroundColor: "green"}}>
             </Col>

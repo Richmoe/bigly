@@ -5,7 +5,7 @@ export default class Team  {
     roster = []; //Array of Players
     myTeam = false;
     //leagueName = "AA";
-    maxInnings = 5;
+    maxInnings = 6;
     maxFieldPlayers = 11;
     maxRunsPerInning = 5;
     machinePitch = true;
@@ -38,9 +38,6 @@ export default class Team  {
 
             defaultRoster.push(player);
         }
-        console.log("Created default roster for " + names);
-        console.log(defaultRoster);
-
         this.roster = defaultRoster;
     }
 
@@ -165,13 +162,9 @@ export class LineUp
 
             player.battingOrder = i;
             player.currentPosition = i;
-            console.log(player);
             this.battingOrder.push(i);
             this.fieldPositions.push(i);
         }
-
-        console.log(this.battingOrder);
-        console.log(this.fieldPositions);
     }
 
     _shuffleArray = (input) => {
@@ -189,13 +182,13 @@ export class LineUp
 
 
     _createRandomLineup() {
+        //
         tempBattingOrder = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         tempFieldingPos = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         
         for (var i = 0; i < this.team.roster.length;i++)
         {
             player = this.team.roster[i];
-            console.log(player);
             player.battingOrder = tempBattingOrder.indexOf(i);
             player.currentPosition = tempFieldingPos.indexOf(i);
 

@@ -62,41 +62,7 @@ export default class GameStateView extends Component {
     }
 };
 
-/*
-
-            <Grid style= { styles.statusStyle } >
-                <Row size = {25} style= {styles.statusRow1} >
-                    <Text style = { [styles.elementStyle, styles.L]}>{this.getInningText()}</Text>
-                    <Text style = { [styles.elementStyle, styles.C]}>Outs: {this.props.outs}</Text>  
-                    <Text style = { [styles.elementStyle, styles.R]}>{this.props.balls} - {this.props.strikes}</Text>
-                </Row>
-                <Row size={25} style={StyleSheet.statusRow2} >
-                    <Col size={30}><Text style= {styles.scoreboard}></Text></Col>
-                    {this.makeInningNumbers()}
-                </Row>
-                <Row size={25} style={StyleSheet.statusRow2} >
-                    <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.awayTeam.teamName}</Text></Col>
-                    {this.makeInningScores(0)}
-                </Row>
-                <Row size={25} style={StyleSheet.statusRow2} >
-                    <Col size={30}><Text style= {styles.scoreboard}>{this.props.game.homeTeam.teamName}</Text></Col>
-                    {this.makeInningScores(1)}
-                </Row>
-            </Grid>
-            */
-
-
 const styles = StyleSheet.create({
-
-    statusStyle: {
-
-    },
-    statusRow1: {
-
-    },
-    statusRow2: {
-        justifyContent: 'center',
-    },  
     scores: {
         //padding: 10,
         marginLeft: 10,
@@ -108,35 +74,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
     } ,
-    teamName: {
-        flex: 6,  
-        fontSize: 22,
-    },
-    inningScore: {
-        flex: 1,
-        borderColor: 'blue',
-        borderWidth: 1,
-        fontSize: 22,
-        textAlign: 'center',
-    },
-    elementStyle: {
-        flex: 1,
-        fontSize: 20,
-    },
-    box: {
-        borderColor: 'black',
-        borderWidth: 1,
-        width: '75%',
-    },
-    R: {
-       textAlign: "right" 
-    },
-    C: {
-        textAlign: 'center'
-    },
-    L: {
-        textAlign: 'left'
-    },
+ 
 });
     
 

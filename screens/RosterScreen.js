@@ -10,6 +10,7 @@ import {
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import GameConst from "../constants/GameConst.js";
 import Buttonish from "../components/Buttonish";
+import * as Util from "../util/Misc";
 
 export default class RosterScreen extends React.Component {
 
@@ -36,6 +37,10 @@ export default class RosterScreen extends React.Component {
         } else if (this.view == "pitching") {
             this.formatRow = [10,80,10];
             this.header = ["Pos", "Name", "PC"];
+            this.order = this.team.fieldPositions;
+        } else if (this.view == "fielding") {
+            this.formatRow = [10,80,10];
+            this.header = ["Pos", "Name", "#"];
             this.order = this.team.fieldPositions;
         } else if (this.view == "lineup") {
             this.formatRow = [25,50,25];
@@ -143,16 +148,19 @@ export default class RosterScreen extends React.Component {
     };
 
     makeRow = (ix, val) => {
-
+        var player;
         if (this.view == "batting" ) {
             player = this.team.team.roster[val];
             return this.rowJSX(ix, (ix+1), player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
-        } else if (this.view == "pitching") {
+        } else if (this.view == "pitching" ) {
             player = this.team.team.roster[val];
             //console.log(`makeRow: ${ix}, ${val}`);
             //console.log(player);
             //console.log(player.pitcherStats.pitches);
             return this.rowJSX(ix, GameConst.fieldPosAbbrev[player.currentPosition], player.name, player.pitcherStats.pitches);
+        } else if (this.view == "fielding" ) {
+            player = this.team.team.roster[val];
+            return this.rowJSX(ix, GameConst.fieldPosAbbrev[player.currentPosition], player.name, (player.battingOrder + 1));
         } else if (this.view == "lineup") {
             player = this.team.team.roster[ix];
             return this.rowJSX(ix, (player.battingOrder) + 1, player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
@@ -171,12 +179,12 @@ export default class RosterScreen extends React.Component {
     fixUpRoster() {
         //walk the roster to create batting and fieldingPos arrays:
         //Reset lineups:
-        tempBattingOrder = new Array(this.team.team.roster.length).fill(-1);
-        tempFieldPositions = new Array(this.team.team.roster.length).fill(-1);
+        var tempBattingOrder = new Array(this.team.team.roster.length).fill(-1);
+        var tempFieldPositions = new Array(this.team.team.roster.length).fill(-1);
 
         for (var i = 0;i < this.team.team.roster.length;i++) {
             //Check to see if we should skip:
-            player = this.team.team.roster[i];
+            var player = this.team.team.roster[i];
             //Add to lineup lists:
             console.log("Player: " + player.name + " batting: " + player.battingOrder + ", field: " + player.currentPosition);
             if (player.battingOrder == -1 || player.currentPosition == GameConst.FIELD_POS_OUT) {
@@ -188,8 +196,8 @@ export default class RosterScreen extends React.Component {
         }
 
         //Remove the -1s, giving us new batting order and position assignments. Basically slides everyone below the -1s up.
-        tempB2 = tempBattingOrder.filter(ix => ix >= 0);
-        tempF2 = tempFieldPositions.filter(ix => ix >= 0);
+        var tempB2 = tempBattingOrder.filter(ix => ix >= 0);
+        var tempF2 = tempFieldPositions.filter(ix => ix >= 0);
 
         //Reset all player positions:
         for (var i = 0;i < tempB2.length; i++) {
@@ -229,7 +237,7 @@ export default class RosterScreen extends React.Component {
     }
 
     swapBatterPosition(toPos) {
-        selectedPlayer = this.team.team.roster[this.state.selectedOrder];
+        var selectedPlayer = this.team.team.roster[this.state.selectedOrder];
 
         console.log("Batting Order: " + toPos);
         console.log(selectedPlayer);
@@ -379,6 +387,24 @@ export default class RosterScreen extends React.Component {
         }
     }
 
+    shuffleFielders () {
+        
+        var tempArray = this.order.slice(2);
+
+        tempArray = Util.shuffleArray(tempArray);
+        console.log("tempArray: ");
+        console.log(tempArray);
+
+        //this.order = tempArray.slice(0);
+        for (var i = 0; i < tempArray.length;i++) {
+            var selectedPlayer = this.team.team.roster[tempArray[i]];
+            selectedPlayer.currentPosition = i + 2;
+        }
+
+        this.fixUpRoster();
+        //this.forceUpdate();
+        this.setState({selectedOrder: -1});
+    }
         
     render() {
 
@@ -387,6 +413,7 @@ export default class RosterScreen extends React.Component {
             
         return (
             <Grid>
+                
                 <Row key={99}>{this.makeHeader()}</Row>
                 {fullRows}
 
@@ -400,6 +427,13 @@ export default class RosterScreen extends React.Component {
                         </View>
                     </View>
                  </Modal>
+
+                 <Row style={{height: 50, backgroundColor: 'red'}} >
+                    <Buttonish  
+                        title = "Shuffle"
+                        onPress = {() => this.shuffleFielders()}
+                    />
+                 </Row>
             </Grid>
         );
 

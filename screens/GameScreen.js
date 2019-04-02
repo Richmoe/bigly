@@ -375,6 +375,10 @@ export default class GameScreen extends Component {
               />
             </Col >
             <Col style = {{backgroundColor: "green"}}>
+            <Buttonish 
+                title="Stats" 
+                onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
+              />
             </Col>
           </Row>
 

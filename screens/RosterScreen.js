@@ -427,13 +427,14 @@ export default class RosterScreen extends React.Component {
                         </View>
                     </View>
                  </Modal>
-
+                {this.view == 'fielding' && 
                  <Row style={{height: 50, backgroundColor: 'red'}} >
                     <Buttonish  
                         title = "Shuffle"
                         onPress = {() => this.shuffleFielders()}
                     />
                  </Row>
+                }
             </Grid>
         );
 

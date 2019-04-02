@@ -371,7 +371,7 @@ export default class GameScreen extends Component {
             <Col style = {{backgroundColor: "red"}}>
               <Buttonish 
                 title="Fielding" 
-                onPress={() => this.props.navigation.navigate('Roster', { team: this.mGame.myTeam, view: 'fielding', callBack: this.cbPitcherChange})}
+                onPress={() => this.props.navigation.navigate('FieldingRoster', { team: this.mGame.myTeam, callBack: this.cbPitcherChange})}
               />
             </Col >
             <Col style = {{backgroundColor: "green"}}>

@@ -3,6 +3,7 @@
 import React, {Component} from 'react';
 import {
   StyleSheet, 
+  View,
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import Team, { LineUp } from '../model/Team';
@@ -393,11 +394,15 @@ export default class GameScreen extends Component {
             <Col style = {{backgroundColor: "yellow"}}>
             <Buttonish 
                 title="Other" 
-                //onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
+                onPress={() => this.props.navigation.navigate('InGameOptions', { game: this.mGame})}
                 disabled = {this.state.inHittingUX}
               />
             </Col>
           </Row>
+          {false && <View style={styles.overlay}>
+          </View>
+          }
+
 
         </Grid>
 
@@ -420,5 +425,14 @@ export default class GameScreen extends Component {
     gamestate: {
         //flex: 3,
         backgroundColor: 'green',
-    }
+    },
+    overlay:{
+      position: 'absolute',
+      top: 60,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 100,
+      backgroundColor: 'rgba(0,0,0,0.2)'
+    },
   });

@@ -19,15 +19,15 @@ export default class InGameOptionsScreen extends React.Component {
     title: 'Game Options',
   };
 
-
+  mGame;
 
   constructor(props) {
     console.log("Creating Settings");
     super(props);
 
-    /*
+
     //We should have passed in team here and game params here. We assume we loaded on launch:
-    this.currentTeam = this.props.navigation.getParam("team",null);
+    this.mGame = this.props.navigation.getParam("game",null);
 
     this.state = { 
       name: this.currentTeam.name, 
@@ -37,7 +37,7 @@ export default class InGameOptionsScreen extends React.Component {
       maxFieldPlayers: this.currentTeam.maxFieldPlayers,
       roster: this.currentTeam.roster.slice(0)
     };
-    */
+
   }
 
   toggleSwitch = (value) => {

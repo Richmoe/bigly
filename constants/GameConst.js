@@ -4,5 +4,6 @@ export default {
     FIELD_POS_OUT: 12,
     PITCHER: 0,
     CATCHER: 1,
+    GAME_OVER: 99,
 
 };

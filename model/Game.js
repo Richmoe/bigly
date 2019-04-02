@@ -13,6 +13,7 @@
 //Todo - what about tracking hit but thrown out at a 2nd?
 
 import Player from '../model/Player.js';
+import GameConst from '../constants/GameConst';
 
 export default class Game {
 
@@ -89,10 +90,12 @@ export default class Game {
         //check for end of game
         if (this.currentInning >= this.gameSettings.maxInnings) {
             //gameOver
+            this.currentInning = GameConst.GAME_OVER;
         } else {
             //Add a new inning
             this.innings.push(new Inning());
         }
+        return (this.currentInning)
     }
 
     addScore(scoreCount) {

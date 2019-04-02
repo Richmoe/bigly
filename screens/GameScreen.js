@@ -16,6 +16,7 @@ import BatterView from '../components/BatterView.js';
 import HitView from '../components/HitView.js';
 import GameStateView from '../components/GameStateView';
 import Buttonish from '../components/Buttonish';
+import GameConst from '../constants/GameConst';
 
 export default class GameScreen extends Component {
   static navigationOptions = {
@@ -69,9 +70,8 @@ export default class GameScreen extends Component {
         }
 
         this.mBaseRunners = [batterUp,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
-        
-        var titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"}  ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
-        this.props.navigation.setParams({title: titleStr});
+   
+
     }
 
 
@@ -108,31 +108,23 @@ export default class GameScreen extends Component {
 
     newInning() {
 
-      this.mGame.newInning();
-      this.mGameState.outs = 0;
-      this.mGameState.balls = 0;
-      this.mGameState.strikes = 0;
+      var newInning = this.mGame.newInning();
+      if (newInning != GameConst.GAME_OVER) {
+        this.mGameState.outs = 0;
+        this.mGameState.balls = 0;
+        this.mGameState.strikes = 0;
 
-      this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher });
+        this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher });
 
-      this.mBaseRunners = [-1, -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
-      this.nextBatter();
-      console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}, pitcher: ${this.mGame.fieldingTeam.currentPitcher.name}`);
+        this.mBaseRunners = [-1, -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
+        this.nextBatter();
+        console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}, pitcher: ${this.mGame.fieldingTeam.currentPitcher.name}`);
+      } else {
+        console.log("GAME OVER - now what???");
+        //this.gameOver();
+
+      }
     };
-
-    scoreRun(player, pitcher, runcount = 1) //Need to figure out RBIs etc.
-    {
-
-      console.log("Score run " + runcount);
-
-      this.mGame.addScore(runcount);
-      let {away, home} = this.mGame.score;
-      console.log(`Score: ${away} - ${home}`);
-      this.mGameState.awayScore = away;
-      this.mGameState.homeScore = home;
-
-    };
-
 
     pitchCallback = (pitchType) => {
 
@@ -204,23 +196,13 @@ export default class GameScreen extends Component {
         console.log("error pitch type: " + pitchType);
       }
 
-      var titleStr = `Inning: ${this.mGame.inning}${this.mGame.isTop? "˄" : "˅"} ${this.mGameState.balls}-${this.mGameState.strikes} Outs: ${this.mGameState.outs} Score: ${this.mGameState.awayScore}-${this.mGameState.homeScore}`;
-      console.log(titleStr);
-
-      this.props.navigation.setParams({title: titleStr});
-
       if (event != null) this.mGame.parseEvent(event);
-      //this.logEvent(event);
     };
 
     onPitcherClick = () => {
       this.props.navigation.navigate('Roster', { team: this.mGame.fieldingTeam, view: 'pitching', callBack: this.cbPitcherChange});
     };
 
-
-    onBatterClick = () => {
-      this.props.navigation.navigate('Roster', { team: this.mGame.battingTeam, view: 'batting'});     
-    }
 
     onHitClick = (position) => {
       console.log("OHC! " + position);
@@ -268,12 +250,6 @@ export default class GameScreen extends Component {
 
     resolveHit = (walk) => {
       
-      if (walk == null) {
-        console.log("resolveHit Hit " + this.mGame.battingTeam.battingOrder[this.mGame.battingTeam.currentBatterIx] + ", BatterUP: " + this.state.batterUp);
-      }else {
-        console.log("resolveHit WALK");
-      }
-
       //Store current Batter:
       //Find batter:
       var batterLoc = this.mBaseRunners.indexOf(this.state.batterUp);
@@ -310,7 +286,13 @@ export default class GameScreen extends Component {
       //var runCount = runs.reduce(this.totalRunners,0);
       //console.log("runCount " + runCount);
       //console.log(runs);
-      if (runCount > 0)  this.scoreRun(0,0,runCount);
+      if (runCount > 0)  {
+        this.mGame.addScore(runcount);
+        let {away, home} = this.mGame.score;
+  
+        this.mGameState.awayScore = away;
+        this.mGameState.homeScore = home;
+      }
 
 
       //get outs - mBaseRunners ix 8-11
@@ -360,7 +342,7 @@ export default class GameScreen extends Component {
           <Row size={10} >
           { this.mGame.myTeamIsBatting == false && 
             <PitcherView 
-              onPitcherChange = {this.onPitcherClick} 
+              //onPitcherChange = {this.onPitcherClick} 
               onMachineChange = {this.onMachineChange} 
               isMachinePitch={this.state.machinePitch} 
               pitcher = {this.mGame.fieldingTeam.getPlayerByPos(0)} 

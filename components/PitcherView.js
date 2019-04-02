@@ -19,7 +19,7 @@ export default class PitcherView extends Component {
       return (
           <Row size={1} style={styles.container}>
             <Col size={15}>
-                <TouchableOpacity onPress={() => this.props.onMachineChange()}>  
+                <TouchableOpacity onPress={() => this.props.onMachineChange()} disabled = {this.props.disabled}>  
                     <Image 
                         style={{marginTop: 2, marginLeft: 2, width: 30, height: 30, resizeMode: 'contain'}} 
                         source={this.props.isMachinePitch ? require("../assets/images/pitchingMachine.png") : require("../assets/images/small-baseball.png")} 
@@ -27,7 +27,7 @@ export default class PitcherView extends Component {
                 </TouchableOpacity>
             </Col>
             <Col size={55}>
-                <TouchableOpacity onPress={() => this.props.onPitcherChange()}>       
+                <TouchableOpacity onPress={() => this.props.onPitcherChange()} disabled = {this.props.disabled}>       
                     <Text style={styles.pitcherName}>{this.props.isMachinePitch ? "Machine Pitch" : this.props.pitcher.name}</Text>
                 </TouchableOpacity>   
             </Col>

@@ -42,7 +42,7 @@ export default class BatterView extends Component {
                 <Image style={styles.batImage} source={require("../assets/images/baseball-bat.png")} />
             </Col>
             <Col size={55}>
-                <TouchableOpacity onPress={() => this.props.batterClick()}>   
+                <TouchableOpacity onPress={() => this.props.batterClick()} disabled = {this.props.disabled}>   
                   <Text style={styles.batter}>{this.batterNameAndOrder(this.props.battingTeam.currentBatterIx)}</Text>
                 </TouchableOpacity>
             </Col>

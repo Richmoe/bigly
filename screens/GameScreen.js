@@ -138,10 +138,17 @@ export default class GameScreen extends Component {
       //Special cases:
       if (pitchType == 'reset') {
         this.mBaseRunners = [...this.mBaseRunnersPreHit];
-        this.setState( {inHittingUX: false});
+        this.setState( {inHittingUX: false, hitMenu: false});
         return;
       } else if (pitchType === 'hit') {
         this.onHitClick(0); //trigger batter click
+        return;
+      }
+
+      //This is to catch cases where we hit the "Done" and "Reset" when the modal is up (which means it truly isn't modal) TODO Refactor
+      if (this.state.hitMenu) {
+        console.log("******************* IGNORE***");
+        this.setState( {inHittingUX: false, hitMenu: false});
         return;
       }
 
@@ -186,6 +193,7 @@ export default class GameScreen extends Component {
         this.resolveHit(true);
 
       } else if (pitchType === 'done') {
+
         this.resolveHit();
         //get current outs?
 
@@ -355,29 +363,38 @@ export default class GameScreen extends Component {
               onMachineChange = {this.onMachineChange} 
               isMachinePitch={this.state.machinePitch} 
               pitcher = {this.mGame.fieldingTeam.getPlayerByPos(0)} 
+              disabled = {this.state.inHittingUX}
             />
           }
           { this.mGame.myTeamIsBatting == true && 
             <BatterView 
               battingTeam = {this.mGame.battingTeam}
-              batterClick = {this.onBatterClick}
+              //batterClick = {this.onBatterClick}
+              disabled = {this.state.inHittingUX}
             />
           }
           </Row>
           <Row style={{height: 65}} >
-            <Col style = {{backgroundColor: "yellow"}}>
-            
-            </Col>
+
             <Col style = {{backgroundColor: "red"}}>
               <Buttonish 
-                title="Fielding" 
-                onPress={() => this.props.navigation.navigate('FieldingRoster', { team: this.mGame.myTeam, callBack: this.cbPitcherChange})}
+                title="Line Up" 
+                onPress={() => this.props.navigation.navigate('Roster', { team: this.mGame.myTeam, view: "fielding", callBack: this.cbPitcherChange})}
+                disabled = {this.state.inHittingUX}
               />
             </Col >
             <Col style = {{backgroundColor: "green"}}>
             <Buttonish 
                 title="Stats" 
                 onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
+                disabled = {this.state.inHittingUX}
+              />
+            </Col>
+            <Col style = {{backgroundColor: "yellow"}}>
+            <Buttonish 
+                title="Other" 
+                //onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
+                disabled = {this.state.inHittingUX}
               />
             </Col>
           </Row>
@@ -386,19 +403,6 @@ export default class GameScreen extends Component {
 
         );
            
-/*
-
-        <Row size={0}>
-          <GameStateView style={styles.gamestate}
-              balls = {this.state.balls}
-              strikes = {this.state.strikes}
-              outs = {this.state.outs}
-              game = {this.mGame}
-            />
-        </Row>
-
-     
-       */
     }
 
   }

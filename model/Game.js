@@ -88,7 +88,7 @@ export default class Game {
     newInning() {
         this.currentInning += 1;
         //check for end of game
-        if (this.currentInning >= this.gameSettings.maxInnings) {
+        if ((this.currentInning / 2) >= this.gameSettings.maxInnings) {
             //gameOver
             this.currentInning = GameConst.GAME_OVER;
         } else {

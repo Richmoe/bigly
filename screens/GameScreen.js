@@ -6,9 +6,13 @@ import {
   View,
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
+import { StackActions, NavigationActions } from 'react-navigation';
+
+
 import Team, { LineUp } from '../model/Team';
 import GameParams from '../model/GameParams';
 import Game from '../model/Game';
+
 
 import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
@@ -106,6 +110,29 @@ export default class GameScreen extends Component {
         this.mGame.parseEvent({type: 'atbat'});
     };
 
+    gameOver() {
+
+      //This resets the Stack so back goes to Home screen
+      // then it navigates to Game Over
+      const resetAction = StackActions.reset({
+        index: 1,
+        actions: [
+          NavigationActions.navigate({ routeName: 'Home' }),
+          NavigationActions.navigate({ routeName: 'GameOver', params: { game: this.mGame } }),
+        ],
+      });
+      this.props.navigation.dispatch(resetAction);
+
+      //this.props.navigation.navigate('GameOver', { game: this.mGame });
+
+    }
+
+    cbSettings = (event) => {
+      if (event == 'EndGame') {
+        this.gameOver();
+      }
+    }
+
     newInning() {
 
       var newInning = this.mGame.newInning();
@@ -121,7 +148,7 @@ export default class GameScreen extends Component {
         console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}, pitcher: ${this.mGame.fieldingTeam.currentPitcher.name}`);
       } else {
         console.log("GAME OVER - now what???");
-        //this.gameOver();
+        this.gameOver();
 
       }
     };
@@ -287,7 +314,7 @@ export default class GameScreen extends Component {
       //console.log("runCount " + runCount);
       //console.log(runs);
       if (runCount > 0)  {
-        this.mGame.addScore(runcount);
+        this.mGame.addScore(runCount);
         let {away, home} = this.mGame.score;
   
         this.mGameState.awayScore = away;
@@ -376,7 +403,7 @@ export default class GameScreen extends Component {
             <Col style = {{backgroundColor: "yellow"}}>
             <Buttonish 
                 title="Other" 
-                onPress={() => this.props.navigation.navigate('InGameOptions', { game: this.mGame})}
+                onPress={() => this.props.navigation.navigate('InGameOptions', { game: this.mGame, callBack: this.cbSettings})}
                 disabled = {this.state.inHittingUX}
               />
             </Col>

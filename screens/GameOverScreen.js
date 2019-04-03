@@ -1,3 +1,5 @@
+"use strict";
+
 import React from 'react';
 import {
   Platform, 
@@ -14,72 +16,61 @@ import {
 } from 'react-native';
 import Buttonish from '../components/Buttonish';
 
+export default class GameOverScreen extends React.Component {
+    //static navigationOptions = {
+    //    header: null,
+    //};
 
-export default class InGameOptionsScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Game Options',
-  };
-
-  mGame;
-  mCallBack
+    mGame;
 
   constructor(props) {
-    console.log("Creating Settings");
+
     super(props);
 
 
     //We should have passed in team here and game params here. We assume we loaded on launch:
     this.mGame = this.props.navigation.getParam("game",null);
-    this.mCallBack = this.props.navigation.getParam("callBack", null);
+    console.log(this.mGame);
+
   }
+
 
   toggleSwitch = (value) => {
     //this.setState( {machinePitch: value});
   }
 
-  endGame() {
-      this.mCallBack("EndGame");
-      this.props.navigation.goBack();
-  }
   
   render() {
+    let {away, home} = this.mGame.score;
+
+    console.log(`score: ${away}, ${home}`);
     return (
       <View style={{flex: 1, flexDirection: "column"}}>
         
-        <View style={{flexDirection: "row"}}>
-          <Text style={[styles.textLabel, {flex: 1}]}>Innings</Text>
+        <View style={{flex:3}}>
+            <View style={{flex: 5, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={{fontSize: 48, fontWeight: 'bold'}}>{this.mGame.awayLineUp.teamName}: {away}</Text>
+            </View>
+                    
+            <View style={{flex: 5, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={{fontSize: 48, fontWeight: 'bold'}}>{this.mGame.homeLineUp.teamName}: {home}</Text>
+            </View>
         </View>
-        <View style={{flexDirection: "row"}}>
-            <Buttonish 
-                title = "End Game"
-                onPress = {() => this.endGame()}
-            />
-          
+        <View style={{flex:1}}>
+            <Text style={styles.settings}>Box Score here: </Text>
         </View>
-        <View style={{flexDirection: "row"}}>
-          <Text style={[styles.textLabel, {flex: 1}]}>End Inning</Text>
-        </View>
-        <View style={{flexDirection: "row"}}>
-          <Text style={[styles.textLabel, {flex: 1}]}>Update LineUp</Text>
-        </View>
-        <View style={{flexDirection: "row"}}>
-          <Text style={[styles.textLabel, {flex: 1}]}>Undo Last Play</Text>
-        </View>
-        
-        <View style={{flexDirection: "row"}}>
-          <Text style={[styles.textLabel, {flex: 1}]}>Disable Mercy Rule:</Text>
-          <View style={{alignItems: 'flex-start', flex: 1}}>
-            <Switch
-              style={styles.switch}
-              onValueChange={this.toggleSwitch}
-              value={ false}
-              
-            />
-          </View>
-        </View>
-        <View style={{flexDirection: "row"}}>
+
+        <View style={{flex: 1}}>
           <Text style={[styles.textLabel, {flex: 1}]}>Add Note</Text>
         </View>
+        
+        <View style={{flex:1}}>
+            <Buttonish 
+              title = "Game Stats" 
+              onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
+            />
+        </View>
+
       </View>
      
 

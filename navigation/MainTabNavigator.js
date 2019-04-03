@@ -11,6 +11,7 @@ import RosterScreen from '../screens/RosterScreen';
 import PreGameScreen from '../screens/PreGameScreen';
 import StatsScreen from '../screens/StatsScreen';
 import InGameOptionsScreen from '../screens/InGameOptionsScreen';
+import GameOverScreen from '../screens/GameOverScreen';
 
 export default  createStackNavigator({
   Home: HomeScreen,
@@ -20,6 +21,7 @@ export default  createStackNavigator({
   TeamSettings: SettingsScreen,
   Stats: StatsScreen,
   InGameOptions: InGameOptionsScreen,
+  GameOver: GameOverScreen,
   navigationOptions: ({navigation}) => ({
     tabBarLabel: 'Home',
     tabBarIcon: ({ focused }) => (

@@ -1,7 +1,7 @@
 export default class GameParams {
 
     /*
-    maxInnings = 5;
+    maxInnings = 6;
     maxFieldPlayers = 11;
     maxRunsPerInning = 5;
     machinePitch = true;
@@ -12,6 +12,6 @@ export default class GameParams {
         this.allowMachinePitch = team.machinePitch;
         this.mercyRule = team.maxRunsPerInning;
         this.maxFieldPlayers = team.maxFieldPlayers;
-        this.maxInnings = team.maxInnings*2; //5 innings, inning counter is even for top, odd for bottom (e.g. inning 1 = bottom of 1st, inning 6 = top of 4th)
+        this.maxInnings = team.maxInnings*2; //6 innings, inning counter is even for top, odd for bottom (e.g. inning 1 = bottom of 1st, inning 6 = top of 4th)
     }
 }

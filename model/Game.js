@@ -14,6 +14,7 @@
 
 import Player from '../model/Player.js';
 import GameConst from '../constants/GameConst';
+import {uid} from '../util/Misc';
 
 export default class Game {
 
@@ -34,7 +35,7 @@ export default class Game {
         this.innings.push(new Inning());
         this.isMachinePitching = gameSettings.allowMachinePitch;
         this.date = date;
-        this.uid = ((((1+Math.random())*0x100000000)|0).toString(16).substring(1));
+        this.uid = uid();
     }
 
 

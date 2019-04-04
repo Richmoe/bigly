@@ -1,4 +1,5 @@
 "use strict";
+import {uid} from '../util/Misc';
 
 class PitcherStats {
     balls = 0;
@@ -34,12 +35,13 @@ class BatterStats {
 
 export default class Player {
 
+    uid;
     name;
     abbrev;
     number;
     battingOrder = 0;
     pitcherStats = new PitcherStats();
-    batterStats = new BatterStats()
+    batterStats = new BatterStats();
     positionByInning = new Array(5).fill(0);
 
     constructor(playername, battingOrder, position) {
@@ -54,7 +56,7 @@ export default class Player {
         }
         this.battingOrder = battingOrder;
         this.positionByInning[0] = position;
-
+        this.uid = uid();
     }
 
     get currentPosition() {

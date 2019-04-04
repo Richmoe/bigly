@@ -13,3 +13,9 @@ export function shuffleArray(input) {
     }
     return input;
   };
+
+
+export function uid() {
+  //8 byte guid, good enough for this I think.
+  return ((((1+Math.random())*0x100000000)|0).toString(16).substring(1))
+}

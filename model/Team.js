@@ -16,6 +16,40 @@ export default class Team  {
         this.name = teamName;
     }
 
+    fromJSON(json) {
+        this.name = json.name;
+        this.maxInnings = json.maxInnings;
+        this.maxFieldPlayers = json.maxFieldPlayers;
+        this.maxRunsPerInning = json.maxRunsPerInning;
+        this.machinePitch = json.machinePitch;
+        this.roster = [];
+        for (let i = 0;i < json.teamRoster.length;i++) {
+            var p = new Player(json.teamRoster[i].name,0,0);
+            p.uid = json.teamRoster[i].uid;
+            p.number = json.teamRoster[i].number; 
+            this.roster.push(p);
+        }
+    }
+
+    createSave() {
+        //simplify roster:
+        var basicRoster = [];
+        for (let i = 0;i<this.roster.length;i++) {
+            basicRoster.push( {name: this.roster[i].name, uid: this.roster[i].uid, number: this.roster[i].number});
+        }
+        var json = {
+            name: this.name,
+            maxInnings: this.maxInnings,
+            maxFieldPlayers: this.maxFieldPlayers,
+            maxRunsPerInning: this.maxRunsPerInning,
+            machinePitch: this.machinePitch,
+            teamRoster: basicRoster,
+        };
+        return json;
+    }
+
+    
+
     _createDefaultRoster(names) {
    
         defaultRoster = [];

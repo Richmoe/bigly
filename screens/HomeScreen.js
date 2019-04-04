@@ -97,6 +97,7 @@ export default class HomeScreen extends React.Component {
 
   _debugAway = () => {
     this.debugGame(false);
+
   }
 
 
@@ -108,6 +109,17 @@ export default class HomeScreen extends React.Component {
     t1.myTeam = true;
     var l1 = new LineUp(t1);
     //l1._createDefaultLineup();
+    var json = t1.createSave();
+    console.log("1*****************");
+    console.log(json);
+    var t3 = new Team();
+    console.log("2*****************");
+    console.log(t3);
+
+    t3.fromJSON(json);
+    console.log("3****************");
+    console.log(t3);
+    console.log("*****************");
 
     var t2 = new Team("Opponent");
     t2._createDefaultRoster();

@@ -25,7 +25,6 @@ export default class PreGameScreen extends React.Component {
         title: 'Pre Game Settings',
     };
 
-
     constructor(props) {
         console.log("Creating PreGame");
         super(props);
@@ -34,6 +33,11 @@ export default class PreGameScreen extends React.Component {
         this.myTeam = this.props.navigation.getParam("myTeam",null);
         this.myTeam.myTeam = true;
         this.myLineup = new LineUp(this.myTeam);
+
+        
+        this.mGameDate = new Date().toISOString().slice(0,10);
+
+
 
         //We need to create our opponent. For now let's just default to 11:
         opponentTeam = new Team();
@@ -93,7 +97,7 @@ export default class PreGameScreen extends React.Component {
         awayTeam = (!this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
         gameParams = new GameParams(this.myTeam);
 
-        this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameParams});
+        this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameParams, date: this.mGameDate});
 
 
     }
@@ -136,6 +140,14 @@ export default class PreGameScreen extends React.Component {
 
                         {!this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Home)</Text>}
                         {this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Away)</Text>}
+                    </View>
+                    <View style={{flex: 2, alignItems: 'center', justifyContent: 'center'}}>
+                        <TextInput
+                            style={styles.dateInput}
+                            //onChangeText={(text) => this.opponentLineUp.teamName = text}
+                            placeholder = "date"
+                            value={ this.mGameDate}
+                        />
                     </View>
                 </View>
                 <View style={{flex:3}}>
@@ -195,6 +207,16 @@ const styles = StyleSheet.create({
       borderColor: 'grey',
       borderWidth: 1,
   },
+  dateInput: {
+    //flex: 1,
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    //backgroundColor: 'yellow',
+    borderStyle: 'solid',
+    borderColor: 'grey',
+    borderWidth: 1,
+},
   switch: {
       flex: 1,
       alignItems: 'center',

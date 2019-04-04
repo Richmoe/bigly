@@ -34,68 +34,45 @@ export default class GameScreen extends Component {
     mGameState;
 
     constructor(props) {
-        console.log("Setting up Game ");
-        super(props);
+      console.log("Setting up Game ");
+      super(props);
 
-        //Init Game
-        //defaultGame = this._testGame();
-        var homeLineUp = this.props.navigation.getParam("homeLineUp");
-        var awayLineUp = this.props.navigation.getParam('awayLineUp');
-        var params = this.props.navigation.getParam('gameParams');
+      //Init Game
+      var homeLineUp = this.props.navigation.getParam("homeLineUp");
+      var awayLineUp = this.props.navigation.getParam('awayLineUp');
+      var params = this.props.navigation.getParam('gameParams');
+      var date = this.props.navigation.getParam('date');
 
-        this.mGame = new Game(homeLineUp, awayLineUp, params);
-        this.mGameState = {
-          awayScore: 0,
-          homeScore: 0,
-          outs: 0, 
-          balls: 0,
-          strikes: 0,
-        };
+      this.mGame = new Game(homeLineUp, awayLineUp, params, date);
+      this.mGameState = {
+        awayScore: 0,
+        homeScore: 0,
+        outs: 0, 
+        balls: 0,
+        strikes: 0,
+      };
 
-        console.log(`my team is batting: ${this.mGame.myTeamIsBatting}, home team: ${this.mGame.homeLineUp.teamName}, away team : ${this.mGame.awayLineUp.teamName}`);
-        console.log('-----------------');
-        //console.log(this.mGame);
-        console.log(`isTop = ${this.mGame.isTop} , batting team = ${this.mGame.battingTeam.teamName}. myTeam =  ${this.mGame.myTeam.teamName}`);
-        // /console.log(this.mGame.battingTeam);
-        console.log(`AwayTeamMy = ${this.mGame.awayLineUp.myTeam}, HomeTeamMy = ${this.mGame.homeLineUp.myTeam}`);
-        console.log('-----------------');
+      console.log(`my team is batting: ${this.mGame.myTeamIsBatting}, home team: ${this.mGame.homeLineUp.teamName}, away team : ${this.mGame.awayLineUp.teamName}`);
+      console.log('-----------------');
+      //console.log(this.mGame);
+      console.log(`isTop = ${this.mGame.isTop} , batting team = ${this.mGame.battingTeam.teamName}. myTeam =  ${this.mGame.myTeam.teamName}`);
+      // /console.log(this.mGame.battingTeam);
+      console.log(`AwayTeamMy = ${this.mGame.awayLineUp.myTeam}, HomeTeamMy = ${this.mGame.homeLineUp.myTeam}`);
+      console.log('-----------------');
 
-        var batterUp = this.mGame.nextBatter;
-        this.mGame.parseEvent({type: 'atbat'});
-   
+      var batterUp = this.mGame.nextBatter;
+      this.mGame.parseEvent({type: 'atbat'});
+  
+      this.state = {
+          machinePitch: true,
+          currentPitcher: this.mGame.homeLineUp.currentPitcher,
+          inHittingUX: false,
+          batterUp: batterUp,
+          hitSelected: -1,
+          hitMenu: false
+      }
 
-        this.state = {
-            machinePitch: true,
-            currentPitcher: this.mGame.homeLineUp.currentPitcher,
-            inHittingUX: false,
-            batterUp: batterUp,
-            hitSelected: -1,
-            hitMenu: false
-        }
-
-        this.mBaseRunners = [batterUp,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
-   
-
-    }
-
-
-    _testGame () {
-      
-      var t1 = new Team("Dragons");
-      t1._createDefaultMyRoster();
-      t1.myTeam = true;
-      var l1 = new LineUp(t1);
-      l1._createDefaultLineup();
-
-      var t2 = new Team("Opponent");
-      t2._createDefaultRoster();
-      var l2 = new LineUp(t2);
-      l2._createDefaultLineup();
-      
-      //Extract game settings from team. Do I want to do this? TODO
-      var gameSettings = new GameParams(t1);
-
-      return new Game(l2, l1, gameSettings);
+      this.mBaseRunners = [batterUp,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
     }
 
     nextBatter() {
@@ -384,23 +361,23 @@ export default class GameScreen extends Component {
             />
           }
           </Row>
-          <Row style={{height: 65}} >
+          <Row style={{height: 65, alignItems: 'center', justifyContent: 'center'}} >
 
-            <Col style = {{backgroundColor: "red"}}>
+            <Col>
               <Buttonish 
                 title="Line Up" 
                 onPress={() => this.props.navigation.navigate('Roster', { team: this.mGame.myTeam, view: "fielding", callBack: this.cbPitcherChange})}
                 disabled = {this.state.inHittingUX}
               />
             </Col >
-            <Col style = {{backgroundColor: "green"}}>
+            <Col>
             <Buttonish 
                 title="Stats" 
                 onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
                 disabled = {this.state.inHittingUX}
               />
             </Col>
-            <Col style = {{backgroundColor: "yellow"}}>
+            <Col>
             <Buttonish 
                 title="Other" 
                 onPress={() => this.props.navigation.navigate('InGameOptions', { game: this.mGame, callBack: this.cbSettings})}

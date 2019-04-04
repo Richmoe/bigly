@@ -26,13 +26,15 @@ export default class Game {
     isMachinePitching;
 
     //stats:
-    constructor(home, away, gameSettings) {
+    constructor(home, away, gameSettings, date) {
         this.homeLineUp = home;
         this.awayLineUp = away;
         this.gameSettings = gameSettings;
         this.currentInning = 0;
         this.innings.push(new Inning());
         this.isMachinePitching = gameSettings.allowMachinePitch;
+        this.date = date;
+        this.uid = ((((1+Math.random())*0x100000000)|0).toString(16).substring(1));
     }
 
 

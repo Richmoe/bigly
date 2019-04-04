@@ -44,8 +44,8 @@ export default class HomeScreen extends React.Component {
     if (this.defaultTeam == null) {
       this.defaultTeam = new Team("New Team");
     }
-    //console.log("default Team is: ");
-    //console.log(this.defaultTeam);
+    console.log("default Team is: ");
+    console.log(this.defaultTeam);
     
 
   }
@@ -73,7 +73,7 @@ export default class HomeScreen extends React.Component {
               title="Debug Home Game" onPress={this._debugHome}
               titleStyle={styles.buttonText}
           />
-          <Buttonish
+          <Button
               title="Debug Away Game" onPress={this._debugAway}
               titleStyle={styles.buttonText}
           />
@@ -117,6 +117,9 @@ export default class HomeScreen extends React.Component {
     //Extract game settings from team. Do I want to do this? TODO
     var gameSettings = new GameParams(t1);
 
+    //Testing a 1 inning game.
+    gameSettings.maxInnings = 1;
+
     var homeTeam, awayTeam;
     if (isHome) {
       homeTeam = l1;
@@ -126,7 +129,9 @@ export default class HomeScreen extends React.Component {
       awayTeam = l1;
     }
 
-    this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameSettings});
+    var date = new Date().toISOString().slice(0,10);
+
+    this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameSettings, date: date});
 
   }
 

@@ -39,6 +39,23 @@ export default class GameOverScreen extends React.Component {
     //this.setState( {machinePitch: value});
   }
 
+  saveGame() {
+
+    //Craft saved game name:
+    var gameName = `${this.mGame.date}-${this.mGame.myTeam.teamName}-${this.mGame.myTeam.teamName}-${this.mGame.uid}`;
+    console.log("Save Game: " + gameName);
+
+    //Util.saveData("DefaultTeam", this.mGame);
+
+  }
+
+  componentWillUnmount() {
+    console.log('UNMOUNTED');
+
+    //test
+    this.saveGame();
+  }
+
   
   render() {
     let {away, home} = this.mGame.score;

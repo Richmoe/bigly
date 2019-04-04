@@ -1,5 +1,12 @@
 import React from 'react';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { 
+  Text, 
+  TouchableOpacity, 
+  TouchableNativeFeedback,
+  StyleSheet,
+  Platform,
+  View,
+} from 'react-native';
 
 export default class Buttonish extends React.Component {
   constructor(props) {
@@ -7,6 +14,20 @@ export default class Buttonish extends React.Component {
   }
 
   render() {
+
+    const buttonStyles = [styles.button];
+    const textStyles = [styles.text];
+    /*if (color) {
+      if (Platform.OS === 'ios') {
+        textStyles.push({color: color});
+      } else {
+        buttonStyles.push({backgroundColor: color});
+      }
+    }
+    */
+    const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+
+    const formattedTitle =  Platform.OS === 'android' ? this.props.title.toUpperCase() : this.props.title;
 
     buttonStyle = this.props.buttonStyle;
     if (buttonStyle == null) {
@@ -18,18 +39,27 @@ export default class Buttonish extends React.Component {
       buttonStyle = { backgroundColor: '#CEE3F6'}
     }
 
+    if (this.props.disabled) {
+      buttonStyles.push(styles.buttonDisabled);
+      textStyles.push(styles.textDisabled);
+    }
+
     return (
-      <TouchableOpacity 
+      <Touchable
         onPress={this.props.onPress}
-        style={[styles.buttonish, buttonStyle]}
+       
         disabled={this.props.disabled}
       >
-        <Text style={[this.props.titleStyle, {color: 'white'}]}>{this.props.title}</Text>
-     </TouchableOpacity>
+        <View style={buttonStyles}>
+          <Text style={textStyles}>{formattedTitle}</Text>
+        </View>
+     </Touchable>
     );
   }
 }
-
+//
+// style={[styles.buttonish, buttonStyle]}
+//<Text style={[this.props.titleStyle, {color: 'white'}]}>{this.props.title}</Text>
 
 const styles = StyleSheet.create({
   buttonish: {
@@ -47,4 +77,43 @@ const styles = StyleSheet.create({
     borderRightWidth: 2,
     borderRadius: 10,
   },
+  button: Platform.select({
+    ios: {},
+    android: {
+      elevation: 4,
+      // Material design blue from https://material.google.com/style/color.html#color-color-palette
+      backgroundColor: '#2196F3',
+      borderRadius: 2,
+    },
+  }),
+  text: {
+    textAlign: 'center',
+    padding: 8,
+    ...Platform.select({
+      ios: {
+        // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
+        color: '#007AFF',
+        fontSize: 18,
+      },
+      android: {
+        color: 'white',
+        fontWeight: '500',
+      },
+    }),
+  },
+  buttonDisabled: Platform.select({
+    ios: {},
+    android: {
+      elevation: 0,
+      backgroundColor: '#dfdfdf',
+    },
+  }),
+  textDisabled: Platform.select({
+    ios: {
+      color: '#cdcdcd',
+    },
+    android: {
+      color: '#a1a1a1',
+    },
+  }),
 });

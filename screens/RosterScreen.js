@@ -87,7 +87,6 @@ export default class RosterScreen extends React.Component {
                 // we have two clicks:
                 if (i == 0) {
                     //Change batting order
-                    col = i;
                     jsx = [...jsx, 
                         <Col key={i} size={this.formatRow[i]}>
                             <Buttonish onPress = {()=>this.selectedOrder(ix)} 
@@ -207,7 +206,7 @@ export default class RosterScreen extends React.Component {
     }
 
     swapPlayerPosition(toPos) {
-        selectedPlayer = this.team.team.roster[this.state.selectedOrder];
+        var selectedPlayer = this.team.team.roster[this.state.selectedOrder];
 
         console.log("FieldPos: " + toPos);
         //cases:
@@ -268,8 +267,6 @@ export default class RosterScreen extends React.Component {
     selectedModal(modalIx) {
 
         this.setModalVisible(false);
-
-        let originalValueAtSelectedOrder = this.order[this.state.selectedOrder];
 
         //Here is where we swap
         if (this.modalView == 'posToName') {
@@ -469,7 +466,5 @@ export default class RosterScreen extends React.Component {
         borderBottomWidth: 2
         
     }
-
-
 });
 

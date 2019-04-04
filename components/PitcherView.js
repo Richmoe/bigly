@@ -75,9 +75,9 @@ export default class PitcherView extends Component {
 
       fontSize: 20,
       textAlign: 'left',
-      textAlignVertical: 'center',
+      //textAlignVertical: 'center',
       margin: 10,
-      height: '100%',
+      //height: '100%',
     },
     pitchdata: {
         fontSize: 14,

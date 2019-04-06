@@ -16,7 +16,8 @@ import {
 import Buttonish from '../components/Buttonish';
 import Player from '../model/Player.js';
 
-import Team, { LineUp } from '../model/Team.js';
+import Team from '../model/Team.js';
+import LineUp from '../model/LineUp';
 import GameConst from '../constants/GameConst';
 import GameParams from '../model/GameParams';
 
@@ -31,6 +32,8 @@ export default class PreGameScreen extends React.Component {
 
         //We should have passed in team here and game params here. We assume we loaded on launch:
         this.myTeam = this.props.navigation.getParam("myTeam",null);
+
+        //console.log(this.myTeam);
         this.myTeam.myTeam = true;
         this.myLineup = new LineUp(this.myTeam);
 
@@ -71,23 +74,18 @@ export default class PreGameScreen extends React.Component {
 
     }
 
-    onLineupChange = () => {
-
-    }
-
     onHomeAway = () => {
         this.setState({myTeamIsHome: !this.state.myTeamIsHome});
     }
 
     onStartingLineUp = () => {
         this.setState({startingLineUpReviewed: true});
-        this.props.navigation.navigate('Roster', { team: this.myLineup, view: 'lineup', callBack: this.onLineupChange});
+        this.props.navigation.navigate('SetLineUp', { Lineup: this.myLineup});
     }
 
 
     onPlayBall = () => {
-        //this.props.navigation.navigate('Roster', { team: this.myLineup, view: 'lineup', callBack: this.onLineupChange});
-        this.buildLineup();
+         this.buildLineup();
 
         console.log("Play Ball:");
 

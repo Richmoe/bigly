@@ -60,31 +60,39 @@ export default class GameScreen extends Component {
       console.log(`AwayTeamMy = ${this.mGame.awayLineUp.myTeam}, HomeTeamMy = ${this.mGame.homeLineUp.myTeam}`);
       console.log('-----------------');
 
-      var batterUp = this.mGame.nextBatter;
+      var batterUpIx = this.mGame.battingTeam.nextBatterIx;
+      console.log("Next batterIX = " + batterUpIx);
       this.mGame.parseEvent({type: 'atbat'});
   
       this.state = {
           machinePitch: true,
           currentPitcher: this.mGame.homeLineUp.currentPitcher,
           inHittingUX: false,
-          batterUp: batterUp,
+          batterUpIx: batterUpIx,
           hitSelected: -1,
-          hitMenu: false
+          hitMenu: false,
+          pitchCount: 0
       }
 
-      this.mBaseRunners = [batterUp,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
+      this.mBaseRunners = [batterUpIx,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
     }
 
     nextBatter() {
         this.mGameState.balls = 0;
         this.mGameState.strikes = 0;
 
-        var batterUp = this.mGame.nextBatter;
-
-        this.setState( {batterUp: batterUp }) ;
-        this.mBaseRunners[0] = batterUp;
+        var batterUpIx = this.mGame.battingTeam.nextBatterIx;
+        
+        this.setState( {batterUpIx: batterUpIx }) ;
+        this.mBaseRunners[0] = batterUpIx;
 
         this.mGame.parseEvent({type: 'atbat'});
+
+        console.log("NextBatter baseRunners:");
+        console.log(this.mBaseRunners);
+
+
+
     };
 
     gameOver() {
@@ -200,11 +208,10 @@ export default class GameScreen extends Component {
         console.log("error pitch type: " + pitchType);
       }
 
-      if (event != null) this.mGame.parseEvent(event);
-    };
-
-    onPitcherClick = () => {
-      this.props.navigation.navigate('Roster', { team: this.mGame.fieldingTeam, view: 'pitching', callBack: this.cbPitcherChange});
+      if (event != null) {
+        this.mGame.parseEvent(event);
+        this.setState({pitchCount: this.state.pitchCount + 1}); //this is more to trigger update than anything else
+      }
     };
 
 
@@ -225,6 +232,7 @@ export default class GameScreen extends Component {
 
       console.log(`cbPitcherChange `);
       this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher});
+      this.setState({ pitchCount: 0}); //this is more to trigger update
 
     }
 
@@ -256,7 +264,7 @@ export default class GameScreen extends Component {
       
       //Store current Batter:
       //Find batter:
-      var batterLoc = this.mBaseRunners.indexOf(this.state.batterUp);
+      var batterLoc = this.mBaseRunners.indexOf(this.state.batterUpIx);
       console.log(`batter advanced to ${batterLoc}`);
 
       if (batterLoc == 1)
@@ -279,7 +287,7 @@ export default class GameScreen extends Component {
         if (this.mBaseRunners[i] != -1) {
           ++runCount;
 
-          if (this.mBaseRunners[i] == this.state.batterUp)
+          if (this.mBaseRunners[i] == this.state.batterUpIx)
           {
             this.mGame.parseEvent({type: 'homerun'});
           } else {
@@ -331,29 +339,30 @@ export default class GameScreen extends Component {
             /> 
           </Row>
           <Row size={80} >
+          {true && 
             <HitView 
               baseRunners = {this.mBaseRunners} 
-              battingTeam={this.mGame.battingTeam} 
+              battingLineUp={this.mGame.battingTeam} 
               clickCB={this.onHitClick}
               showMenu={this.state.hitMenu} 
               clickPos={this.state.hitSelected}
             />
+          }
           </Row>
           
           <Row size={10} >
             <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} isHitting= {this.state.inHittingUX} />
           </Row>
           <Row size={10} >
-          { this.mGame.myTeamIsBatting == false && 
+          { true && this.mGame.myTeamIsBatting == false && 
             <PitcherView 
-              //onPitcherChange = {this.onPitcherClick} 
               onMachineChange = {this.onMachineChange} 
               isMachinePitch={this.state.machinePitch} 
-              pitcher = {this.mGame.fieldingTeam.getPlayerByPos(0)} 
+              lineUp = {this.mGame.fieldingTeam} 
               disabled = {this.state.inHittingUX}
             />
           }
-          { this.mGame.myTeamIsBatting == true && 
+          { true && this.mGame.myTeamIsBatting == true && 
             <BatterView 
               battingTeam = {this.mGame.battingTeam}
               //batterClick = {this.onBatterClick}

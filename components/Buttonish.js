@@ -27,7 +27,8 @@ export default class Buttonish extends React.Component {
     */
     const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
-    const formattedTitle =  Platform.OS === 'android' ? this.props.title.toUpperCase() : this.props.title;
+
+    const formattedTitle =  Platform.OS === 'android' ? this.props.title.toString().toUpperCase() : this.props.title;
 
     buttonStyle = this.props.buttonStyle;
     if (buttonStyle == null) {
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
   button: Platform.select({
     ios: {},
     android: {
+      margin: 5,
       elevation: 4,
       // Material design blue from https://material.google.com/style/color.html#color-color-palette
       backgroundColor: '#2196F3',

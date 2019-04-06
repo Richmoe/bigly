@@ -20,7 +20,8 @@ import Layout from '../constants/Layout';
 import Buttonish from '../components/Buttonish';
 
 import * as Util from '../util/SaveLoad';
-import Team, { LineUp } from '../model/Team';
+import Team from '../model/Team';
+import LineUp from '../model/LineUp';
 import GameParams from '../model/GameParams';
 
 export default class HomeScreen extends React.Component {
@@ -40,14 +41,19 @@ export default class HomeScreen extends React.Component {
 
   async _loadDefaultTeam() {
 
-    this.defaultTeam = await Util.retrieveData("DefaultTeam");
-    if (this.defaultTeam == null) {
-      this.defaultTeam = new Team("New Team");
-    }
-    console.log("default Team is: ");
-    console.log(this.defaultTeam);
     
-
+    //this.defaultTeam = await Util.retrieveData("DefaultTeam");
+    if (this.defaultTeam == null) {
+      console.log("Creating Default Team");
+      this.defaultTeam = new Team("New Team");
+      //TEST:
+      this.defaultTeam._createDefaultMyRoster();
+    }
+    //console.log("default Team is: ");
+    //console.log(this.defaultTeam);
+    //console.log(this.defaultTeam.roster);
+    //console.log(`testing length: ${Object.keys(this.defaultTeam.roster).length}`);
+  
   }
 
   render() {
@@ -73,7 +79,7 @@ export default class HomeScreen extends React.Component {
               title="Debug Home Game" onPress={this._debugHome}
               titleStyle={styles.buttonText}
           />
-          <Button
+          <Buttonish
               title="Debug Away Game" onPress={this._debugAway}
               titleStyle={styles.buttonText}
           />
@@ -107,25 +113,20 @@ export default class HomeScreen extends React.Component {
     var t1 = new Team("Dragons");
     t1._createDefaultMyRoster();
     t1.myTeam = true;
+    console.log("1*****************");
     var l1 = new LineUp(t1);
     //l1._createDefaultLineup();
-    var json = t1.createSave();
-    console.log("1*****************");
-    console.log(json);
-    var t3 = new Team();
+    //var json = t1.createSave();
+    //console.log("1*****************");
+    //console.log(json);
+    //console.log(l1);
+
     console.log("2*****************");
-    console.log(t3);
-
-    t3.fromJSON(json);
-    console.log("3****************");
-    console.log(t3);
-    console.log("*****************");
-
     var t2 = new Team("Opponent");
     t2._createDefaultRoster();
     var l2 = new LineUp(t2);
     //l2._createDefaultLineup();
-
+    //console.log(l2);
     //Extract game settings from team. Do I want to do this? TODO
     var gameSettings = new GameParams(t1);
 

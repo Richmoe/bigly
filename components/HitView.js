@@ -31,10 +31,9 @@ export default class HitView extends Component {
   
         super(props);
         //props
-        //baseRunner array - an array of roster IX for players on base 0 = hitter, 1-3 base
-        //battingTeam - LineUp object
+        //baseRunner array - an array of uids for players on base 0 = hitter, 1-3 base
+        //battingLineUp - LineUp object
         //resolve - resolveCB
-
 
         //update positions of bases:
         this.stylesPos = JSON.parse(JSON.stringify(stylesPosBase));
@@ -120,22 +119,26 @@ export default class HitView extends Component {
     }
 
     getAbbrev = (positionIx) => {
-      var runnerIx = this.props.baseRunners[positionIx];
-      return this.props.battingTeam.getPlayer(runnerIx).abbrev;
+      var battingOrderIx = this.props.baseRunners[positionIx];
+      var player = this.props.battingLineUp.batterByOrder(battingOrderIx);
+      return player.abbrev;
+
     }
 
     getFName = (positionIx) => {
-      var runnerIx = this.props.baseRunners[positionIx];
+
+      var battingOrderIx = this.props.baseRunners[positionIx];
+      var player = this.props.battingLineUp.batterByOrder(battingOrderIx);
       if (positionIx == -1) {
         return "";
       } else {
         //For our team, just pull first naem
-        if (this.props.battingTeam.myTeam) {
-          var names = this.props.battingTeam.getPlayer(runnerIx).name.split(" ");
+        if (this.props.battingLineUp.myTeam) {
+          var names = player.name.split(" ");
           return names[0];
         } else {
           //return just the full name of the opponent team
-          return this.props.battingTeam.getPlayer(runnerIx).name;
+          return player.name;
         }        
       }
     }
@@ -147,7 +150,7 @@ export default class HitView extends Component {
       for (let i = 0;i < this.props.baseRunners.length;i++)
       {
         var baseRunnerIx = this.props.baseRunners[i];
-        if (baseRunnerIx >= 0)
+        if (baseRunnerIx != -1)
         {
 
           if (i >= OUTOFFSET) /*out*/ stylesColor = {     backgroundColor: 'red'}
@@ -283,19 +286,19 @@ const stylesPosBase = [
   {
     //Run 0:
     position: 'absolute',
-    left: 114,
+    left: 111,
     top: 360
   },
   {
     //Run 1:
     position: 'absolute',
-    left: 76,
+    left: 74,
     top: 360,
   },
   {
     //Run 2:
     position: 'absolute',
-    left: 38,
+    left: 37,
     top: 360,
   },
   {

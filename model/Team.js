@@ -9,12 +9,18 @@ export default class Team  {
     maxFieldPlayers = 11;
     maxRunsPerInning = 5;
     machinePitch = true;
+    playerGameStats = []; //array of player game stats which can be summed for lifetime. [game][PlayerUID]
 
     
     constructor(teamName)
     {
         this.name = teamName;
     }
+
+    get rosterLength() {
+        return Object.keys(this.roster).length;
+    }
+
 
     fromJSON(json) {
         this.name = json.name;
@@ -29,6 +35,7 @@ export default class Team  {
             p.number = json.teamRoster[i].number; 
             this.roster.push(p);
         }
+        this.playerGameStats = json.playerGameStats;
     }
 
     createSave() {
@@ -44,6 +51,7 @@ export default class Team  {
             maxRunsPerInning: this.maxRunsPerInning,
             machinePitch: this.machinePitch,
             teamRoster: basicRoster,
+            playerGameStats: this.playerGameStats,
         };
         return json;
     }
@@ -52,7 +60,7 @@ export default class Team  {
 
     _createDefaultRoster(names) {
    
-        defaultRoster = [];
+        var defaultRoster = {};
 
         if (names) {
             playerCount = names.length;
@@ -66,11 +74,15 @@ export default class Team  {
             if (names) {
                 name = names[i];
             } else {
-                name = "";
+                name = "Player " + (i+1);
             }
-            player = new Player(name, i, i);
+            player = new Player();
+            player.setName(name);
+            //console.log(`Created player ${name}, UID is ${player.uid}`);
 
-            defaultRoster.push(player);
+            //defaultRoster.push(player);
+            defaultRoster[player.uid] = player;
+            //console.log(defaultRoster);
         }
         this.roster = defaultRoster;
     }
@@ -94,145 +106,3 @@ export default class Team  {
     }
     
 }
-
-
-export class LineUp 
-{
-
-    team;
-    battingOrder = []; //array of batting order. Value = index into roster.
-    currentBatterIx = -1; //Start with -1 because we always call nextBatter;
-    fieldPositions = []; //Array of field pos, 0 = pitcher. Value = index into roster.
-
-    //Stats = wins, losses
-
-    constructor(team) {
-        this.team = team;
-
-        //We need to create a starting order which is the whole team, in Roster order:
-        this._createDefaultLineUp();
-    }
-
-    get myTeam() {
-        return this.team.myTeam;
-    }
-
-    get teamName() {
-        return this.team.name;
-    }
-
-    set teamName(name) {
-        this.team.name = name;
-    }
-
-    get currentBatter() {
-        return this.team.roster[this.battingOrder[this.currentBatterIx]];
-    }
-
-    get currentPitcher() {
-        return this.team.roster[this.fieldPositions[0]];
-    }
-
-    set currentPitcher(ix) {
-        this.team.roster[this.fieldPositions[0]] = ix;
-    }
-
-    get nextBatter() {
-
-        console.log(`Hmm. Batting order: ${this.battingOrder.length}`);
-        this.currentBatterIx = (this.currentBatterIx + 1) % this.battingOrder.length;
-
-        console.log("Team Get next batter ix " + this.currentBatterIx);
-
-        return this.battingOrder[this.currentBatterIx];
-    }
-
-    batterByOrder(pos) {
-        //Safety check: wrap if beyond:
-        pos = pos % this.battingOrder.length;
-
-        return this.team.roster[this.battingOrder[pos]];
-    }
-
-    getPlayerByPos(pos) {
-        return this.team.roster[this.fieldPositions[pos]];
-    }
-
-    setPlayerPos(playerIx, newPos) {
-
-        console.log(`SetPlayerPos (${playerIx}, ${newPos})`);
-        console.log(this.fieldPositions);
-
-        //Set the fieldPos at pos to be playerIx. move the player there to the pos where playerIx was.
-        playerOldPos = this.team.roster[playerIx].currentPosition;
-        swapPlayerIx = this.fieldPositions[newPos];
-        if (swapPlayerIx != -1) {
-            this.team.roster[swapPlayerIx].currentPosition = playerOldPos;
-            this.fieldPositions[playerOldPos] = swapPlayerIx;
-        }
-        //Set my info here:
-        this.fieldPositions[newPos] = playerIx;
-        this.team.roster[playerIx].currentPosition = newPos;
-        console.log("After:");
-        console.log(this.fieldPositions);
-    }
-
-    getPlayer(ix) {
-        //safety check:
-        ix = ix % this.team.roster.length;
-
-        return this.team.roster[ix];
-    }
-
-    _createDefaultLineUp() {
-
-        //reset arrays:
-        this.battingOrder = [];
-        this.fieldPositions = [];
-        //walk the roster and assign position and order to IX
-        for (var i = 0; i < this.team.roster.length; i++)
-        {
-            player = this.team.roster[i];
-
-            player.battingOrder = i;
-            player.currentPosition = i;
-            this.battingOrder.push(i);
-            this.fieldPositions.push(i);
-        }
-    }
-
-    _shuffleArray = (input) => {
-        
-        for (var i = input.length-1; i >=0; i--) {
-         
-          var randomIndex = Math.floor(Math.random()*(i+1)); 
-          var itemAtIndex = input[randomIndex]; 
-           
-          input[randomIndex] = input[i]; 
-          input[i] = itemAtIndex;
-        }
-        return input;
-      };
-
-
-    _createRandomLineup() {
-        //
-        tempBattingOrder = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        tempFieldingPos = this._shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        
-        for (var i = 0; i < this.team.roster.length;i++)
-        {
-            player = this.team.roster[i];
-            player.battingOrder = tempBattingOrder.indexOf(i);
-            player.currentPosition = tempFieldingPos.indexOf(i);
-
-        }
-    
-        this.battingOrder = tempBattingOrder;
-        this.fieldPositions = tempFieldingPos;
-
-    }
-    
-
-}
-

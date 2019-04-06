@@ -107,36 +107,39 @@ export default class StatsScreen extends React.Component {
     };
 
     makeRow = (ix, val) => {
+
         var player = this.team.team.roster[val];
+        var playerStats = this.team.playerStats[player.uid];
+
         if (this.state.view == "batting" ) {
             //this.header = ["Name", "AB", "R", "H", "RBI", "2B","3B","HR","BB","SO","HBP"];
 
             return this.rowJSX( ix,
                 player.name, 
-                player.batterStats.atBats,
-                player.batterStats.runs,
-                player.batterStats.hits,
-                player.batterStats.RBIs,
-                player.batterStats.doubles,
-                player.batterStats.triples,
-                player.batterStats.homeRuns,
-                player.batterStats.walks,
-                player.batterStats.strikeOuts,
-                player.batterStats.hitBatter
+                playerStats.batterStats.atBats,
+                playerStats.batterStats.runs,
+                playerStats.batterStats.hits,
+                playerStats.batterStats.RBIs,
+                playerStats.batterStats.doubles,
+                playerStats.batterStats.triples,
+                playerStats.batterStats.homeRuns,
+                playerStats.batterStats.walks,
+                playerStats.batterStats.strikeOuts,
+                playerStats.batterStats.hitBatter
             );
         } else if (this.state.view == "pitching" ) {
             //this.header = ["Name", "BF", "R", "H", "BB", "SO", "HB", "PT", "B", "S"];
             return this.rowJSX(ix, 
                 player.name, 
-                player.pitcherStats.battersFaced,
-                player.pitcherStats.runsAgainst,
-                player.pitcherStats.hits,
-                player.pitcherStats.walks,
-                player.pitcherStats.strikeOuts,
-                player.pitcherStats.hitBatter,
-                player.pitcherStats.pitches,
-                player.pitcherStats.balls,
-                player.pitcherStats.strikes
+                playerStats.pitcherStats.battersFaced,
+                playerStats.pitcherStats.runsAgainst,
+                playerStats.pitcherStats.hits,
+                playerStats.pitcherStats.walks,
+                playerStats.pitcherStats.strikeOuts,
+                playerStats.pitcherStats.hitBatter,
+                playerStats.pitcherStats.pitches,
+                playerStats.pitcherStats.balls,
+                playerStats.pitcherStats.strikes
 
             );
         } else {
@@ -161,13 +164,13 @@ export default class StatsScreen extends React.Component {
                 <Row key={99}>{this.makeHeader()}</Row>
                 {fullRows}
                 <Row style={{height: 65}} >
-                    <Col style = {{backgroundColor: "red"}}>
+                    <Col >
                     <Buttonish 
                         title="Batting" 
                         onPress={() => {this.updateView("batting")}}
                     />
                     </Col >
-                    <Col style = {{backgroundColor: "green"}}>
+                    <Col >
                     <Buttonish 
                         title="Pitching" 
                         onPress={() => {this.updateView("pitching")}}

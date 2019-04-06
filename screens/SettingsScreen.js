@@ -31,57 +31,84 @@ export default class SettingsScreen extends React.Component {
     //We should have passed in team here and game params here. We assume we loaded on launch:
     this.currentTeam = this.props.navigation.getParam("team",null);
 
+
     this.state = { 
       name: this.currentTeam.name, 
       maxInnings: this.currentTeam.maxInnings, 
       machinePitch: this.currentTeam.machinePitch,
       maxRunsPerInning: this.currentTeam.maxRunsPerInning,
       maxFieldPlayers: this.currentTeam.maxFieldPlayers,
-      roster: this.currentTeam.roster.slice(0)
+      roster: JSON.parse(JSON.stringify(this.currentTeam.roster))
     };
+
+    console.log(this.state.roster);
   }
 
   toggleSwitch = (value) => {
     this.setState( {machinePitch: value});
   }
 
-  _playerNameChange(text, index) {
+  _playerNameChange(text, key) {
 
-    roster = this.state.roster;
-    roster[index].name = text;
+    this.state.roster[key].name = text;
     this.setState({roster: roster});
   }
 
-  _delPressed(text, index) {
+  _delPressed(key, index) {
 
-    console.log("DEL: " + text + ", " + index);
+    console.log("DEL: " + key + ", " + index);
 
+    /*
     //TODO: We need a warning/confirmation
     roster = this.state.roster;
     roster.splice(index,1);
+*/
 
+    delete this.state.roster[key];
+    console.log(this.state.roster);
     this.setState({roster: roster});
 
   }
 
 
-  renderItem = ({item, index} ) => {
+  renderItem = ({key, index} ) => {
+
+    console.log("Key: " + key + ", " + index);
     return (
       <View key={index} style={{flexDirection: "row", justifyContent: 'space-between'}}>
         <Text style={{flex: 1}}>Player:</Text>
         <TextInput
           style={[styles.textInput, {flex: 3}]}
-          onChangeText={(text) => this._playerNameChange(text, index)}
-          value={ item.name}
+          onChangeText={(text) => this._playerNameChange(text, key)}
+          value={ this.state.roster[key].name}
           placeholder="player name"
         />
-        <Button style={{flex: 1}} title="Del" onPress={() => this._delPressed(item,index)} />
+        <Button style={{flex: 1}} title="Del" onPress={() => this._delPressed(key,index)} />
       </View>
 
       );
   }
 
-  keyExtractor = (item, index) => index.toString()
+  renderPlayerList() {
+    return Object.keys(this.state.roster).map((k, i) => {
+      console.log("Rendering key: " + k);
+       return (
+          <View key={i} style={{flexDirection: "row", justifyContent: 'space-between'}}>
+            <Text style={{flex: 1}}>Player:</Text>
+            <TextInput
+              style={[styles.textInput, {flex: 3}]}
+              onChangeText={(text) => this._playerNameChange(text, k)}
+              value={ this.state.roster[k].name}
+              placeholder="player name"
+            />
+            <Button style={{flex: 1}} title="Del" onPress={() => this._delPressed(k,i)} />
+        </View>
+      );
+    })
+  }
+
+
+  //keyExtractor = (item, index) => index.toString()
 
   _addPlayer() {
     //console.log("state roster was:");
@@ -133,11 +160,7 @@ export default class SettingsScreen extends React.Component {
     test = new Team();
     test._createDefaultMyRoster();
 
-    var r = [];
-    for (var i = 0;i < test.roster.length; i++) {
-      r.push(test.roster[i]);
-    }
-    this.setState({roster: r});
+    this.setState({roster: JSON.parse(JSON.stringify(test.roster))});
 
   }
 
@@ -152,7 +175,7 @@ export default class SettingsScreen extends React.Component {
     this.currentTeam.maxRunsPerInning = this.state.maxRunsPerInning;
     this.currentTeam.maxFieldPlayers = this.state.maxFieldPlayers;
 
-    Util.saveData("DefaultTeam", this.currentTeam);
+    //Util.saveData("DefaultTeam", this.currentTeam);
     console.log("Saving team:");
     console.log(this.currentTeam);
   }
@@ -165,6 +188,12 @@ export default class SettingsScreen extends React.Component {
   }
   
   render() {
+
+    console.log("_---------------------");
+    console.log(Object.keys(this.state.roster));
+    console.log("_---------------------");
+
+    var rosterKeyArray = Object.keys(this.state.roster);
     return (
       <View style={{flex: 1, flexDirection: "column"}}>
         
@@ -217,12 +246,7 @@ export default class SettingsScreen extends React.Component {
         </View>
       
         <Text style={styles.textLabel}>Players:</Text>
-        <FlatList
-          keyExtractor={this.keyExtractor}
-          data={this.state.roster}
-          renderItem={this.renderItem}
-          extraData={this.state}
-        />
+        {this.renderPlayerList()}
         <View>
           <Button title="Add Player" onPress={() => this._addPlayer()}></Button>
         </View>
@@ -233,6 +257,15 @@ export default class SettingsScreen extends React.Component {
   }
 }
 
+/*
+        <FlatList
+
+          data={rosterKeyArray}
+          renderItem={this.renderItem}
+          extraData={this.state}
+        />
+//          keyExtractor={this.keyExtractor}
+*/
 
 const styles = StyleSheet.create({
   container: {

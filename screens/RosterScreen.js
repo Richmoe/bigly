@@ -52,7 +52,11 @@ export default class RosterScreen extends React.Component {
             this.order = this.team.battingOrder;
         }
 
-        this.state = { modalVisible: false, selectedOrder: -1 };
+        this.state = { 
+            modalVisible: false, 
+            selectedOrder: -1,
+            selectedUid: -1
+        };
     }
 
     selectedOrder  (ix){
@@ -71,7 +75,7 @@ export default class RosterScreen extends React.Component {
     }
 
     selectedPlayer (ix) {
-        console.log("SelectedPlayer: At OnPress for Pos " + ix + " which is player ix: " + this.order[ix]);
+        console.log("SelectedPlayer: At OnPress for Pos " + ix + " which is player uid: " + this.order[ix]);
         this.modalView = 'nameToPos';
         this.setModalVisible(true);
         this.setState({selectedOrder: ix});
@@ -203,6 +207,11 @@ export default class RosterScreen extends React.Component {
             this.team.team.roster[tempB2[i]].battingOrder = i;
             this.team.team.roster[tempF2[i]].currentPosition = i;
         }
+
+        console.log("FixUp: B, F");
+        console.log(tempB2);
+        console.log("--");
+        console.log(tempF2);
     }
 
     swapPlayerPosition(toPos) {
@@ -268,6 +277,7 @@ export default class RosterScreen extends React.Component {
 
         this.setModalVisible(false);
 
+        console.log(`'SelectedModal: view = ${this.modalView}`);
         //Here is where we swap
         if (this.modalView == 'posToName') {
 
@@ -278,7 +288,7 @@ export default class RosterScreen extends React.Component {
 
         } else /* if (this.modalView == 'nameToPos')*/ {
 
-            this.swapPositionPlayer(modalIx);
+            this.swapPositionPlayer(modalIx); //modalIx is player UID.
             
         }
 
@@ -287,10 +297,11 @@ export default class RosterScreen extends React.Component {
         this.setState({selectedOrder: -1});
     }
 
-    swapPositionPlayer(playerIx) {
+    swapPositionPlayer(playerUid) {
 
+        console.log("swap Position Player " + playerUid);
         //Find where the modal selected value is in the order:
-        this.team.setPlayerPos(playerIx, this.state.selectedOrder);
+        this.team.setPlayerPos(playerUid, this.state.selectedOrder);
     }
 
     renderModal() {
@@ -304,7 +315,7 @@ export default class RosterScreen extends React.Component {
             return (
                 <View>
                 <Text key={99} style={styles.headerText}>{header}</Text>
-                { this.team.team.roster.map((object, i) => {
+                { Object.keys(this.team.team.roster).map((object, i) => {
                     let style = (i % 2 ? [styles.rowOdd, styles.rowText] : styles.rowText);
                     return (
                         <TouchableHighlight key={i} onPress = {() => this.selectedModal(i)}>
@@ -324,11 +335,12 @@ export default class RosterScreen extends React.Component {
             return (
                 <View>
                 <Text key={99} style={styles.headerText}>{header}</Text>
-                { this.team.team.roster.map((object, i) => {
+                { Object.keys(this.team.team.roster).map((key, i) => {
                     let style = (i % 2 ? [styles.rowOdd, styles.rowText] : styles.rowText);
+
                     return (
-                        <TouchableHighlight key={i} onPress = {() => this.selectedModal(i)}>
-                            <Text style={style}>{object.name}</Text>
+                        <TouchableHighlight key={i} onPress = {() => this.selectedModal(key)}>
+                            <Text style={style}>{this.team.team.roster[key].name}</Text>
                         </TouchableHighlight> 
                     );
                 })
@@ -362,7 +374,7 @@ export default class RosterScreen extends React.Component {
             }
             //
             tempArray = [];
-            for (var i = 0;i < this.team.team.roster.length;i++){
+            for (var i = 0;i < this.team.team.rosterLength;i++){
                 tempArray.push("Batting " + (i + 1));
             }
             tempArray.push("Not Playing");
@@ -425,7 +437,7 @@ export default class RosterScreen extends React.Component {
                     </View>
                  </Modal>
                 {this.view == 'fielding' && 
-                 <Row style={{height: 50, backgroundColor: 'red'}} >
+                 <Row style={{height: 50}} >
                     <Buttonish  
                         title = "Shuffle"
                         onPress = {() => this.shuffleFielders()}

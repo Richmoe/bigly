@@ -1,37 +1,6 @@
 "use strict";
-import {uid} from '../util/Misc';
+import * as Util from '../util/Misc';
 
-class PitcherStats {
-    balls = 0;
-    strikes = 0;
-    hits = 0;
-    runsAgainst = 0;
-    walks = 0;
-    strikeOuts = 0;
-    hitBatter = 0;
-    battersFaced = 0;
-
-    get pitches() {
-        return (this.balls + this.strikes);
-    }
-}
-
-class BatterStats {
-    atBats = 0;
-    strikeOuts = 0;
-    walks = 0;
-    hitBatter = 0;
-    singles = 0;
-    doubles = 0;
-    triples = 0;
-    homeRuns = 0;
-    RBIs = 0;
-    runs = 0;
-
-    get hits() {
-        return (this.singles + this.doubles + this.triples + this.homeRuns);
-    }
-}
 
 export default class Player {
 
@@ -40,11 +9,26 @@ export default class Player {
     abbrev;
     number;
     battingOrder = 0;
-    pitcherStats = new PitcherStats();
-    batterStats = new BatterStats();
+    //pitcherStats = new PitcherStats();
+    //batterStats = new BatterStats();
     positionByInning = new Array(5).fill(0);
 
-    constructor(playername, battingOrder, position) {
+
+    constructor(uid) {
+        if (uid !== undefined) {
+            this.uid = uid;
+        } else {
+            console.log("New player is being created");
+            this.uid = Util.uid();
+        }
+    }
+
+    setName(playerName) {
+        this.name = playerName;
+        this.abbrev = this.makeAbbrev(playerName);
+    }
+
+    setPlayer(playername, battingOrder, position) {
 
         //If they don't have a name, generate one
         if (playername == "") {
@@ -56,7 +40,6 @@ export default class Player {
         }
         this.battingOrder = battingOrder;
         this.positionByInning[0] = position;
-        this.uid = uid();
     }
 
     get currentPosition() {

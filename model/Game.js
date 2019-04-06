@@ -12,7 +12,7 @@
 //Todo - figure out right approach for bottom bar
 //Todo - what about tracking hit but thrown out at a 2nd?
 
-import Player from '../model/Player.js';
+import PlayerStats from '../model/PlayerStats.js';
 import GameConst from '../constants/GameConst';
 import {uid} from '../util/Misc';
 
@@ -83,11 +83,6 @@ export default class Game {
         return (this.battingTeam === this.myTeam)
     }
 
-    get nextBatter() {
-        var currentBatter = this.battingTeam.nextBatter;
-        return currentBatter;
-    }
-
     newInning() {
         this.currentInning += 1;
         //check for end of game
@@ -123,15 +118,18 @@ export default class Game {
     }
 
     parseEvent (event) {
+
         console.log(`In ParseEvent for event ${event.type}, machinePitching: ${this.isMachinePitching}` );
         //Shortcut:
-        var batterStats = this.battingTeam.currentBatter.batterStats;
-        var pitcherStats = this.fieldingTeam.currentPitcher.pitcherStats;
+        var batter = this.battingTeam.currentBatter;
+        var batterStats = this.battingTeam.playerStats[batter.uid].batterStats;
+        var pitcher = this.fieldingTeam.currentPitcher;
+        var pitcherStats = this.fieldingTeam.playerStats[pitcher.uid].pitcherStats;
 
         //Swallow events if machinepitch:
         if (this.isMachinePitching) {
-            var fakePlayer = new Player("machine",0,0);
-            pitcherStats = fakePlayer.pitcherStats;
+            
+            pitcherStats = new PlayerStats().pitcherStats;
         }
 
         console.log("currently at bat is: " + this.battingTeam.currentBatter.name);
@@ -192,7 +190,7 @@ export default class Game {
                 ++batterStats.RBIs;
 
                 //Get the other runner here
-                ++this.battingTeam.team.roster[event.other].batterStats.runs;
+                //TODO ++this.battingTeam.team.roster[event.other].batterStats.runs;
                 break;
             case 'out':
                 break;
@@ -203,7 +201,6 @@ export default class Game {
             default:
                 break;
         } 
-
     }
 
 }

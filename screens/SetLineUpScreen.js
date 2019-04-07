@@ -14,7 +14,9 @@ import Buttonish from "../components/Buttonish";
 import * as Util from "../util/Misc";
 
 export default class SetLineUpScreen extends React.Component {
-
+    static navigationOptions = {
+        title: 'Starting Line Up',
+    };
 
 
     constructor(props){
@@ -116,10 +118,12 @@ export default class SetLineUpScreen extends React.Component {
                 //Change fieldPos
                 jsx = [...jsx, 
                     <Col key={i} size={this.formatRow[i]}>
+                        {!isOut && 
                         <Buttonish onPress={() => this.selectedPos(ix)} 
                             title={args[i]} 
                             titleStyle={styles.buttonRowText}
                         />
+                        }
                     </Col>
                 ];
         

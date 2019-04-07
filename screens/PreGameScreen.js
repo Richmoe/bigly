@@ -16,7 +16,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Buttonish from '../components/Buttonish';
-import Player from '../model/Player.js';
 
 import Team from '../model/Team.js';
 import LineUp from '../model/LineUp';
@@ -52,6 +51,7 @@ export default class PreGameScreen extends React.Component {
         this.state = {
             myTeamIsHome: true,
             startingLineUpReviewed: false,
+            opponentName: ""
         }
     }
 
@@ -94,7 +94,26 @@ export default class PreGameScreen extends React.Component {
 
         console.log("Play Ball:");
 
+        //Validate: 
+        //Opponent Name
+        if (this.state.opponentName != ""){
+            this.opponentLineUp.team.name = this.state.opponentName;
+        } else {
+            this.opponentLineUp.team.name = "Opponent";
+        }
+
+        //My Roster has enough
+        if (this.myLineup.battingOrder.length < 8) {
+            console.log("We Don't have enough to play!!!");
+            return;
+
+        }
+
+        //Date is good
+
         //console.log(this.myLineup);
+
+        //TODO - save last lineup?
 
         let homeTeam = (this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
         let awayTeam = (!this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
@@ -106,6 +125,7 @@ export default class PreGameScreen extends React.Component {
     }
 
     render() {
+        //TODO - add load last linup?
         return (
             <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
                 <View style={{flex:10}}>
@@ -134,9 +154,9 @@ export default class PreGameScreen extends React.Component {
                         
                         <TextInput
                             style={styles.textInput}
-                            onChangeText={(text) => this.opponentLineUp.teamName = text}
-                            placeholder = "team name"
-                            value={ this.opponentLineUp.teamName}
+                            onChangeText={(text) => this.setState({opponentName:  text})}
+                            placeholder = "Team Name"
+                            value={ this.state.opponentName}
                         />
 
 

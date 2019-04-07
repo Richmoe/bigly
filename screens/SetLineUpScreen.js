@@ -23,12 +23,15 @@ export default class SetLineUpScreen extends React.Component {
         super(props);
 
         this.team = this.props.navigation.getParam("Lineup",[]);
-        this.formatRow = [25,50,25];
+        this.formatRow = [15,70,15];
         this.header = ["#", "Name", "Pos"];
         //this.order = this.team.team.roster;
 
         this.buildSortOrder();
         this.order = this.sortingOrderBO;
+
+        console.log("ORDER: ");
+        console.log(this.order);
         this.modalView = 'batToName';
 
         this.state = { 
@@ -53,11 +56,17 @@ export default class SetLineUpScreen extends React.Component {
         this.sortingOrderBO = Object.keys(r).sort(function(a,b) { return r[a].battingOrder - r[b].battingOrder });
 
         bo = this.sortingOrderBO;
+
         console.log("BO");
         console.log(bo);
         for (var i = 0;i < bo.length;i++) {
             console.log(r[bo[i]].name + ", " + r[bo[i]].battingOrder);
         }
+
+        this.order = this.sortingOrderBO;
+
+       console.log("ORDER: ");
+       console.log(this.order);
     }
 
     selectedOrder  (ix){
@@ -78,16 +87,28 @@ export default class SetLineUpScreen extends React.Component {
     rowJSX = (ix, ...args) => {
         var jsx = [];
          //assert args.length = formatRow.length
+        var isOut = false;;
         for (let i = 0; i < this.formatRow.length;i++) {
             
             // we have two clicks:
             if (i == 0) {
                 //Change batting order
+                //Batting #:
+                var titleStyle = [styles.buttonRowText];
+                let bo = args[i];
+                if (args[i] == GameConst.DNP) {
+                    bo = "DNP";
+                    isOut = true;
+                    titleStyle = [...titleStyle, {fontSize: 15}];
+                } else {
+                    bo = (bo + 1).toString()
+                }
+
                 jsx = [...jsx, 
                     <Col key={i} size={this.formatRow[i]}>
                         <Buttonish onPress = {()=>this.selectedOrder(ix)} 
-                            title ={args[i].toString()} 
-                            titleStyle={styles.buttonRowText}
+                            title ={bo} 
+                            titleStyle={titleStyle}
                         />
                     </Col>
                 ];
@@ -103,9 +124,13 @@ export default class SetLineUpScreen extends React.Component {
                 ];
         
             } else {
+                var textStyle = [styles.rowText];
+                if (isOut) {
+                    textStyle = [...textStyle, {color: 'red'}];
+                }
                 jsx = [...jsx, 
                     <Col key={i} size={this.formatRow[i]}>
-                        <Text style={styles.rowText}>{args[i]}</Text>
+                        <Text style={textStyle}>{args[i]}</Text>
                     </Col>
                 ];
             }
@@ -121,13 +146,12 @@ export default class SetLineUpScreen extends React.Component {
         for (var i = 0; i < this.header.length; i++) {
             jsx = [...jsx, <Col key={i} size={this.formatRow[i]}><Text style={styles.headerText}>{this.header[i]}</Text></Col>];
         }
-
         return jsx;
     };
 
     makeRow = (ix, k) => {
         var player = this.team.team.roster[k];
-        return this.rowJSX(ix, (player.battingOrder) + 1, player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
+        return this.rowJSX(ix, (player.battingOrder), player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
 
     }
 
@@ -143,37 +167,42 @@ export default class SetLineUpScreen extends React.Component {
         var tempBattingOrder = new Array(this.team.team.rosterLength).fill(-1);
         var tempFieldPositions = new Array(this.team.team.rosterLength).fill(-1);
 
+        console.log("____FIXUP____");
         console.log(this.team.team.roster);
-        for (let p in this.team.team.roster) {
+
+        var r = this.team.team.roster;
+        for (let pid in r) {
         //var i = 0;i < this.team.team.rosterLength;i++) {
             //Check to see if we should skip:
             //Add to lineup lists:
-            console.log("Player: " + p.name + " batting: " + p.battingOrder + ", field: " + p.currentPosition);
-            if (p.battingOrder == -1 || p.currentPosition == GameConst.FIELD_POS_OUT) {
+            console.log("Player: " + r[pid].name + " batting: " + r[pid].battingOrder + ", field: " + r[pid].currentPosition);
+            if (r[pid].battingOrder == GameConst.DNP || r[pid].currentPosition == GameConst.DNP) {
                 //skip
             } else {
-                tempBattingOrder[p.battingOrder] = p.uid;
-                tempFieldPositions[p.currentPosition] = p.uid;
+                tempBattingOrder[r[pid].battingOrder] = pid;
+                tempFieldPositions[r[pid].currentPosition] = pid;
             }
         }
 
         console.log(tempBattingOrder);
 
         //Remove the -1s, giving us new batting order and position assignments. Basically slides everyone below the -1s up.
-        var tempB2 = tempBattingOrder.filter(ix => ix >= 0);
-        var tempF2 = tempFieldPositions.filter(ix => ix >= 0);
+        var tempB2 = tempBattingOrder.filter(ix => ix != -1);
+        var tempF2 = tempFieldPositions.filter(ix => ix != -1);
 
 
         //Reset all player positions:
         for (var i = 0;i < tempB2.length; i++) {
-            this.team.team.roster[tempB2[i]].battingOrder = i;
-            this.team.team.roster[tempF2[i]].currentPosition = i;
+            r[tempB2[i]].battingOrder = i;
+            r[tempF2[i]].currentPosition = i;
         }
 
         console.log("FixUp: B, F");
         console.log(tempB2);
         console.log("--");
         console.log(tempF2);
+
+        this.buildSortOrder();
     }
 
     swapPlayerPosition(toPos) {
@@ -185,7 +214,7 @@ export default class SetLineUpScreen extends React.Component {
         //Swap out
         if (toPos >= this.team.team.rosterLength) { 
             //Swap Out
-            selectedPlayer.battingOrder = -1;
+            selectedPlayer.battingOrder = GameConst.DNP;
         } else {
             if (selectedPlayer.currentPosition == GameConst.FIELD_POS_OUT) { 
                 //Swap back in
@@ -195,8 +224,14 @@ export default class SetLineUpScreen extends React.Component {
                 swapToPos = selectedPlayer.currentPosition;
             }
             //Swap with player if one was there:
-
-            let swapWithPlayer = this.team.team.roster.find(o => o.currentPosition == toPos);
+            //Swap with player if one was there:
+            var swapWithPlayer;
+            for (let pid in this.team.team.roster) {
+                if (this.team.team.roster[pid].currentPosition == toPos) {
+                    swapWithPlayer = this.team.team.roster[pid];
+                    break;
+                }
+            }
             if (swapWithPlayer) {
                 swapWithPlayer.currentPosition = swapToPos;
             }
@@ -215,9 +250,9 @@ export default class SetLineUpScreen extends React.Component {
         if (toPos >= this.team.team.rosterLength) { 
             // not playing 
             selectedPlayer.currentPosition = GameConst.FIELD_POS_OUT;
-            selectedPlayer.battingOrder = -1;
+            selectedPlayer.battingOrder = GameConst.DNP;
         } else {
-            if (selectedPlayer.battingOrder == -1) {
+            if (selectedPlayer.battingOrder == GameConst.DNP) {
                 //Back in
                 selectedPlayer.currentPosition = this.team.team.maxFieldPlayers - 1; //put him back in bench spot which should be empty
                 swapToPos = this.team.team.rosterLength - 1;
@@ -226,13 +261,15 @@ export default class SetLineUpScreen extends React.Component {
             }
             //Swap with player if one was there:
             var swapWithPlayer;
-            for (let p in this.team.team.roster) {
-                if (p.battingOrder == toPos) {
-                    swapWithPlayer = p;
+            for (let pid in this.team.team.roster) {
+                if (this.team.team.roster[pid].battingOrder == toPos) {
+                    swapWithPlayer = this.team.team.roster[pid];
                     break;
                 }
             }
             if (swapWithPlayer) {
+                console.log("Swapping player:");
+                console.log(swapWithPlayer);
                 swapWithPlayer.battingOrder = swapToPos;
             }
             selectedPlayer.battingOrder = toPos;
@@ -270,11 +307,13 @@ export default class SetLineUpScreen extends React.Component {
             //Assign pos to Name:
             modalArray = GameConst.fieldPos;
         } else if (this.modalView == "batToName") {
+
+
+
             modalArray = [];
 
             for (let i = 0;i < this.team.team.rosterLength;i++){
                 modalArray.push("Batting " + (i + 1));
-
             }
             modalArray.push("Not Playing");
         }
@@ -299,13 +338,20 @@ export default class SetLineUpScreen extends React.Component {
     render() {
 
         //Create rows:
-        var fullRows = this.order.map( (k,ix) => <Row key={ix}>{this.makeRow(ix, k)}</Row>);
-            
+        var fullRows = this.order.map( (k,ix) => {
+            let style = (ix % 2 ? styles.rowOdd : styles.rowEven);
+            return (<Row key={ix} style={style}>{this.makeRow(ix, k)}</Row>)
+        });
+
+        //NOTE: iOS doesn't support bottom width. Easiest way with Easy Grid is to just make a one-pixel row.
         return (
             <Grid>
                 
-                <Row key={99}>{this.makeHeader()}</Row>
+                <Row key={99} style={{height: 30}}>{this.makeHeader()}</Row>
+                <Row style = {{height: 1, backgroundColor: 'black'}}></Row>
+
                 {fullRows}
+
 
                 <Modal animationType = "fade" transparent = {true}
                     visible = {this.state.modalVisible}
@@ -347,9 +393,6 @@ export default class SetLineUpScreen extends React.Component {
     headerText: {
         fontSize: 22,
         fontWeight: 'bold',
-        borderColor: 'black',
-        borderBottomWidth: 2
-        
     }
 });
 

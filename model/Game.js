@@ -120,10 +120,12 @@ export default class Game {
     parseEvent (event) {
 
         console.log(`In ParseEvent for event ${event.type}, machinePitching: ${this.isMachinePitching}` );
+        //console.log(this.fieldingTeam);
         //Shortcut:
         var batter = this.battingTeam.currentBatter;
         var batterStats = this.battingTeam.playerStats[batter.uid].batterStats;
         var pitcher = this.fieldingTeam.currentPitcher;
+        console.log(pitcher);
         var pitcherStats = this.fieldingTeam.playerStats[pitcher.uid].pitcherStats;
 
         //Swallow events if machinepitch:

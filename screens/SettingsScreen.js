@@ -175,9 +175,9 @@ export default class SettingsScreen extends React.Component {
     this.currentTeam.maxRunsPerInning = this.state.maxRunsPerInning;
     this.currentTeam.maxFieldPlayers = this.state.maxFieldPlayers;
 
-    //Util.saveData("DefaultTeam", this.currentTeam);
-    console.log("Saving team:");
-    console.log(this.currentTeam);
+    Util.saveData("DefaultTeam", this.currentTeam);
+    //console.log("Saving team:");
+    //console.log(this.currentTeam);
   }
 
   componentWillUnmount() {

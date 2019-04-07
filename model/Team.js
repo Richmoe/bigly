@@ -1,8 +1,10 @@
 import Player from '../model/Player.js';
+import * as Util from "../util/Misc";
 
 export default class Team  {
+    uid;
     name = "Team Name";
-    roster = []; //Array of Players
+    roster; //Object of Players
     myTeam = false;
     //leagueName = "AA";
     maxInnings = 6;
@@ -12,9 +14,15 @@ export default class Team  {
     playerGameStats = []; //array of player game stats which can be summed for lifetime. [game][PlayerUID]
 
     
-    constructor(teamName)
+    constructor(teamName, uid)
     {
+        console.log(`Team Constructor: ${teamName}, ${uid}`);
         this.name = teamName;
+        if (uid !== undefined) {
+            this.uid = uid;
+        } else {
+            this.uid = Util.uid();
+        }
     }
 
     get rosterLength() {
@@ -23,34 +31,48 @@ export default class Team  {
 
 
     fromJSON(json) {
+        this.uid = json.uid;
         this.name = json.name;
         this.maxInnings = json.maxInnings;
         this.maxFieldPlayers = json.maxFieldPlayers;
         this.maxRunsPerInning = json.maxRunsPerInning;
         this.machinePitch = json.machinePitch;
-        this.roster = [];
-        for (let i = 0;i < json.teamRoster.length;i++) {
-            var p = new Player(json.teamRoster[i].name,0,0);
-            p.uid = json.teamRoster[i].uid;
-            p.number = json.teamRoster[i].number; 
-            this.roster.push(p);
-        }
         this.playerGameStats = json.playerGameStats;
+
+        //rebuild roster array of Players:
+        let r = json.roster;
+
+        //console.log("------------FROMJSON Roster");
+        //console.log(r);
+        this.roster = {};
+        for (let pid in r) {
+            //console.log(`${r[pid].name} , ${r[pid].currentPosition}`);
+            let p = new Player(r[pid].uid);
+            p.setPlayer(r[pid].name, r[pid].battingOrder, r[pid].currentPosition);
+            this.roster[pid] = p;
+            //console.log(p);
+        }
+        //console.log("------------new Roster");
+        //console.log(this.roster);
+
     }
 
     createSave() {
         //simplify roster:
+        /*
         var basicRoster = [];
         for (let i = 0;i<this.roster.length;i++) {
             basicRoster.push( {name: this.roster[i].name, uid: this.roster[i].uid, number: this.roster[i].number});
         }
+        */
         var json = {
+            uid: this.uid,
             name: this.name,
             maxInnings: this.maxInnings,
             maxFieldPlayers: this.maxFieldPlayers,
             maxRunsPerInning: this.maxRunsPerInning,
             machinePitch: this.machinePitch,
-            teamRoster: basicRoster,
+            roster: this.roster, //We'll lose some functions, but recreate on load,
             playerGameStats: this.playerGameStats,
         };
         return json;

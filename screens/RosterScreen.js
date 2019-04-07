@@ -182,19 +182,20 @@ export default class RosterScreen extends React.Component {
     fixUpRoster() {
         //walk the roster to create batting and fieldingPos arrays:
         //Reset lineups:
-        var tempBattingOrder = new Array(this.team.team.roster.length).fill(-1);
-        var tempFieldPositions = new Array(this.team.team.roster.length).fill(-1);
+        var tempBattingOrder = new Array(this.team.team.rosterLength).fill(-1);
+        var tempFieldPositions = new Array(this.team.team.rosterLength).fill(-1);
 
-        for (var i = 0;i < this.team.team.roster.length;i++) {
+        //for (var i = 0;i < this.team.team.rosterLength;i++) {
+        for (let pid in this.team.team.roster) {
             //Check to see if we should skip:
-            var player = this.team.team.roster[i];
+            var player = this.team.team.roster[pid];
             //Add to lineup lists:
             console.log("Player: " + player.name + " batting: " + player.battingOrder + ", field: " + player.currentPosition);
             if (player.battingOrder == -1 || player.currentPosition == GameConst.FIELD_POS_OUT) {
                 //skip
             } else {
-                tempBattingOrder[player.battingOrder] = i;
-                tempFieldPositions[player.currentPosition] = i;
+                tempBattingOrder[player.battingOrder] = pid;
+                tempFieldPositions[player.currentPosition] = pid;
             }
         }
 
@@ -221,13 +222,13 @@ export default class RosterScreen extends React.Component {
         //cases:
 
         //Swap out
-        if (toPos >= this.team.team.roster.length) { 
+        if (toPos >= this.team.team.rosterLength) { 
             //Swap Out
             selectedPlayer.battingOrder = -1;
         } else {
             if (selectedPlayer.currentPosition == GameConst.FIELD_POS_OUT) { 
                 //Swap back in
-                selectedPlayer.battingOrder = this.team.team.roster.length - 1; //put him back in last spot which should be empty
+                selectedPlayer.battingOrder = this.team.team.rosterLength - 1; //put him back in last spot which should be empty
                 swapToPos = this.team.team.maxFieldPlayers-1;
             } else {
                 swapToPos = selectedPlayer.currentPosition;
@@ -250,7 +251,7 @@ export default class RosterScreen extends React.Component {
         console.log("Batting Order: " + toPos);
         console.log(selectedPlayer);
         //Cases:
-        if (toPos >= this.team.team.roster.length) { 
+        if (toPos >= this.team.team.rosterLength) { 
             // not playing 
             selectedPlayer.currentPosition = GameConst.FIELD_POS_OUT;
             selectedPlayer.battingOrder = -1;
@@ -258,7 +259,7 @@ export default class RosterScreen extends React.Component {
             if (selectedPlayer.battingOrder == -1) {
                 //Back in
                 selectedPlayer.currentPosition = this.team.team.maxFieldPlayers - 1; //put him back in bench spot which should be empty
-                swapToPos = this.team.team.roster.length - 1;
+                swapToPos = this.team.team.rosterLength - 1;
             } else {
                 swapToPos = selectedPlayer.battingOrder;
             }

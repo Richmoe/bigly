@@ -9,6 +9,7 @@ export default class Player {
     abbrev;
     number;
     battingOrder = 0;
+    currentPosition = 0;
     //pitcherStats = new PitcherStats();
     //batterStats = new BatterStats();
     positionByInning = new Array(5).fill(0);
@@ -18,7 +19,6 @@ export default class Player {
         if (uid !== undefined) {
             this.uid = uid;
         } else {
-            console.log("New player is being created");
             this.uid = Util.uid();
         }
     }
@@ -39,15 +39,7 @@ export default class Player {
             this.abbrev = this.makeAbbrev(playername);
         }
         this.battingOrder = battingOrder;
-        this.positionByInning[0] = position;
-    }
-
-    get currentPosition() {
-        return this.positionByInning[0];
-    }
-
-    set currentPosition(pos) {
-        this.positionByInning[0] = pos;
+        this.currentPosition = position;
     }
 
     makeAbbrev = (name) => {

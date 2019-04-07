@@ -34,7 +34,7 @@ export default class GameScreen extends Component {
     mGameState;
 
     constructor(props) {
-      console.log("Setting up Game ");
+      console.log("Setting up Game");
       super(props);
 
       //Init Game
@@ -57,7 +57,7 @@ export default class GameScreen extends Component {
       //console.log(this.mGame);
       console.log(`isTop = ${this.mGame.isTop} , batting team = ${this.mGame.battingTeam.teamName}. myTeam =  ${this.mGame.myTeam.teamName}`);
       // /console.log(this.mGame.battingTeam);
-      console.log(`AwayTeamMy = ${this.mGame.awayLineUp.myTeam}, HomeTeamMy = ${this.mGame.homeLineUp.myTeam}`);
+      //console.log(`AwayTeamMy = ${this.mGame.awayLineUp.myTeam}, HomeTeamMy = ${this.mGame.homeLineUp.myTeam}`);
       console.log('-----------------');
 
       var batterUpIx = this.mGame.battingTeam.nextBatterIx;

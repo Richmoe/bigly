@@ -37,6 +37,7 @@ export default class LineUp
     }
 
     get currentPitcher() {
+        console.log("current pitcher uid: " + this.fieldPositions[0]);
         return this.team.roster[this.fieldPositions[0]];
     }
 
@@ -116,12 +117,12 @@ export default class LineUp
         tempBattingOrder = Util.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         tempFieldingPos = Util.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         
-        for (var i = 0; i < this.team.rosterLength;i++)
-        {
-            player = this.team.roster[i];
-            player.battingOrder = tempBattingOrder.indexOf(i);
-            player.currentPosition = tempFieldingPos.indexOf(i);
-
+        let i = 0;
+        for (let pid in this.team.roster)  {
+            player = this.team.roster[pid];
+            player.battingOrder = tempBattingOrder[i];
+            player.currentPosition = tempFieldingPos[i];
+            ++i;
         }
     
         this.battingOrder = tempBattingOrder;

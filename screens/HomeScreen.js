@@ -11,6 +11,12 @@ import {
   View,
   Button,
 } from 'react-native';
+import { 
+  AppLoading, 
+  Asset, 
+  Font, 
+  Icon 
+} from 'expo';
 
 
 import { MonoText } from '../components/StyledText';
@@ -37,18 +43,50 @@ export default class HomeScreen extends React.Component {
 
     this._loadDefaultTeam();
 
+    this.state = { isLoadingComplete : false };
+
   }
 
   async _loadDefaultTeam() {
 
-    
-    //this.defaultTeam = await Util.retrieveData("DefaultTeam");
-    if (this.defaultTeam == null) {
+
+    var json = await Util.retrieveData("DefaultTeam");
+    //console.log("default Team is: ");
+    //console.log(json);
+    //console.log("-------------------------------------------");
+
+
+
+    if (json == null) {
       console.log("Creating Default Team");
       this.defaultTeam = new Team("New Team");
       //TEST:
       this.defaultTeam._createDefaultMyRoster();
+    } else {
+      this.defaultTeam = new Team();
+      this.defaultTeam.fromJSON(json);
+      //console.log("---------xx--------------------------");
+      //   console.log(this.defaultTeam);
+      //console.log("-------------------------------------------");
+  
     }
+
+    this.setState({isLoadingComplete: true});
+
+    /*
+    console.log("<TEsT>");
+    var json = this.defaultTeam.createSave();
+    console.log(json);
+    console.log("00000------------");
+
+    var team2 = new Team("tester");
+    team2.fromJSON(json);
+
+    //console.log()
+    console.log("</TEsT>");
+*/
+
+
     //console.log("default Team is: ");
     //console.log(this.defaultTeam);
     //console.log(this.defaultTeam.roster);
@@ -57,35 +95,44 @@ export default class HomeScreen extends React.Component {
   }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={require('../assets/images/biglyLogo.png')}
-              style={styles.welcomeImage}
-            />
-          </View>
+    if (!this.state.isLoadingComplete) {
+      return (
+        <AppLoading
 
-          <Buttonish 
-              title="Start Game" onPress={this._startGamePress}
-              titleStyle={styles.buttonText}
-          />
-          <Buttonish
-              title="Settings" onPress={this._settingsPress}              
-              titleStyle={styles.buttonText}
-          />
-          <Buttonish
-              title="Debug Home Game" onPress={this._debugHome}
-              titleStyle={styles.buttonText}
-          />
-          <Buttonish
-              title="Debug Away Game" onPress={this._debugAway}
-              titleStyle={styles.buttonText}
-          />
-        </ScrollView>
-      </View>
-    );
+        />
+      );
+    } else {
+      var startString = `Start Game (${this.defaultTeam.name})`;
+      return (
+        <View style={styles.container}>
+          <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+            <View style={styles.welcomeContainer}>
+              <Image
+                source={require('../assets/images/biglyLogo.png')}
+                style={styles.welcomeImage}
+              />
+            </View>
+
+            <Buttonish 
+                title={startString} onPress={this._startGamePress}
+                titleStyle={styles.buttonText}
+            />
+            <Buttonish
+                title="Settings" onPress={this._settingsPress}              
+                titleStyle={styles.buttonText}
+            />
+            <Buttonish
+                title="Debug Home Game" onPress={this._debugHome}
+                titleStyle={styles.buttonText}
+            />
+            <Buttonish
+                title="Debug Away Game" onPress={this._debugAway}
+                titleStyle={styles.buttonText}
+            />
+          </ScrollView>
+        </View>
+      );
+    }
   }
 
   _startGamePress = () => {

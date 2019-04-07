@@ -1,3 +1,5 @@
+"use strict";
+
 import React from 'react';
 import {
   Platform, 
@@ -43,9 +45,8 @@ export default class PreGameScreen extends React.Component {
 
 
         //We need to create our opponent. For now let's just default to 11:
-        opponentTeam = new Team();
+        var opponentTeam = new Team("");
         opponentTeam._createDefaultRoster();
-
         this.opponentLineUp = new LineUp(opponentTeam);
 
         this.state = {
@@ -60,17 +61,21 @@ export default class PreGameScreen extends React.Component {
         this.myLineup.battingOrder = [];
         this.myLineup.fieldPositions = [];
 
-
-        for (var i = 0;i < this.myLineup.team.roster.length;i++) {
+        for (let pid in this.myLineup.team.roster) {
             //Check to see if we should skip:
-            if (this.myLineup.team.roster[i].currentPosition == GameConst.FIELD_POS_OUT){
-                console.log("Skipping " + this.myLineup.team.roster[i].name);
+            if (this.myLineup.team.roster[pid].currentPosition == GameConst.FIELD_POS_OUT){
+                console.log("Skipping " + this.myLineup.team.roster[pid].name);
             } else {
                 //Add to lineup lists:
-                this.myLineup.battingOrder[this.myLineup.team.roster[i].battingOrder] = i;
-                this.myLineup.fieldPositions[this.myLineup.team.roster[i].currentPosition] = i;
+                this.myLineup.battingOrder[this.myLineup.team.roster[pid].battingOrder] = pid;
+                this.myLineup.fieldPositions[this.myLineup.team.roster[pid].currentPosition] = pid;
             }
         }
+
+        console.log("Post Build LineUP:");
+        console.log(this.myLineup.battingOrder);
+        console.log("---------------------------------------");
+        console.log(this.myLineup.fieldPositions);
 
     }
 
@@ -89,11 +94,11 @@ export default class PreGameScreen extends React.Component {
 
         console.log("Play Ball:");
 
-        console.log(this.myLineup);
+        //console.log(this.myLineup);
 
-        homeTeam = (this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
-        awayTeam = (!this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
-        gameParams = new GameParams(this.myTeam);
+        let homeTeam = (this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
+        let awayTeam = (!this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
+        let gameParams = new GameParams(this.myTeam);
 
         this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameParams, date: this.mGameDate});
 
@@ -220,19 +225,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       //backgroundColor: 'green',
       transform: [{ scaleX: .7  }, { scaleY: .7}] ,
-  },
-  buttonish: {
-    backgroundColor: 'cyan',
-    justifyContent: 'center',
-    height: '100%',
-    alignItems: 'center',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    fontSize: 18,
-    borderStyle: 'solid',
-    borderColor: 'black',
-    borderWidth: 2,
-    borderRadius: 10,
   },
 });
 

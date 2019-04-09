@@ -1,6 +1,7 @@
 import Player from "./Player";
 import * as Util from "../util/Misc";
 import PlayerStats from "./PlayerStats";
+import Team from "./Team";
 
 export default class LineUp 
 {
@@ -147,5 +148,15 @@ export default class LineUp
             playerStats: this.playerStats,
         };
         return json;
+    }
+
+    fromSave(json) {
+
+        this.team = new Team();
+        this.team.fromJSON(json.team);
+
+        this.battingOrder = json.battingOrder;
+        this.fieldPositions = json.fieldPositions;
+        this.playerStats = json.playerStats;
     }
 }

@@ -10,10 +10,6 @@ export default class Player {
     number;
     battingOrder = 0;
     currentPosition = 0;
-    //pitcherStats = new PitcherStats();
-    //batterStats = new BatterStats();
-    positionByInning = new Array(5).fill(0);
-
 
     constructor(uid) {
         if (uid !== undefined) {

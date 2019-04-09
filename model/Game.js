@@ -15,6 +15,7 @@
 import PlayerStats from '../model/PlayerStats.js';
 import GameConst from '../constants/GameConst';
 import {uid} from '../util/Misc';
+import LineUp from './LineUp.js';
 
 export default class Game {
 
@@ -99,7 +100,10 @@ export default class Game {
     addScore(scoreCount) {
 
         this.innings[this.currentInning].runs += scoreCount;
+    }
 
+    addHit(hitCount) {
+        this.innings[this.currentInning].hits += hitCount;
     }
 
     get score() {
@@ -205,11 +209,45 @@ export default class Game {
         } 
     }
 
+
+    createSave() {
+        /*
+        homeLineUp; //type LineUp
+        awayLineUp; //type LineUp
+        //state:
+        currentInning - not needed; //Current Inning will be 0 based, top of inning = even, bottom = odd
+        innings = []; //array of Inning objects
+        gameSettings; //param
+        isMachinePitching;
+        */
+
+        var homeLineUp = this.homeLineUp.createSave();
+        var awayLineUp = this.awayLineUp.createSave();
+
+        var json = {
+            homeLineUp: homeLineUp,
+            awayLineUp: awayLineUp,
+            date: this.date,
+            uid = this.uid,
+        };
+        return json;
+    }
+
+    fromSave(json) {
+
+        this.homeLineUp = new LineUp();
+        this.homeLineUp.fromJSON(json.homeLineUp);
+
+        this.awayLineUp = new LineUp();
+        this.awayLineUp.fromJSON(json.awayLineUp);
+
+        this.date = json.date;
+        this.uid = json.uid;
+    }
 }
 
 
 export class Inning {
-    outs = 0;
     currentBatter = 0;
     runs = 0;
     hits = 0;

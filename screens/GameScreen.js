@@ -270,10 +270,13 @@ export default class GameScreen extends Component {
       if (batterLoc == 1)
       {
         this.mGame.parseEvent({type: 'single'});
+        this.mGame.addHit(1);
       } else if (batterLoc == 2) {
         this.mGame.parseEvent({type: 'double'});
+        this.mGame.addHit(1);
       } else if (batterLoc == 3) {
         this.mGame.parseEvent({type: 'triple'});
+        this.mGame.addHit(1);
       } else if (batterLoc > 7) {
         //This assume batter hit the ball but was thrown out.
         //batter is out, just count the pitch itself
@@ -290,6 +293,7 @@ export default class GameScreen extends Component {
           if (this.mBaseRunners[i] == this.state.batterUpIx)
           {
             this.mGame.parseEvent({type: 'homerun'});
+            this.mGame.addHit(1);
           } else {
             this.mGame.parseEvent({type: 'run', other: this.mBaseRunners[i]});
           }

@@ -4,22 +4,18 @@ import React, {Component} from 'react';
 import {
   StyleSheet, 
   View,
+  Button
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import { StackActions, NavigationActions } from 'react-navigation';
 
-
-import Team, { LineUp } from '../model/Team';
-import GameParams from '../model/GameParams';
 import Game from '../model/Game';
-
 
 import PitchControl from '../components/PitchControl.js';
 import PitcherView from '../components/PitcherView.js';
 import BatterView from '../components/BatterView.js';
 import HitView from '../components/HitView.js';
 import GameStateView from '../components/GameStateView';
-import Buttonish from '../components/Buttonish';
 import GameConst from '../constants/GameConst';
 
 export default class GameScreen extends Component {
@@ -38,10 +34,10 @@ export default class GameScreen extends Component {
       super(props);
 
       //Init Game
-      var homeLineUp = this.props.navigation.getParam("homeLineUp");
-      var awayLineUp = this.props.navigation.getParam('awayLineUp');
-      var params = this.props.navigation.getParam('gameParams');
-      var date = this.props.navigation.getParam('date');
+      let homeLineUp = this.props.navigation.getParam("homeLineUp");
+      let awayLineUp = this.props.navigation.getParam('awayLineUp');
+      let params = this.props.navigation.getParam('gameParams');
+      let date = this.props.navigation.getParam('date');
 
       this.mGame = new Game(homeLineUp, awayLineUp, params, date);
       this.mGameState = {
@@ -60,45 +56,60 @@ export default class GameScreen extends Component {
       //console.log(`AwayTeamMy = ${this.mGame.awayLineUp.myTeam}, HomeTeamMy = ${this.mGame.homeLineUp.myTeam}`);
       console.log('-----------------');
 
-      var batterUpIx = this.mGame.battingTeam.nextBatterIx;
-      console.log("Next batterIX = " + batterUpIx);
+
+      let batterIx = this.mGame.battingTeam.nextBatterIx; //note this sets the current batter so we can call Parse atbat
       this.mGame.parseEvent({type: 'atbat'});
   
       this.state = {
           machinePitch: true,
           currentPitcher: this.mGame.homeLineUp.currentPitcher,
           inHittingUX: false,
-          batterUpIx: batterUpIx,
+          batterUpIx: batterIx,
           hitSelected: -1,
           hitMenu: false,
           pitchCount: 0,
           endGame: false,
       }
 
-      this.mBaseRunners = [batterUpIx,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
+      this.mBaseRunners = [batterIx,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
     }
 
     nextBatter() {
         this.mGameState.balls = 0;
         this.mGameState.strikes = 0;
 
-        var batterUpIx = this.mGame.battingTeam.nextBatterIx;
-        
-        this.setState( {batterUpIx: batterUpIx }) ;
-        this.mBaseRunners[0] = batterUpIx;
+        let nextBatterIx = this.mGame.battingTeam.nextBatterIx;
+        this.setState( {batterUpIx: nextBatterIx }) ;
+        this.mBaseRunners[0] = nextBatterIx;
 
         this.mGame.parseEvent({type: 'atbat'});
 
         console.log("NextBatter baseRunners:");
         console.log(this.mBaseRunners);
+    };
 
 
+    newInning() {
 
+      let newInning = this.mGame.newInning();
+      if (newInning != GameConst.GAME_OVER) {
+        this.mGameState.outs = 0;
+        this.mGameState.balls = 0;
+        this.mGameState.strikes = 0;
+
+        this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher });
+
+        this.mBaseRunners = [-1, -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
+        this.nextBatter();
+        console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}, pitcher: ${this.mGame.fieldingTeam.currentPitcher.name}`);
+      } else {
+        this.gameOver();
+      }
     };
 
     gameOver() {
 
-      //This resets the Stack so back goes to Home screen
+      //This resets the NavStack so back goes to Home screen
       // then it navigates to Game Over
 
       console.log("in gameOVer function");
@@ -111,13 +122,11 @@ export default class GameScreen extends Component {
       });
       this.props.navigation.dispatch(resetAction);
 
-      //this.props.navigation.navigate('GameOver', { game: this.mGame });
-
     }
 
-    cbSettings = (event) => {
+    //callback from inGameOptions
+    cbOptions = (event) => {
 
-      console.log("CBSettings:")
       if (event == 'EndGame') {
         //this.setState({endGame: true});
         this.gameOver();
@@ -126,25 +135,14 @@ export default class GameScreen extends Component {
       }
     }
 
-    newInning() {
+    cbPitcherChange = () => {
 
-      var newInning = this.mGame.newInning();
-      if (newInning != GameConst.GAME_OVER) {
-        this.mGameState.outs = 0;
-        this.mGameState.balls = 0;
-        this.mGameState.strikes = 0;
+      this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher});
+      this.setState({ pitchCount: 0}); //this is more to trigger update
 
-        this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher });
+    }
 
-        this.mBaseRunners = [-1, -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
-        this.nextBatter();
-        console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}, pitcher: ${this.mGame.fieldingTeam.currentPitcher.name}`);
-      } else {
-        console.log("GAME OVER - now what???");
-        this.gameOver();
 
-      }
-    };
 
     pitchCallback = (pitchType) => {
 
@@ -224,7 +222,7 @@ export default class GameScreen extends Component {
 
 
     onHitClick = (position) => {
-      console.log("OHC! " + position);
+  
       if (position == -1) {
         //hide menu
         this.setState({ hitSelected: -1, hitMenu: false});
@@ -236,27 +234,13 @@ export default class GameScreen extends Component {
 
     }
 
-    cbPitcherChange = () => {
-
-      console.log(`cbPitcherChange `);
-      this.setState({currentPitcher: this.mGame.fieldingTeam.currentPitcher});
-      this.setState({ pitchCount: 0}); //this is more to trigger update
-
-    }
 
     onMachineChange = () => {      
       this.setState ( {machinePitch : !this.state.machinePitch});
       this.mGame.isMachinePitching = !this.mGame.isMachinePitching;
     }
 
-    totalRunners = (total, num) => {
-      if (num >= 0) {
-        return (total + 1);
-      } else {
-        return total;
-      }
-    }
-
+    //Recursive function to advance a hitter
     advanceRunner = (ix) => {
       if (this.mBaseRunners[(ix)] != -1) {
         this.advanceRunner(ix+1);
@@ -267,12 +251,20 @@ export default class GameScreen extends Component {
       
     }
 
+    //Used in array reduce
+    totalRunners = (total, num) => {
+      if (num >= 0) {
+        return (total + 1);
+      } else {
+        return total;
+      }
+    }
 
     resolveHit = (walk) => {
       
       //Store current Batter:
       //Find batter:
-      var batterLoc = this.mBaseRunners.indexOf(this.state.batterUpIx);
+      let batterLoc = this.mBaseRunners.indexOf(this.state.batterUpIx);
       console.log(`batter advanced to ${batterLoc}`);
 
       if (batterLoc == 1)
@@ -292,9 +284,9 @@ export default class GameScreen extends Component {
       }
 
       //get runs:
-      var runCount = 0;
+      let runCount = 0;
       //loop though:
-      for (var i = 4; i < 8;i++) {
+      for (let i = 4; i < 8;i++) {
         if (this.mBaseRunners[i] != -1) {
           ++runCount;
 
@@ -320,8 +312,7 @@ export default class GameScreen extends Component {
 
 
       //get outs - mBaseRunners ix 8-11
-      var outs = this.mBaseRunners.slice(8,11);
-      var outCount = outs.reduce(this.totalRunners,0);
+      var outCount = this.mBaseRunners.slice(8,11).reduce(this.totalRunners,0);
       if (outCount > 0) {
         this.mGameState.outs += outCount;
         //this.setState( { outs: curOutCount });
@@ -346,7 +337,7 @@ export default class GameScreen extends Component {
         return null;
       }
       return (
-        <Grid style={styles.container}>
+        <Grid>
           <Row style= {{height: 20}} />
           <Row style={{height: 45}}>
             <GameStateView
@@ -367,7 +358,7 @@ export default class GameScreen extends Component {
           </Row>
           
           <Row size={10} >
-            <PitchControl style={styles.pitchcontrol} clickHandler = {this.pitchCallback} isHitting= {this.state.inHittingUX} />
+            <PitchControl clickHandler = {this.pitchCallback} isHitting= {this.state.inHittingUX} />
           </Row>
           <Row size={10} >
           { true && this.mGame.myTeamIsBatting == false && 
@@ -389,23 +380,23 @@ export default class GameScreen extends Component {
           <Row style={{height: 65, alignItems: 'center', justifyContent: 'center'}} >
 
             <Col>
-              <Buttonish 
+              <Button 
                 title="Line Up" 
                 onPress={() => this.props.navigation.navigate('Roster', { team: this.mGame.myTeam, view: "fielding", callBack: this.cbPitcherChange})}
                 disabled = {this.state.inHittingUX}
               />
             </Col >
             <Col>
-            <Buttonish 
+            <Button 
                 title="Stats" 
                 onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
                 disabled = {this.state.inHittingUX}
               />
             </Col>
             <Col>
-            <Buttonish 
+            <Button 
                 title="Other" 
-                onPress={() => this.props.navigation.navigate('InGameOptions', { game: this.mGame, callBack: this.cbSettings})}
+                onPress={() => this.props.navigation.navigate('InGameOptions', { game: this.mGame, callBack: this.cbOptions})}
                 disabled = {this.state.inHittingUX}
               />
             </Col>
@@ -424,19 +415,7 @@ export default class GameScreen extends Component {
   }
 
   const styles = StyleSheet.create({
-    container: {
-      //flex: 1,
-      //flexDirection: 'column',
 
-    },
-    pitchcontrol: {
-        //flex: .5,
-        backgroundColor: 'yellow',
-    },
-    gamestate: {
-        //flex: 3,
-        backgroundColor: 'green',
-    },
     overlay:{
       position: 'absolute',
       top: 60,

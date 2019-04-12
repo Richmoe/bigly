@@ -15,11 +15,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Buttonish from '../components/Buttonish';
+import BoxScoreView from '../components/BoxScoreView';
+
 
 export default class GameOverScreen extends React.Component {
-    //static navigationOptions = {
-    //    header: null,
-    //};
+
+    static navigationOptions = {
+      title: 'Main Menu',
+    };
 
     mGame;
 
@@ -74,7 +77,7 @@ export default class GameOverScreen extends React.Component {
             </View>
         </View>
         <View style={{flex:1}}>
-            <Text style={styles.settings}>Box Score here: </Text>
+          <BoxScoreView game = {this.mGame} />
         </View>
 
         <View style={{flex: 1}}>
@@ -94,6 +97,8 @@ export default class GameOverScreen extends React.Component {
     );
   }
 }
+
+
 
 
 const styles = StyleSheet.create({

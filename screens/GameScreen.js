@@ -71,7 +71,8 @@ export default class GameScreen extends Component {
           batterUpIx: batterUpIx,
           hitSelected: -1,
           hitMenu: false,
-          pitchCount: 0
+          pitchCount: 0,
+          endGame: false,
       }
 
       this.mBaseRunners = [batterUpIx,  -1,-1,-1, -1,-1,-1,-1, -1,-1,-1];
@@ -99,6 +100,8 @@ export default class GameScreen extends Component {
 
       //This resets the Stack so back goes to Home screen
       // then it navigates to Game Over
+
+      console.log("in gameOVer function");
       const resetAction = StackActions.reset({
         index: 1,
         actions: [
@@ -113,7 +116,10 @@ export default class GameScreen extends Component {
     }
 
     cbSettings = (event) => {
+
+      console.log("CBSettings:")
       if (event == 'EndGame') {
+        //this.setState({endGame: true});
         this.gameOver();
       }
     }
@@ -333,6 +339,10 @@ export default class GameScreen extends Component {
 
     render() {
  
+      if (this.state.endGame == true) {
+        this.gameOver();
+        return null;
+      }
       return (
         <Grid style={styles.container}>
           <Row style= {{height: 20}} />

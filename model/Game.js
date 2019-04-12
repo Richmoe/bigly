@@ -228,7 +228,7 @@ export default class Game {
             homeLineUp: homeLineUp,
             awayLineUp: awayLineUp,
             date: this.date,
-            uid = this.uid,
+            uid: this.uid,
         };
         return json;
     }

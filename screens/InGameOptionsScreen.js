@@ -6,11 +6,7 @@ import {
   View,
   TextInput,
   Switch,
-  FlatList,
-  Button,
-  Image,
-  ImageBackground,
-  TouchableOpacity,
+
 } from 'react-native';
 import Buttonish from '../components/Buttonish';
 
@@ -24,7 +20,7 @@ export default class InGameOptionsScreen extends React.Component {
   mCallBack
 
   constructor(props) {
-    console.log("Creating Settings");
+    console.log("Creating InGameOptions");
     super(props);
 
 
@@ -38,8 +34,11 @@ export default class InGameOptionsScreen extends React.Component {
   }
 
   endGame() {
+
+      console.log("Selected EndGame");
       this.mCallBack("EndGame");
       this.props.navigation.goBack();
+
   }
   
   render() {

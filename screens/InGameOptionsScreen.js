@@ -40,6 +40,13 @@ export default class InGameOptionsScreen extends React.Component {
       this.props.navigation.goBack();
 
   }
+
+  endInning() {
+
+    this.mCallBack("EndInning");
+    this.props.navigation.goBack();
+
+  } 
   
   render() {
     return (
@@ -56,7 +63,10 @@ export default class InGameOptionsScreen extends React.Component {
           
         </View>
         <View style={{flexDirection: "row"}}>
-          <Text style={[styles.textLabel, {flex: 1}]}>End Inning</Text>
+        <Buttonish 
+                title = "End Inning"
+                onPress = {() => this.endInning()}
+            />
         </View>
         <View style={{flexDirection: "row"}}>
           <Text style={[styles.textLabel, {flex: 1}]}>Update LineUp</Text>

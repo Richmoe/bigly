@@ -121,6 +121,8 @@ export default class GameScreen extends Component {
       if (event == 'EndGame') {
         //this.setState({endGame: true});
         this.gameOver();
+      } else if (event == 'EndInning') {
+        this.newInning();
       }
     }
 

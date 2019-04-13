@@ -46,6 +46,10 @@ export default class GameScreen extends Component {
         outs: 0, 
         balls: 0,
         strikes: 0,
+        currentPitcher: 0,
+        currentBatter: 0,
+        atBatTeam: awayLineUp,
+        inning: 0,
       };
 
       console.log(`my team is batting: ${this.mGame.myTeamIsBatting}, home team: ${this.mGame.homeLineUp.teamName}, away team : ${this.mGame.awayLineUp.teamName}`);
@@ -75,6 +79,9 @@ export default class GameScreen extends Component {
     }
 
     nextBatter() {
+
+        console.log("Next Batter, base index ");
+        console.log(this.mBaseRunners);
         this.mGameState.balls = 0;
         this.mGameState.strikes = 0;
 
@@ -286,6 +293,9 @@ export default class GameScreen extends Component {
       //get runs:
       let runCount = 0;
       //loop though:
+      console.log("This:");
+      console.log(this.mBaseRunners);
+
       for (let i = 4; i < 8;i++) {
         if (this.mBaseRunners[i] != -1) {
           ++runCount;
@@ -295,7 +305,7 @@ export default class GameScreen extends Component {
             this.mGame.parseEvent({type: 'homerun'});
             this.mGame.addHit(1);
           } else {
-            this.mGame.parseEvent({type: 'run', other: this.mBaseRunners[i]});
+            this.mGame.parseEvent({type: 'run', other: this.mGame.battingTeam.batterByOrder(this.mBaseRunners[i]).uid});
           }
         }
       }

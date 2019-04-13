@@ -1,4 +1,5 @@
-import Player from "./Player";
+"use strict";
+
 import * as Util from "../util/Misc";
 import PlayerStats from "./PlayerStats";
 import Team from "./Team";
@@ -58,7 +59,7 @@ export default class LineUp
 
     batterByOrder(pos) {
         //Safety check: wrap if beyond:
-        pos = pos % this.battingOrder.length;
+        let pos = pos % this.battingOrder.length;
 
         return this.team.roster[this.battingOrder[pos]];
     }
@@ -73,8 +74,8 @@ export default class LineUp
         console.log(this.fieldPositions);
 
         //Set the fieldPos at pos to be playerIx. move the player there to the pos where playerIx was.
-        playerOldPos = this.team.roster[playerUid].currentPosition;
-        swapPlayerUid = this.fieldPositions[newPos];
+        let playerOldPos = this.team.roster[playerUid].currentPosition;
+        let swapPlayerUid = this.fieldPositions[newPos];
         if (swapPlayerUid != -1) {
             this.team.roster[swapPlayerUid].currentPosition = playerOldPos;
             this.fieldPositions[playerOldPos] = swapPlayerUid;
@@ -99,9 +100,9 @@ export default class LineUp
 
         console.log("Create default lineup");
         var i = 0;
-        for (var playerUid in this.team.roster) {
+        for (let playerUid in this.team.roster) {
 
-            player = this.team.roster[playerUid];
+            let player = this.team.roster[playerUid];
 
             player.battingOrder = i;
             player.currentPosition = i;
@@ -115,8 +116,8 @@ export default class LineUp
 
     _createRandomLineup() {
         //
-        tempBattingOrder = Util.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        tempFieldingPos = Util.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        let tempBattingOrder = Util.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        let tempFieldingPos = Util.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         
         let i = 0;
         for (let pid in this.team.roster)  {

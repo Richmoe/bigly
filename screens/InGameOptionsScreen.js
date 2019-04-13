@@ -6,9 +6,9 @@ import {
   View,
   TextInput,
   Switch,
+  Button,
 
 } from 'react-native';
-import Buttonish from '../components/Buttonish';
 
 
 export default class InGameOptionsScreen extends React.Component {
@@ -34,18 +34,14 @@ export default class InGameOptionsScreen extends React.Component {
   }
 
   endGame() {
-
-      console.log("Selected EndGame");
       this.mCallBack("EndGame");
       this.props.navigation.goBack();
-
   }
 
   endInning() {
 
     this.mCallBack("EndInning");
     this.props.navigation.goBack();
-
   } 
   
   render() {
@@ -56,17 +52,17 @@ export default class InGameOptionsScreen extends React.Component {
           <Text style={[styles.textLabel, {flex: 1}]}>Innings</Text>
         </View>
         <View style={{flexDirection: "row"}}>
-            <Buttonish 
-                title = "End Game"
-                onPress = {() => this.endGame()}
+            <Button 
+              title = "End Game"
+              onPress = {() => this.endGame()}
             />
           
         </View>
         <View style={{flexDirection: "row"}}>
-        <Buttonish 
-                title = "End Inning"
-                onPress = {() => this.endInning()}
-            />
+        <Button 
+          title = "End Inning"
+          onPress = {() => this.endInning()}
+        />
         </View>
         <View style={{flexDirection: "row"}}>
           <Text style={[styles.textLabel, {flex: 1}]}>Update LineUp</Text>
@@ -98,11 +94,7 @@ export default class InGameOptionsScreen extends React.Component {
 
 
 const styles = StyleSheet.create({
-  container: {
-    //flex: 1,
-    //flexDirection: 'column',
 
-  },
   textLabel: {
 
     fontSize: 16,
@@ -122,19 +114,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       //backgroundColor: 'green',
       transform: [{ scaleX: .7  }, { scaleY: .7}] ,
-  },
-  buttonish: {
-    backgroundColor: 'cyan',
-    justifyContent: 'center',
-    height: '100%',
-    alignItems: 'center',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    fontSize: 18,
-    borderStyle: 'solid',
-    borderColor: 'black',
-    borderWidth: 2,
-    borderRadius: 10,
   },
 });
 

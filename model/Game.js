@@ -1,15 +1,15 @@
 "use strict";
 
 //Keeping TODOs here:
-//Todo - randomize fielding order
+
 //Todo - Fielder view
-//Todo - stats view
-//Todo - clean up UX for the hitterview
+
+
 //Todo - check out alignment across iphone / android
 //Todo - run experience
 //Todo - Gamelog
-//Todo - scoreboard view
-//Todo - figure out right approach for bottom bar
+//Todo - Undo last play
+
 //Todo - what about tracking hit but thrown out at a 2nd?
 
 import PlayerStats from '../model/PlayerStats.js';
@@ -41,7 +41,7 @@ export default class Game {
 
 
     get myTeam() {
-        if (this.homeLineUp.myTeam == true) {
+        if (this.homeLineUp.myTeam) {
             return this.homeLineUp;
         } else {
             return this.awayLineUp;
@@ -126,11 +126,10 @@ export default class Game {
         console.log(`In ParseEvent for event ${event.type}, machinePitching: ${this.isMachinePitching}` );
         //console.log(this.fieldingTeam);
         //Shortcut:
-        var batter = this.battingTeam.currentBatter;
-        var batterStats = this.battingTeam.playerStats[batter.uid].batterStats;
-        var pitcher = this.fieldingTeam.currentPitcher;
-        console.log(pitcher);
-        var pitcherStats = this.fieldingTeam.playerStats[pitcher.uid].pitcherStats;
+        let batter = this.battingTeam.currentBatter;
+        let batterStats = this.battingTeam.playerStats[batter.uid].batterStats;
+        let pitcher = this.fieldingTeam.currentPitcher;
+        let pitcherStats = this.fieldingTeam.playerStats[pitcher.uid].pitcherStats;
 
         //Swallow events if machinepitch:
         if (this.isMachinePitching) {
@@ -194,9 +193,8 @@ export default class Game {
             case 'run':
                 ++pitcherStats.runsAgainst;
                 ++batterStats.RBIs;
-
                 //Get the other runner here
-                //TODO ++this.battingTeam.team.roster[event.other].batterStats.runs;
+                this.battingTeam.playerStats[event.other].batterStats.runs += 1;
                 break;
             case 'out':
                 break;

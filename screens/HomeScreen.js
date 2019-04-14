@@ -19,7 +19,7 @@ import {
 } from 'expo';
 
 
-import { MonoText } from '../components/StyledText';
+import { VText } from '../components/StyledText';
 
 import Layout from '../constants/Layout';
 
@@ -129,6 +129,11 @@ export default class HomeScreen extends React.Component {
                 title="Debug Away Game" onPress={this._debugAway}
                 titleStyle={styles.buttonText}
             />
+            <View style={{height:40, backgroundColor: "red", justifyContent: "center"}}>
+              <Text>Hello</Text></View>
+              
+            <VText>Testing VText</VText>
+     
           </ScrollView>
         </View>
       );

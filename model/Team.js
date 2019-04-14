@@ -11,6 +11,7 @@ export default class Team  {
     maxFieldPlayers = 11;
     maxRunsPerInning = 5;
     machinePitch = true;
+    gamesPlayed = [];   //array of games played where game = {UID, Date, Opponent, isHome, myScore, oppScore}
     playerGameStats = []; //array of player game stats which can be summed for lifetime. [game][PlayerUID]
 
     
@@ -41,9 +42,6 @@ export default class Team  {
 
         //rebuild roster array of Players:
         let r = json.roster;
-
-        //console.log("------------FROMJSON Roster");
-        //console.log(r);
         this.roster = {};
         for (let pid in r) {
             //console.log(`${r[pid].name} , ${r[pid].currentPosition}`);
@@ -52,19 +50,12 @@ export default class Team  {
             this.roster[pid] = p;
             //console.log(p);
         }
-        //console.log("------------new Roster");
-        //console.log(this.roster);
+
 
     }
 
     createSave() {
-        //simplify roster:
-        /*
-        var basicRoster = [];
-        for (let i = 0;i<this.roster.length;i++) {
-            basicRoster.push( {name: this.roster[i].name, uid: this.roster[i].uid, number: this.roster[i].number});
-        }
-        */
+
         var json = {
             uid: this.uid,
             name: this.name,

@@ -6,20 +6,20 @@ import Team from "./Team";
 
 export default class LineUp 
 {
-    //gameRoster = [];
-    //team type Team
-    battingOrder = []; //array of batting order. Value = index into roster.
+    // Member Variables:
+    team; //type Team
+    battingOrder = []; //array of batting order. Value = player UID.
     currentBatterIx = -1; //Start with -1 because we always call nextBatter;
     //TODO make this by inning.
-    fieldPositions = []; //Array of field pos, 0 = pitcher. Value = index into roster.
+    fieldPositions = []; //Array of field pos, 0 = pitcher. Value = player UID.
     playerStats = []; //Array of player stats [PlayerUID]
-    //Stats = wins, losses
-
+    
     constructor(team) {
         this.team = team;
 
         //We need to create a starting order which is the whole team, in Roster order:
         this._createDefaultLineUp();
+
     }
 
     get myTeam() {
@@ -47,19 +47,15 @@ export default class LineUp
         this.team.roster[this.fieldPositions[0]] = ix;
     }
 
-    get nextBatterIx() {
+    getNextBatterIx() {
 
-        console.log(`Hmm. Batting order: ${this.battingOrder.length}`);
         this.currentBatterIx = (this.currentBatterIx + 1) % this.battingOrder.length;
-
-        console.log("Team Get next batter ix " + this.currentBatterIx);
-
         return this.currentBatterIx;
     }
 
     batterByOrder(pos) {
         //Safety check: wrap if beyond:
-        let pos = pos % this.battingOrder.length;
+        pos = pos % this.battingOrder.length;
 
         return this.team.roster[this.battingOrder[pos]];
     }
@@ -99,6 +95,7 @@ export default class LineUp
         //walk the roster and assign position and order to IX
 
         console.log("Create default lineup");
+        console.log(this.team.roster);
         var i = 0;
         for (let playerUid in this.team.roster) {
 

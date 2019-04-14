@@ -15,6 +15,7 @@ import {
 import Player from '../model/Player.js';
 import * as Util from '../util/SaveLoad.js';
 import Team from '../model/Team.js';
+import { VText } from '../components/StyledText';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
@@ -94,7 +95,7 @@ export default class SettingsScreen extends React.Component {
       console.log("Rendering key: " + k);
        return (
           <View key={i} style={{flexDirection: "row", justifyContent: 'space-between'}}>
-            <Text style={{flex: 1}}>Player:</Text>
+            <VText style={{flex: 1}}>Player:</VText>
             <TextInput
               style={[styles.textInput, {flex: 3}]}
               onChangeText={(text) => this._playerNameChange(text, k)}
@@ -245,7 +246,7 @@ export default class SettingsScreen extends React.Component {
           </View>
         </View>
       
-        <Text style={styles.textLabel}>Players:</Text>
+        <VText style={styles.textLabel}>Players:</VText>
         {this.renderPlayerList()}
         <View>
           <Button title="Add Player" onPress={() => this._addPlayer()}></Button>

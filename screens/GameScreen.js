@@ -61,7 +61,7 @@ export default class GameScreen extends Component {
       console.log('-----------------');
 
 
-      let batterIx = this.mGame.battingTeam.nextBatterIx; //note this sets the current batter so we can call Parse atbat
+      let batterIx = this.mGame.battingTeam.getNextBatterIx(); //note this sets the current batter so we can call Parse atbat
       this.mGame.parseEvent({type: 'atbat'});
   
       this.state = {
@@ -85,7 +85,7 @@ export default class GameScreen extends Component {
         this.mGameState.balls = 0;
         this.mGameState.strikes = 0;
 
-        let nextBatterIx = this.mGame.battingTeam.nextBatterIx;
+        let nextBatterIx = this.mGame.battingTeam.getNextBatterIx();
         this.setState( {batterUpIx: nextBatterIx }) ;
         this.mBaseRunners[0] = nextBatterIx;
 

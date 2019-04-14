@@ -391,7 +391,7 @@ export default class GameScreen extends Component {
 
             <Col>
               <Button 
-                title="Line Up" 
+                title="Lineup" 
                 onPress={() => this.props.navigation.navigate('Roster', { team: this.mGame.myTeam, view: "fielding", callBack: this.cbPitcherChange})}
                 disabled = {this.state.inHittingUX}
               />

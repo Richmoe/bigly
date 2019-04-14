@@ -1,3 +1,4 @@
+"use strict";
 import React from 'react';
 import {
   Platform, 
@@ -6,16 +7,11 @@ import {
   View,
   TextInput,
   Switch,
-  FlatList,
   Button,
-  Image,
-  ImageBackground,
-  TouchableOpacity,
 } from 'react-native';
 import Player from '../model/Player.js';
 import * as Util from '../util/SaveLoad.js';
 import Team from '../model/Team.js';
-import { VText } from '../components/StyledText';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
@@ -42,7 +38,6 @@ export default class SettingsScreen extends React.Component {
       roster: JSON.parse(JSON.stringify(this.currentTeam.roster))
     };
 
-    console.log(this.state.roster);
   }
 
   toggleSwitch = (value) => {
@@ -74,7 +69,6 @@ export default class SettingsScreen extends React.Component {
 
   renderItem = ({key, index} ) => {
 
-    console.log("Key: " + key + ", " + index);
     return (
       <View key={index} style={{flexDirection: "row", justifyContent: 'space-between'}}>
         <Text style={{flex: 1}}>Player:</Text>
@@ -92,12 +86,11 @@ export default class SettingsScreen extends React.Component {
 
   renderPlayerList() {
     return Object.keys(this.state.roster).map((k, i) => {
-      console.log("Rendering key: " + k);
        return (
           <View key={i} style={{flexDirection: "row", justifyContent: 'space-between'}}>
-            <VText style={{flex: 1}}>Player:</VText>
+
             <TextInput
-              style={[styles.textInput, {flex: 3}]}
+              style={[styles.textInput, {flex: 4}]}
               onChangeText={(text) => this._playerNameChange(text, k)}
               value={ this.state.roster[k].name}
               placeholder="player name"
@@ -114,36 +107,34 @@ export default class SettingsScreen extends React.Component {
   _addPlayer() {
     //console.log("state roster was:");
     //console.log(this.state.roster);
-    var r = this.state.roster;
+    let r = this.state.roster;
     r.push(new Player("",0,0));
     this.setState({roster: r});
     console.log(r);
   }
 
   changeInning(text) {
+    let num = 0;
     if (text > "") {
       num = parseInt(text);      
-    } else {
-      num = 0;
     }
+
     this.setState({maxInnings: num});
   }
 
   changeMaxRuns(text) {
+    let num = 0;
     if (text > "") {
       num = parseInt(text);
-    } else {
-      num = 0;
     }
     this.setState({maxRunsPerInning: num});
     
   }
 
   changeMaxFielders(text) {
+    let num = 0;
     if (text > "") {
       num = parseInt(text);
-    } else {
-      num = 0;
     }
 
     //Cheater:
@@ -158,7 +149,7 @@ export default class SettingsScreen extends React.Component {
   preloadDragons() {
     //Total hack for debug purposes:
     //this.currentTeam._createDefaultMyRoster();
-    test = new Team();
+    let test = new Team();
     test._createDefaultMyRoster();
 
     this.setState({roster: JSON.parse(JSON.stringify(test.roster))});
@@ -190,11 +181,6 @@ export default class SettingsScreen extends React.Component {
   
   render() {
 
-    console.log("_---------------------");
-    console.log(Object.keys(this.state.roster));
-    console.log("_---------------------");
-
-    var rosterKeyArray = Object.keys(this.state.roster);
     return (
       <View style={{flex: 1, flexDirection: "column"}}>
         
@@ -245,11 +231,14 @@ export default class SettingsScreen extends React.Component {
             />
           </View>
         </View>
-      
-        <VText style={styles.textLabel}>Players:</VText>
+        <View style={{height: 5}} />
+        <View style={{height: 1, backgroundColor: 'black'}} />
+        <View style={{height: 5}} />
+
         {this.renderPlayerList()}
+
         <View>
-          <Button title="Add Player" onPress={() => this._addPlayer()}></Button>
+          <Button style={{width: 50}} title="Add Player" onPress={() => this._addPlayer()}></Button>
         </View>
       </View>
      
@@ -258,22 +247,7 @@ export default class SettingsScreen extends React.Component {
   }
 }
 
-/*
-        <FlatList
-
-          data={rosterKeyArray}
-          renderItem={this.renderItem}
-          extraData={this.state}
-        />
-//          keyExtractor={this.keyExtractor}
-*/
-
 const styles = StyleSheet.create({
-  container: {
-    //flex: 1,
-    //flexDirection: 'column',
-
-  },
   textLabel: {
 
     fontSize: 16,
@@ -293,19 +267,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       //backgroundColor: 'green',
       transform: [{ scaleX: .7  }, { scaleY: .7}] ,
-  },
-  buttonish: {
-    backgroundColor: 'cyan',
-    justifyContent: 'center',
-    height: '100%',
-    alignItems: 'center',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    fontSize: 18,
-    borderStyle: 'solid',
-    borderColor: 'black',
-    borderWidth: 2,
-    borderRadius: 10,
   },
 });
 

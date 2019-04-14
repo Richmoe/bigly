@@ -44,6 +44,9 @@ class BatterStats {
 
 
 export default class StatsScreen extends React.Component {
+    static navigationOptions = {
+        title: 'Stats',
+    };
 
     team;
     callBack;

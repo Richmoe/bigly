@@ -13,6 +13,9 @@ import Buttonish from "../components/Buttonish";
 import * as Util from "../util/Misc";
 
 export default class RosterScreen extends React.Component {
+    static navigationOptions = {
+        title: 'Lineup',
+    };
 
     team;
     callBack;
@@ -82,11 +85,11 @@ export default class RosterScreen extends React.Component {
     }
 
     rowJSX = (ix, ...args) => {
-        var jsx = [];
+        let jsx = [];
         //console.log("Making rowJSX for row " + ix + ", args " + args[0] + ", " + args[1] + "...");
 
         //assert args.length = formatRow.length
-        for (var i = 0; i < this.formatRow.length;i++) {
+        for (let i = 0; i < this.formatRow.length;i++) {
             if (this.view == 'lineup') {
                 // we have two clicks:
                 if (i == 0) {
@@ -141,9 +144,9 @@ export default class RosterScreen extends React.Component {
     };
 
     makeHeader = () => {
-        var jsx = [];
+        let jsx = [];
 
-        for (var i = 0; i < this.header.length; i++) {
+        for (let i = 0; i < this.header.length; i++) {
             jsx = [...jsx, <Col key={i} size={this.formatRow[i]}><Text style={styles.headerText}>{this.header[i]}</Text></Col>];
         }
 
@@ -151,7 +154,7 @@ export default class RosterScreen extends React.Component {
     };
 
     makeRow = (ix, val) => {
-        var player;
+        let player;
         if (this.view == "batting" ) {
             player = this.team.team.roster[val];
             return this.rowJSX(ix, (ix+1), player.name, GameConst.fieldPosAbbrev[player.currentPosition]);
@@ -204,7 +207,7 @@ export default class RosterScreen extends React.Component {
         var tempF2 = tempFieldPositions.filter(ix => ix >= 0);
 
         //Reset all player positions:
-        for (var i = 0;i < tempB2.length; i++) {
+        for (let i = 0;i < tempB2.length; i++) {
             this.team.team.roster[tempB2[i]].battingOrder = i;
             this.team.team.roster[tempF2[i]].currentPosition = i;
         }
@@ -406,7 +409,7 @@ export default class RosterScreen extends React.Component {
         console.log(tempArray);
 
         //this.order = tempArray.slice(0);
-        for (var i = 0; i < tempArray.length;i++) {
+        for (let i = 0; i < tempArray.length;i++) {
             var selectedPlayer = this.team.team.roster[tempArray[i]];
             selectedPlayer.currentPosition = i + 2;
         }
@@ -440,7 +443,7 @@ export default class RosterScreen extends React.Component {
                 {this.view == 'fielding' && 
                  <Row style={{height: 50}} >
                     <Buttonish  
-                        title = "Shuffle"
+                        title = "Shuffle Fielding"
                         onPress = {() => this.shuffleFielders()}
                     />
                  </Row>

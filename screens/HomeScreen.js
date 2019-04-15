@@ -134,6 +134,9 @@ export default class HomeScreen extends React.Component {
     let t = this.teamList.find(o => o.uid == this.state.defaultTeamUid);
     t.name = teamName;
 
+    //save teamlist:
+    Util.saveData("SavedTeams", this.teamList);
+
     //Trigger re-render
     this.setState({
       defaultTeam: this.state.defaultTeam,

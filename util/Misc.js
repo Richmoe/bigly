@@ -19,3 +19,11 @@ export function uid() {
   //8 byte guid, good enough for this I think.
   return ((((1+Math.random())*0x100000000)|0).toString(16).substring(1))
 }
+
+export function log(...args) {
+  console.log("<-----------------------------");
+  for (let i = 0; i < args.length; i++) {
+      console.log(args[i]);
+  }
+  console.log("---------------------------->");
+}

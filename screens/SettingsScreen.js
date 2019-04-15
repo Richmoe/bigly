@@ -179,6 +179,8 @@ export default class SettingsScreen extends React.Component {
 
     //test
     this.saveTeam();
+    let callBack = this.props.navigation.getParam("closeCB",null);
+    if (callBack != null) callBack(this.currentTeam.name);
   }
   
   render() {

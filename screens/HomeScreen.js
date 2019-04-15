@@ -28,17 +28,18 @@ export default class HomeScreen extends React.Component {
     header: null,
   };
 
-  teamList = [];
-  defaultTeam;
-
   constructor(props)
   {
     super(props);
 
     //this._loadDefaultTeam();
+    this.teamList = [];
     this._loadTeamListAndDefault();
 
-    this.state = { isLoadingComplete : false };
+    this.state = { 
+      isLoadingComplete : false,
+      defaultTeam : null
+    };
   }
 
   createAndSaveNewTeam() {
@@ -47,6 +48,19 @@ export default class HomeScreen extends React.Component {
     team._createDefaultMyRoster();
 
     team._saveTeam();
+
+    //Add it to SavedTeams
+    if (this.teamList == null) this.teamList = [];
+    this.teamList.push({name: team.name, uid: team.uid});
+    log("new teamList ", this.teamList);
+    //Save new SavedTeams;
+    Util.saveData("SavedTeams", this.teamList);
+
+    log("Saved Team?");
+    //Set as default
+    Util.saveData("DefaultTeam", team.uid);
+    log("Saved default?");
+
     return team;
   }
 
@@ -66,11 +80,14 @@ export default class HomeScreen extends React.Component {
 
   async _loadTeamListAndDefault() {
     let defaultTeamUid = -1;
+    let defaultTeam = null;
     this.teamList = await Util.retrieveData("SavedTeams");
 
     log("team list:", this.teamList);
 
     //this.teamList = null; //wipe
+
+
     if (this.teamList != null) {
       //get default team
       defaultTeamUid = await Util.retrieveData("DefaultTeam");
@@ -83,34 +100,45 @@ export default class HomeScreen extends React.Component {
         log("Loaded team: " + defaultTeamUid);
       }
 
-      this.defaultTeam = await this._loadTeam(defaultTeamUid);
-      if (this.defaultTeam.uid != defaultTeamUid) {
+      defaultTeam = await this._loadTeam(defaultTeamUid);
+      if (defaultTeam.uid != defaultTeamUid) {
         //If we get here, we made a new team.
         log("Saving new default team's uid as default");
-        Util.saveData("DefaultTeam", this.defaultTeam.uid)
+        Util.saveData("DefaultTeam", defaultTeam.uid)
+        defaultTeamUid = defaultTeam.uid;
       } else {
-        log("we have team:", this.defaultTeam.name);
+        log("we have team:", defaultTeam.name);
       }
 
     } else {
       //Create new team:
+
       log("Creeating new team because team list is null");
-      this.defaultTeam = this.createAndSaveNewTeam();  
-
-      //Add it to SavedTeams
-      this.teamList = [{name: this.defaultTeam.name, uid: this.defaultTeam.uid}];
-      log("new teamList ", this.teamList);
-      //Save new SavedTeams;
-      Util.saveData("SavedTeams", [{name: this.defaultTeam.name, uid: this.defaultTeam.uid}]);
-
-      log("Saved Team?");
-      //Set as default
-      Util.saveData("DefaultTeam", this.defaultTeam.uid);
-      log("Saved default?");
+      defaultTeam = this.createAndSaveNewTeam();  
+      defaultTeamUid = defaultTeam.uid;
     }
 
-    this.setState({isLoadingComplete: true});
+    this.setState({
+      isLoadingComplete: true,
+      defaultTeam: defaultTeam,
+      defaultTeamUid: defaultTeamUid,
 
+    });
+
+  }
+
+  cbSettingsClosed = (teamName) => {
+    log("Settings callback!!!", this.teamList, this.state.defaultTeamUid);
+
+    //update name in case:
+    let t = this.teamList.find(o => o.uid == this.state.defaultTeamUid);
+    t.name = teamName;
+
+    //Trigger re-render
+    this.setState({
+      defaultTeam: this.state.defaultTeam,
+    });
+  
   }
 
   teamsPicker = () => {
@@ -119,9 +147,35 @@ export default class HomeScreen extends React.Component {
     for (let i = 0;i < this.teamList.length; i++) {
       jsx = [...jsx, <Picker.Item key={i} label={this.teamList[i].name} value={this.teamList[i].uid} />];
     }
-    jsx = [...jsx, <Picker.Item key={99} label="Create Team..." value="-1" />]
+    //TODO enable later?
+    //jsx = [...jsx, <Picker.Item key={99} label="Create Team..." value="-1" />]
     
     return jsx;
+  }
+
+  async selectTeam(uid) {
+    let defaultTeam = await this._loadTeam(uid);
+    if (defaultTeam.uid != uid) {
+      //If we get here, we made a new team.
+      log("Saving new default team's uid as default");
+      Util.saveData("DefaultTeam", defaultTeam.uid);
+    } 
+    this.setState({defaultTeam: defaultTeam });
+  }
+
+  pickerPick = (itemValue, itemIndex) => {
+    log("Value Changex: " + itemValue + ", " + itemIndex);
+    if (itemValue == -1) {
+      log("creating new team:");
+      //new team: - just need to spawn this out.
+      let defaultTeam = this.createAndSaveNewTeam();
+      this.setState({defaultTeam: defaultTeam});
+
+    } else {
+      //load team where UID = itemValue
+      this.selectTeam(itemValue);
+
+    }
   }
 
   render() {
@@ -132,7 +186,7 @@ export default class HomeScreen extends React.Component {
         />
       );
     } else {
-      var startString = `Start Game (${this.defaultTeam.name})`;
+      var startString = `Start Game (${this.state.defaultTeam.name})`;
       return (
         <View style={styles.container}>
           <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -141,6 +195,17 @@ export default class HomeScreen extends React.Component {
                 source={require('../assets/images/biglyLogo.png')}
                 style={styles.welcomeImage}
               />
+            </View>
+
+            <View style={{flex: 1, justifyContent: "center"}}>
+              <Picker
+                selectedValue={this.state.defaultUid}
+                onValueChange={this.pickerPick}
+                style={{width: 250}}
+              >
+                {this.teamsPicker()}
+
+              </Picker>
             </View>
 
             <Button 
@@ -159,16 +224,7 @@ export default class HomeScreen extends React.Component {
                 title="Debug Away Game" onPress={this._debugAway}
 
             />
-            <Picker
-              selectedValue={this.state.language}
-              onValueChange={(itemValue, itemIndex) => {
-                log("Value Change: " + itemValue + ", " + itemIndex);
-                this.setState({language: itemValue})
-              }
-              }>
-              {this.teamsPicker()}
 
-            </Picker>
     
           </ScrollView>
         </View>
@@ -177,12 +233,12 @@ export default class HomeScreen extends React.Component {
   }
 
   _startGamePress = () => {
-    this.props.navigation.navigate('PreGame', {myTeam: this.defaultTeam});
+    this.props.navigation.navigate('PreGame', {myTeam: this.state.defaultTeam});
  
   };
 
   _settingsPress = () => {
-    this.props.navigation.navigate('TeamSettings', { team: this.defaultTeam});
+    this.props.navigation.navigate('TeamSettings', { team: this.state.defaultTeam, closeCB: this.cbSettingsClosed});
   };
 
   _debugHome = () => {

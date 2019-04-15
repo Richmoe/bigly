@@ -1,5 +1,6 @@
 import Player from '../model/Player.js';
 import * as Util from "../util/Misc";
+import * as Save from '../util/SaveLoad';
 
 export default class Team  {
     uid;
@@ -69,6 +70,11 @@ export default class Team  {
         return json;
     }
 
+    async _saveTeam() {
+        let json = this.createSave(); //todo collapse this
+
+        Save.saveData(`Team-${this.uid}`,json);
+    }
     
 
     _createDefaultRoster(names) {

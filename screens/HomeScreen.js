@@ -10,22 +10,15 @@ import {
   TouchableOpacity,
   View,
   Button,
+  Picker,
+  PickerIOS,
 } from 'react-native';
 import { 
   AppLoading, 
-  Asset, 
-  Font, 
-  Icon 
 } from 'expo';
 
-
-import { VText } from '../components/StyledText';
-
-import Layout from '../constants/Layout';
-
-import Buttonish from '../components/Buttonish';
-
 import * as Util from '../util/SaveLoad';
+import { log } from '../util/Misc';
 import Team from '../model/Team';
 import LineUp from '../model/LineUp';
 import GameParams from '../model/GameParams';
@@ -35,63 +28,100 @@ export default class HomeScreen extends React.Component {
     header: null,
   };
 
+  teamList = [];
   defaultTeam;
 
   constructor(props)
   {
     super(props);
 
-    this._loadDefaultTeam();
+    //this._loadDefaultTeam();
+    this._loadTeamListAndDefault();
 
     this.state = { isLoadingComplete : false };
-
   }
 
-  async _loadDefaultTeam() {
+  createAndSaveNewTeam() {
+    let team = new Team("Default Team");
+    //Test:
+    team._createDefaultMyRoster();
 
+    team._saveTeam();
+    return team;
+  }
 
-    var json = await Util.retrieveData("DefaultTeam");
-    //console.log("default Team is: ");
-    //console.log(json);
-    //console.log("-------------------------------------------");
-
-
-
-    if (json == null) {
-      console.log("Creating Default Team");
-      this.defaultTeam = new Team("New Team");
-      //TEST:
-      this.defaultTeam._createDefaultMyRoster();
+  async _loadTeam(UID) {
+    log ("loading team: " + UID);
+    let teamObject = await Util.retrieveData(`Team-${UID}`);
+    if (teamObject != null) {
+      log("making team from object");
+      let team = new Team();
+      team.fromJSON(teamObject);
+      return team;
     } else {
-      this.defaultTeam = new Team();
-      this.defaultTeam.fromJSON(json);
-      //console.log("---------xx--------------------------");
-      //   console.log(this.defaultTeam);
-      //console.log("-------------------------------------------");
-  
+      log("couldn't find save so creating new");
+      return this.createAndSaveNewTeam();
+    }
+  }
+
+  async _loadTeamListAndDefault() {
+    let defaultTeamUid = -1;
+    this.teamList = await Util.retrieveData("SavedTeams");
+
+    log("team list:", this.teamList);
+
+    //this.teamList = null; //wipe
+    if (this.teamList != null) {
+      //get default team
+      defaultTeamUid = await Util.retrieveData("DefaultTeam");
+      if (defaultTeamUid == null) {
+        log("No default team. Creating and saving new one.")
+        //set default to be the 1st team
+        defaultTeamUid = this.teamList[0].uid;
+        Util.saveData("DefaultTeam", defaultTeamUid);
+      } else {
+        log("Loaded team: " + defaultTeamUid);
+      }
+
+      this.defaultTeam = await this._loadTeam(defaultTeamUid);
+      if (this.defaultTeam.uid != defaultTeamUid) {
+        //If we get here, we made a new team.
+        log("Saving new default team's uid as default");
+        Util.saveData("DefaultTeam", this.defaultTeam.uid)
+      } else {
+        log("we have team:", this.defaultTeam.name);
+      }
+
+    } else {
+      //Create new team:
+      log("Creeating new team because team list is null");
+      this.defaultTeam = this.createAndSaveNewTeam();  
+
+      //Add it to SavedTeams
+      this.teamList = [{name: this.defaultTeam.name, uid: this.defaultTeam.uid}];
+      log("new teamList ", this.teamList);
+      //Save new SavedTeams;
+      Util.saveData("SavedTeams", [{name: this.defaultTeam.name, uid: this.defaultTeam.uid}]);
+
+      log("Saved Team?");
+      //Set as default
+      Util.saveData("DefaultTeam", this.defaultTeam.uid);
+      log("Saved default?");
     }
 
     this.setState({isLoadingComplete: true});
 
-    /*
-    console.log("<TEsT>");
-    var json = this.defaultTeam.createSave();
-    console.log(json);
-    console.log("00000------------");
+  }
 
-    var team2 = new Team("tester");
-    team2.fromJSON(json);
+  teamsPicker = () => {
 
-    //console.log()
-    console.log("</TEsT>");
-*/
-
-
-    //console.log("default Team is: ");
-    //console.log(this.defaultTeam);
-    //console.log(this.defaultTeam.roster);
-    //console.log(`testing length: ${Object.keys(this.defaultTeam.roster).length}`);
-  
+    let jsx = [];
+    for (let i = 0;i < this.teamList.length; i++) {
+      jsx = [...jsx, <Picker.Item key={i} label={this.teamList[i].name} value={this.teamList[i].uid} />];
+    }
+    jsx = [...jsx, <Picker.Item key={99} label="Create Team..." value="-1" />]
+    
+    return jsx;
   }
 
   render() {
@@ -113,27 +143,33 @@ export default class HomeScreen extends React.Component {
               />
             </View>
 
-            <Buttonish 
+            <Button 
                 title={startString} onPress={this._startGamePress}
-                titleStyle={styles.buttonText}
+
             />
-            <Buttonish
+            <Button
                 title="Settings" onPress={this._settingsPress}              
-                titleStyle={styles.buttonText}
+
             />
-            <Buttonish
+            <Button
                 title="Debug Home Game" onPress={this._debugHome}
-                titleStyle={styles.buttonText}
+
             />
-            <Buttonish
+            <Button
                 title="Debug Away Game" onPress={this._debugAway}
-                titleStyle={styles.buttonText}
+
             />
-            <View style={{height:40, backgroundColor: "red", justifyContent: "center"}}>
-              <Text>Hello</Text></View>
-              
-            <VText>Testing VText</VText>
-     
+            <Picker
+              selectedValue={this.state.language}
+              onValueChange={(itemValue, itemIndex) => {
+                log("Value Change: " + itemValue + ", " + itemIndex);
+                this.setState({language: itemValue})
+              }
+              }>
+              {this.teamsPicker()}
+
+            </Picker>
+    
           </ScrollView>
         </View>
       );
@@ -167,18 +203,12 @@ export default class HomeScreen extends React.Component {
     t1.myTeam = true;
     console.log("1*****************");
     var l1 = new LineUp(t1);
-    //l1._createDefaultLineup();
-    //var json = t1.createSave();
-    //console.log("1*****************");
-    //console.log(json);
-    //console.log(l1);
 
     console.log("2*****************");
     var t2 = new Team("Opponent");
     t2._createDefaultRoster();
     var l2 = new LineUp(t2);
-    //l2._createDefaultLineup();
-    //console.log(l2);
+
     //Extract game settings from team. Do I want to do this? TODO
     var gameSettings = new GameParams(t1);
 
@@ -219,66 +249,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: 3,
     marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
   },
   buttonText: {
     fontSize: 22,

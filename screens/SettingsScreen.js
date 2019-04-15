@@ -12,6 +12,7 @@ import {
 import Player from '../model/Player.js';
 import * as Util from '../util/SaveLoad.js';
 import Team from '../model/Team.js';
+import { log } from '../util/Misc';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
@@ -167,7 +168,8 @@ export default class SettingsScreen extends React.Component {
     this.currentTeam.maxRunsPerInning = this.state.maxRunsPerInning;
     this.currentTeam.maxFieldPlayers = this.state.maxFieldPlayers;
 
-    Util.saveData("DefaultTeam", this.currentTeam);
+    Util.saveData(`Team-${this.currentTeam.uid}`, this.currentTeam);
+    log("Saving Team with UID" + this.currentTeam.uid);
     //console.log("Saving team:");
     //console.log(this.currentTeam);
   }

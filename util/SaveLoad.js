@@ -22,3 +22,20 @@ export async function retrieveData (key)  {
     }
     return;
 };
+
+export async function getAllKeys() {
+
+    try {
+        const keys = await AsyncStorage.getAllKeys();
+        console.log("Get All Keys:");
+        console.log(keys);
+
+        return keys;
+
+    } catch (error) {
+        // Error retrieving data
+        console.log(error.message)
+    }
+    return null;
+
+}

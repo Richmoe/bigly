@@ -39,12 +39,27 @@ export default class Game {
         this.uid = uid();
     }
 
+    get isHome() {
+        if (this.homeLineUp.myTeam) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     get myTeam() {
         if (this.homeLineUp.myTeam) {
             return this.homeLineUp;
         } else {
             return this.awayLineUp;
+        }
+    }
+
+    get oppTeam() {
+        if (this.homeLineUp.myTeam) {
+            return this.awayLineUp;
+        } else {
+            return this.homeLineUp;
         }
     }
 
@@ -55,6 +70,7 @@ export default class Game {
             return false;
         }
     }
+
 
     get inning() {
         return Math.floor(this.currentInning / 2) + 1;
@@ -119,6 +135,24 @@ export default class Game {
         }
 
         return {away: awayScore, home: homeScore} ;
+    }
+
+    get myScore() {
+        let {away, home} = this.score;
+        if (this.isHome) {
+            return home;
+        } else {
+            return away;
+        }
+    }
+
+    get oppScore() {
+        let {away, home} = this.score;
+        if (this.isHome) {
+            return away;
+        } else {
+            return home;
+        }
     }
 
     parseEvent (event) {

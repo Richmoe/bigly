@@ -13,7 +13,7 @@ export default class Team  {
     maxRunsPerInning = 5;
     machinePitch = true;
     gamesPlayed = [];   //array of games played where game = {UID, Date, Opponent, isHome, myScore, oppScore}
-    playerGameStats = []; //array of player game stats which can be summed for lifetime. [game][PlayerUID]
+    playerGameStats = []; //array of player game stats which can be summed for lifetime. [gameUid][PlayerUID]
 
     
     constructor(teamName, uid)
@@ -31,6 +31,39 @@ export default class Team  {
         return Object.keys(this.roster).length;
     }
 
+    addGame(gameObject) {
+        //pull out the right info here:
+        //{UID, Date, Opponent, isHome, myScore, oppScore}
+
+        let gp = {
+            uid: gameObject.uid,
+            date: gameObject.date,
+            opponent: gameObject.oppTeam.teamName,
+            isHome: gameObject.isHome,
+            myScore: gameObject.myScore,
+            oppScore: gameObject.oppScore,
+        }
+        this.gamesPlayed.push(gp);
+
+        Util.log("Games Played added, now:", this.gamesPlayed);
+
+        //Update player stats
+        this.playerGameStats[gp.uid] = gameObject.myTeam.playerStats;
+
+       
+        //Util.log("player game stats: ", this.playerGameStats, myLU.playerStats);
+        //Update Win/loss/tie
+        //NVM - we should walk GP to get this
+
+    }
+
+    __debugGamesPlayed() {
+        Util.log("Debugging Games Played (len: " + this.gamesPlayed.length);
+        for (let g in this.gamesPlayed) {
+            Util.log(`Game #${g}`, this.gamesPlayed[g]);
+        }
+    }
+
 
     fromJSON(json) {
         this.uid = json.uid;
@@ -40,6 +73,7 @@ export default class Team  {
         this.maxRunsPerInning = json.maxRunsPerInning;
         this.machinePitch = json.machinePitch;
         this.playerGameStats = json.playerGameStats;
+        this.gamesPlayed = json.gamesPlayed;
 
         //rebuild roster array of Players:
         let r = json.roster;
@@ -51,27 +85,20 @@ export default class Team  {
             this.roster[pid] = p;
             //console.log(p);
         }
-
-
     }
 
-    createSave() {
-
-        var json = {
+    async _save() {
+        let json = {
             uid: this.uid,
             name: this.name,
             maxInnings: this.maxInnings,
             maxFieldPlayers: this.maxFieldPlayers,
             maxRunsPerInning: this.maxRunsPerInning,
             machinePitch: this.machinePitch,
-            roster: this.roster, //We'll lose some functions, but recreate on load,
             playerGameStats: this.playerGameStats,
+            gamesPlayed: this.gamesPlayed,
+            roster: this.roster, //We'll lose some functions, but recreate on load,
         };
-        return json;
-    }
-
-    async _saveTeam() {
-        let json = this.createSave(); //todo collapse this
 
         Save.saveData(`Team-${this.uid}`,json);
     }

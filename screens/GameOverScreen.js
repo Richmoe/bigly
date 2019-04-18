@@ -6,35 +6,26 @@ import {
   StyleSheet, 
   Text, 
   View,
-  TextInput,
-  Switch,
-  FlatList,
   Button,
-  Image,
-  ImageBackground,
-  TouchableOpacity,
 } from 'react-native';
-import Buttonish from '../components/Buttonish';
-import BoxScoreView from '../components/BoxScoreView';
 
+import BoxScoreView from '../components/BoxScoreView';
+import { log } from '../util/Misc';
 
 export default class GameOverScreen extends React.Component {
+  static navigationOptions = {
+    header: null,
+  };
 
-    static navigationOptions = {
-      title: 'Main Menu',
-    };
-
-    mGame;
+  mGame;
 
   constructor(props) {
-
+    console.log("GameOverScreen");
     super(props);
-
 
     //We should have passed in team here and game params here. We assume we loaded on launch:
     this.mGame = this.props.navigation.getParam("game",null);
-    console.log(this.mGame);
-
+    //console.log(this.mGame); <- I think this was causing a hang perhaps????
   }
 
 
@@ -44,21 +35,17 @@ export default class GameOverScreen extends React.Component {
 
   saveGame() {
 
-    //Craft saved game name:
-    var gameName = `${this.mGame.date}-${this.mGame.myTeam.teamName}-${this.mGame.myTeam.teamName}-${this.mGame.uid}`;
-    console.log("Save Game: " + gameName);
+    //Add game data to team:
+    this.mGame.myTeam.team.addGame(this.mGame);
 
-    //Util.saveData("DefaultTeam", this.mGame);
+    //Save team
+    this.mGame.myTeam.team._save();
 
+    //Save game
+    this.mGame._save();
+
+    this.props.navigation.popToTop();
   }
-
-  componentWillUnmount() {
-    console.log('UNMOUNTED');
-
-    //test
-    this.saveGame();
-  }
-
   
   render() {
     let {away, home} = this.mGame.score;
@@ -85,12 +72,17 @@ export default class GameOverScreen extends React.Component {
         </View>
         
         <View style={{flex:1}}>
-            <Buttonish 
+            <Button 
               title = "Game Stats" 
               onPress={() => this.props.navigation.navigate('Stats', { team: this.mGame.myTeam})}
             />
         </View>
-
+        <View style={{flex:1}}>
+            <Button 
+              title = "Save and Main Menu" 
+              onPress={() => this.saveGame()}
+            />
+        </View>
       </View>
      
 

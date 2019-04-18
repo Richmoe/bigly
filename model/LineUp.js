@@ -94,8 +94,8 @@ export default class LineUp
         this.fieldPositions = [];
         //walk the roster and assign position and order to IX
 
-        console.log("Create default lineup");
-        console.log(this.team.roster);
+        //console.log("Create default lineup");
+        //console.log(this.team.roster);
         var i = 0;
         for (let playerUid in this.team.roster) {
 

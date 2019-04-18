@@ -15,6 +15,7 @@
 import PlayerStats from '../model/PlayerStats.js';
 import GameConst from '../constants/GameConst';
 import {uid} from '../util/Misc';
+import * as SaveLoad from '../util/SaveLoad';
 import LineUp from './LineUp.js';
 
 export default class Game {
@@ -241,9 +242,8 @@ export default class Game {
         } 
     }
 
-
-    createSave() {
-        /*
+    _save() {
+         /*
         homeLineUp; //type LineUp
         awayLineUp; //type LineUp
         //state:
@@ -253,16 +253,23 @@ export default class Game {
         isMachinePitching;
         */
 
-        var homeLineUp = this.homeLineUp.createSave();
-        var awayLineUp = this.awayLineUp.createSave();
+        let homeLineUp = this.homeLineUp.createSave();
+        let awayLineUp = this.awayLineUp.createSave();
 
-        var json = {
+        let json = {
             homeLineUp: homeLineUp,
             awayLineUp: awayLineUp,
+            innings: this.innings,
+            gameSettings: this.gameSettings,
             date: this.date,
             uid: this.uid,
         };
-        return json;
+
+        //Craft saved game name:
+        let gameName = `Game-${this.uid}`;
+        console.log("Save Game: " + gameName);
+
+        SaveLoad.saveData(gameName, json);
     }
 
     fromSave(json) {
@@ -273,6 +280,8 @@ export default class Game {
         this.awayLineUp = new LineUp();
         this.awayLineUp.fromJSON(json.awayLineUp);
 
+        this.innings = json.innings;
+        this.gameSettings = json.gameSettings;
         this.date = json.date;
         this.uid = json.uid;
     }

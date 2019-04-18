@@ -32,6 +32,9 @@ export default class HomeScreen extends React.Component {
   {
     super(props);
 
+    //test:
+    let test = Util.getAllKeys();
+
     //this._loadDefaultTeam();
     this.teamList = [];
     this._loadTeamListAndDefault();
@@ -47,7 +50,7 @@ export default class HomeScreen extends React.Component {
     //Test:
     team._createDefaultMyRoster();
 
-    team._saveTeam();
+    team._save();
 
     //Add it to SavedTeams
     if (this.teamList == null) this.teamList = [];
@@ -108,6 +111,9 @@ export default class HomeScreen extends React.Component {
         defaultTeamUid = defaultTeam.uid;
       } else {
         log("we have team:", defaultTeam.name);
+
+
+        defaultTeam.__debugGamesPlayed();
       }
 
     } else {
@@ -146,9 +152,11 @@ export default class HomeScreen extends React.Component {
 
   teamsPicker = () => {
 
+    //log("TeamsPicker:", this.teamList);
     let jsx = [];
     for (let i = 0;i < this.teamList.length; i++) {
       jsx = [...jsx, <Picker.Item key={i} label={this.teamList[i].name} value={this.teamList[i].uid} />];
+      //log(jsx);
     }
     //TODO enable later?
     //jsx = [...jsx, <Picker.Item key={99} label="Create Team..." value="-1" />]
@@ -200,33 +208,35 @@ export default class HomeScreen extends React.Component {
               />
             </View>
 
-            <View style={{flex: 1, justifyContent: "center"}}>
+            <View style={{flex: 1, justifyContent: "center", backgroundColor: 'red'}}>
               <Picker
                 selectedValue={this.state.defaultUid}
                 onValueChange={this.pickerPick}
-                style={{width: 250}}
+                
               >
                 {this.teamsPicker()}
 
               </Picker>
             </View>
 
-            <Button 
-                title={startString} onPress={this._startGamePress}
+            <View style={{flex: 1}}>
+              <Button 
+                  title={startString} onPress={this._startGamePress}
 
-            />
-            <Button
-                title="Settings" onPress={this._settingsPress}              
+              />
+              <Button
+                  title="Settings" onPress={this._settingsPress}              
 
-            />
-            <Button
-                title="Debug Home Game" onPress={this._debugHome}
+              />
+              <Button
+                  title="Debug Home Game" onPress={this._debugHome}
 
-            />
-            <Button
-                title="Debug Away Game" onPress={this._debugAway}
+              />
+              <Button
+                  title="Debug Away Game" onPress={this._debugAway}
 
-            />
+              />
+            </View>
 
     
           </ScrollView>

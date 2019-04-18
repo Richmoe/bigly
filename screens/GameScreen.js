@@ -18,6 +18,8 @@ import HitView from '../components/HitView.js';
 import GameStateView from '../components/GameStateView';
 import GameConst from '../constants/GameConst';
 
+import { log } from '../util/Misc';
+
 export default class GameScreen extends Component {
   static navigationOptions = {
     header: null,
@@ -80,21 +82,16 @@ export default class GameScreen extends Component {
 
     nextBatter() {
 
-        console.log("Next Batter, base index ");
-        console.log(this.mBaseRunners);
-        this.mGameState.balls = 0;
-        this.mGameState.strikes = 0;
+      this.mGameState.balls = 0;
+      this.mGameState.strikes = 0;
 
-        let nextBatterIx = this.mGame.battingTeam.getNextBatterIx();
-        this.setState( {batterUpIx: nextBatterIx }) ;
-        this.mBaseRunners[0] = nextBatterIx;
+      let nextBatterIx = this.mGame.battingTeam.getNextBatterIx();
+      this.setState( {batterUpIx: nextBatterIx }) ;
+      this.mBaseRunners[0] = nextBatterIx;
 
-        this.mGame.parseEvent({type: 'atbat'});
+      this.mGame.parseEvent({type: 'atbat'});
 
-        console.log("NextBatter baseRunners:");
-        console.log(this.mBaseRunners);
     };
-
 
     newInning() {
 
@@ -110,16 +107,19 @@ export default class GameScreen extends Component {
         this.nextBatter();
         console.log(`New inning: ${this.mGame.inning}  (TOP: ${this.mGame.isTop}), starting onBase: ${this.mBaseRunners}, pitcher: ${this.mGame.fieldingTeam.currentPitcher.name}`);
       } else {
-        this.gameOver();
+
+        this.setState({gameOver: true});
+        //this.gameOver();
       }
     };
 
-    gameOver() {
+    onGameOver = () =>  {
 
       //This resets the NavStack so back goes to Home screen
       // then it navigates to Game Over
-
-      console.log("in gameOVer function");
+      // Note: this reruns the Home constructor. Is this okay????M
+      this.props.navigation.navigate('GameOver', { game: this.mGame})
+      /*
       const resetAction = StackActions.reset({
         index: 1,
         actions: [
@@ -127,16 +127,16 @@ export default class GameScreen extends Component {
           NavigationActions.navigate({ routeName: 'GameOver', params: { game: this.mGame } }),
         ],
       });
-      this.props.navigation.dispatch(resetAction);
-
+      this.props.navigation.dispatch(resetAction);       
+      */
     }
 
     //callback from inGameOptions
     cbOptions = (event) => {
 
       if (event == 'EndGame') {
-        //this.setState({endGame: true});
-        this.gameOver();
+        this.setState({gameOver: true});
+        //this.onGameOver();
       } else if (event == 'EndInning') {
         this.newInning();
       }
@@ -148,8 +148,6 @@ export default class GameScreen extends Component {
       this.setState({ pitchCount: 0}); //this is more to trigger update
 
     }
-
-
 
     pitchCallback = (pitchType) => {
 
@@ -268,7 +266,6 @@ export default class GameScreen extends Component {
     }
 
     resolveHit = (walk) => {
-      
       //Store current Batter:
       //Find batter:
       let batterLoc = this.mBaseRunners.indexOf(this.state.batterUpIx);
@@ -292,10 +289,8 @@ export default class GameScreen extends Component {
 
       //get runs:
       let runCount = 0;
-      //loop though:
-      console.log("This:");
-      console.log(this.mBaseRunners);
 
+      //loop though:
       for (let i = 4; i < 8;i++) {
         if (this.mBaseRunners[i] != -1) {
           ++runCount;
@@ -320,7 +315,6 @@ export default class GameScreen extends Component {
         this.mGameState.homeScore = home;
       }
 
-
       //get outs - mBaseRunners ix 8-11
       var outCount = this.mBaseRunners.slice(8,11).reduce(this.totalRunners,0);
       if (outCount > 0) {
@@ -341,11 +335,6 @@ export default class GameScreen extends Component {
 
 
     render() {
- 
-      if (this.state.endGame == true) {
-        this.gameOver();
-        return null;
-      }
       return (
         <Grid>
           <Row style= {{height: 20}} />
@@ -368,7 +357,15 @@ export default class GameScreen extends Component {
           </Row>
           
           <Row size={10} >
+          { !this.state.gameOver &&
             <PitchControl clickHandler = {this.pitchCallback} isHitting= {this.state.inHittingUX} />
+          }
+          { this.state.gameOver &&
+            <Button 
+              title="Game Over" 
+              onPress={() => this.onGameOver()} //this.props.navigation.navigate('GameOver', { game: this.mGame})} 
+            />
+          }
           </Row>
           <Row size={10} >
           { true && this.mGame.myTeamIsBatting == false && 

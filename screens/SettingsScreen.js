@@ -2,6 +2,7 @@
 import React from 'react';
 import {
   Platform, 
+  ScrollView,
   StyleSheet, 
   Text, 
   View,
@@ -10,7 +11,7 @@ import {
   Button,
 } from 'react-native';
 import Player from '../model/Player.js';
-import * as Util from '../util/SaveLoad.js';
+import * as SaveLoad from '../util/SaveLoad.js';
 import Team from '../model/Team.js';
 import { log } from '../util/Misc';
 
@@ -36,7 +37,8 @@ export default class SettingsScreen extends React.Component {
       machinePitch: this.currentTeam.machinePitch,
       maxRunsPerInning: this.currentTeam.maxRunsPerInning,
       maxFieldPlayers: this.currentTeam.maxFieldPlayers,
-      roster: JSON.parse(JSON.stringify(this.currentTeam.roster))
+      roster: JSON.parse(JSON.stringify(this.currentTeam.roster)),
+      noSave: false,
     };
 
   }
@@ -168,13 +170,14 @@ export default class SettingsScreen extends React.Component {
     this.currentTeam.maxRunsPerInning = this.state.maxRunsPerInning;
     this.currentTeam.maxFieldPlayers = this.state.maxFieldPlayers;
 
-    Util.saveData(`Team-${this.currentTeam.uid}`, this.currentTeam);
+    SaveLoad.saveData(`Team-${this.currentTeam.uid}`, this.currentTeam);
     log("Saving Team with UID" + this.currentTeam.uid);
     //console.log("Saving team:");
     //console.log(this.currentTeam);
   }
 
   componentWillUnmount() {
+    if (this.state.noSave) return;
     console.log('UNMOUNTED');
 
     //test
@@ -182,11 +185,42 @@ export default class SettingsScreen extends React.Component {
     let callBack = this.props.navigation.getParam("closeCB",null);
     if (callBack != null) callBack(this.currentTeam.name);
   }
+
+  async __debug(event) {
+    console.log(event.nativeEvent.text);
+
+    let words = event.nativeEvent.text.split(" ");
+
+    if (words[0]== "show") {
+      log("Showing: " + words[1]);
+      let test = await SaveLoad.retrieveData(words[1]);
+      log(test);
+
+    } else if (words[0] == 'list') {
+      let test = SaveLoad.getAllKeys();
+      log(test);
+    } else if (words[0] == 'del') { 
+      this.setState({noSave: true});
+      SaveLoad.deleteKey(words[1]);
+    } else if (words[0] == 'delall') { 
+      this.setState({noSave: true});
+      let test = await SaveLoad.getAllKeys();
+      for (let i = 0;i < test.list;i++) {
+        log(`Deleting: ${test[i]}`);
+        SaveLoad.deleteKey(test[i]);
+      }
+    } else if (words[0] == "showstats") {
+      log("Showing stats: " + words[1]);
+      let test = await SaveLoad.retrieveData(words[1]);
+      log(test.playerGameStats);
+      //debugger;
+    }
+  }
   
   render() {
 
     return (
-      <View style={{flex: 1, flexDirection: "column"}}>
+      <ScrollView style={{flex: 1, flexDirection: "column"}}>
         
         <View style={{flexDirection: "row"}}>
           <Text style={[styles.textLabel, {flex: 1}]}>Team Name:</Text>
@@ -244,7 +278,16 @@ export default class SettingsScreen extends React.Component {
         <View>
           <Button style={{width: 50}} title="Add Player" onPress={() => this._addPlayer()}></Button>
         </View>
-      </View>
+
+        <View style={{flexDirection: "row"}}>
+          <Text style={[styles.textLabel, {flex: 1}]}>Debug</Text>
+          <TextInput
+            style={styles.textInput}
+            onSubmitEditing={(text) => this.__debug(text)}
+          />
+        </View>
+      </ScrollView>
+
      
 
     );

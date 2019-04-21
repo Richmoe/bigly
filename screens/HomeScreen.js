@@ -32,9 +32,6 @@ export default class HomeScreen extends React.Component {
   {
     super(props);
 
-    //test:
-    let test = Util.getAllKeys();
-
     //this._loadDefaultTeam();
     this.teamList = [];
     this._loadTeamListAndDefault();
@@ -114,6 +111,8 @@ export default class HomeScreen extends React.Component {
 
 
         defaultTeam.__debugGamesPlayed();
+
+        defaultTeam.__debugSeasonStats();
       }
 
     } else {
@@ -236,6 +235,10 @@ export default class HomeScreen extends React.Component {
                   title="Debug Away Game" onPress={this._debugAway}
 
               />
+              <Button
+                  title="Season Stats" onPress={this._seasonStats}
+
+              />
             </View>
 
     
@@ -253,6 +256,12 @@ export default class HomeScreen extends React.Component {
   _settingsPress = () => {
     this.props.navigation.navigate('TeamSettings', { team: this.state.defaultTeam, closeCB: this.cbSettingsClosed});
   };
+
+  
+  _seasonStats = () => {
+    this.props.navigation.navigate('SeasonStats', { team: this.state.defaultTeam});
+  };
+
 
   _debugHome = () => {
     this.debugGame(true);

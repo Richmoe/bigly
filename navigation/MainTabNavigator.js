@@ -12,6 +12,7 @@ import StatsScreen from '../screens/StatsScreen';
 import InGameOptionsScreen from '../screens/InGameOptionsScreen';
 import GameOverScreen from '../screens/GameOverScreen';
 import SetLineUpScreen from '../screens/SetLineUpScreen';
+import SeasonStatsScreen from '../screens/SeasonStatsScreen';
 
 export default  createStackNavigator({
   Home: HomeScreen,
@@ -23,6 +24,7 @@ export default  createStackNavigator({
   InGameOptions: InGameOptionsScreen,
   GameOver: GameOverScreen,
   SetLineUp: SetLineUpScreen,
+  SeasonStats: SeasonStatsScreen,
   navigationOptions: ({navigation}) => ({
     tabBarLabel: 'Home',
     tabBarIcon: ({ focused }) => (

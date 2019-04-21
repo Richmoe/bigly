@@ -39,4 +39,24 @@ export default class PlayerStats {
         this.pitcherStats = new PitcherStats();
         this.batterStats = new BatterStats();
     }
+
+    sumStats(stats) {
+
+        //Test:
+        //this.pitcherStats.balls += stats.pitcherStats.balls;
+        /*
+        console.log("summing stats:");
+        console.log(stats);
+        console.log("to:");
+        console.log(this);
+        */
+        for (let key in stats.pitcherStats) {
+            this.pitcherStats[key] += stats.pitcherStats[key];
+        }
+        for (let key in stats.batterStats) {
+            this.batterStats[key] += stats.batterStats[key];
+        }
+        //console.log(this);
+
+    }
 }

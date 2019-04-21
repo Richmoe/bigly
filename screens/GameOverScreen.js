@@ -35,6 +35,8 @@ export default class GameOverScreen extends React.Component {
 
   saveGame() {
 
+    
+
     //Add game data to team:
     this.mGame.myTeam.team.addGame(this.mGame);
 
@@ -42,7 +44,9 @@ export default class GameOverScreen extends React.Component {
     this.mGame.myTeam.team._save();
 
     //Save game
-    this.mGame._save();
+    //this.mGame._save();
+
+    //debugger;
 
     this.props.navigation.popToTop();
   }

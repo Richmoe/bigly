@@ -48,8 +48,8 @@ export default class StatsScreen extends React.Component {
         title: 'Stats',
     };
 
-    team;
-    callBack;
+    lineUp;
+
     formatRow;
     header;
     order;
@@ -59,9 +59,9 @@ export default class StatsScreen extends React.Component {
 
         super(props);
 
-        this.team = this.props.navigation.getParam("team",[]);
+        this.lineUp = this.props.navigation.getParam("team",[]);
 
-        this.state = { modalVisible: false, selectedOrder: -1, view: "batting" };
+        this.state = { view: "batting" };
         this.setView("batting");
     }
 
@@ -72,15 +72,15 @@ export default class StatsScreen extends React.Component {
         if (view == "batting") {
             this.formatRow = [5,1,1,1,1,1,1,1,1,1,1];
             this.header = ["Name", "AB", "R", "H", "RBI", "2B","3B","HR","BB","SO","HBP"];
-            this.order = this.team.battingOrder;
+            this.order = this.lineUp.battingOrder;
         } else if (view == "pitching") {
             this.formatRow = [5,1,1,1,1,1,1,1,1,1];;
             this.header = ["Name", "BF", "R", "H", "BB", "SO", "HB", "PT", "B", "S"];
-            this.order = this.team.fieldPositions;
+            this.order = this.lineUp.fieldPositions;
         } else {
             this.formatRow = [10,80,10];
             this.header = ["#", "Name", "Pos"];
-            this.order = this.team.battingOrder;
+            this.order = this.lineUp.battingOrder;
         }
     }
    
@@ -111,8 +111,8 @@ export default class StatsScreen extends React.Component {
 
     makeRow = (ix, val) => {
 
-        var player = this.team.team.roster[val];
-        var playerStats = this.team.playerStats[player.uid];
+        var player = this.lineUp.team.roster[val];
+        var playerStats = this.lineUp.playerStats[player.uid];
 
         if (this.state.view == "batting" ) {
             //this.header = ["Name", "AB", "R", "H", "RBI", "2B","3B","HR","BB","SO","HBP"];

@@ -12,7 +12,7 @@ export default class LineUp
     currentBatterIx = -1; //Start with -1 because we always call nextBatter;
     //TODO make this by inning.
     fieldPositions = []; //Array of field pos, 0 = pitcher. Value = player UID.
-    playerStats = []; //Array of player stats [PlayerUID]
+    playerStats = {}; //Object of player stats key = PlayerUID]
     
     constructor(team) {
         this.team = team;
@@ -107,7 +107,7 @@ export default class LineUp
             this.fieldPositions.push(player.uid);
             ++i;
 
-            this.playerStats[player.uid] = new PlayerStats(player.uid);
+            this.playerStats[player.uid.toString()] = new PlayerStats(player.uid);
         }
     }
 
@@ -137,9 +137,14 @@ export default class LineUp
         //player stats
         //CurrentBatter - not needed unless we want to save mid-game
 
-        var teamJson = this.team.createSave();
+        //let teamJson = this.team.createSave();
+        //From team we should take:
+        //name
+        //roster
+        //Record snapshot?
 
-        var json = {
+
+        let json = {
             team: teamJson,
             battingOrder: this.battingOrder,
             fieldPositions: this.fieldPositions,

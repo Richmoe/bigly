@@ -13,7 +13,7 @@ export default class Team  {
     maxRunsPerInning = 5;
     machinePitch = true;
     gamesPlayed = [];   //array of games played where game = {UID, Date, Opponent, isHome, myScore, oppScore}
-    playerGameStats = []; //array of player game stats which can be summed for lifetime. [gameUid][PlayerUID]
+    playerGameStats = {}; //object of player game stats which can be summed for lifetime. [gameUid][PlayerUID]
 
     
     constructor(teamName, uid)
@@ -25,6 +25,9 @@ export default class Team  {
         } else {
             this.uid = Util.uid();
         }
+        this.playerGameStats = {};
+        Util.log(this.playerGameStats);
+
     }
 
     get rosterLength() {
@@ -47,11 +50,12 @@ export default class Team  {
 
         Util.log("Games Played added, now:", this.gamesPlayed);
 
+        //debugger;
         //Update player stats
-        this.playerGameStats[gp.uid] = gameObject.myTeam.playerStats;
+        this.playerGameStats[gp.uid.toString()] = gameObject.myTeam.playerStats;
 
        
-        //Util.log("player game stats: ", this.playerGameStats, myLU.playerStats);
+        Util.log("player game stats: ", this.playerGameStats);
         //Update Win/loss/tie
         //NVM - we should walk GP to get this
 
@@ -64,6 +68,12 @@ export default class Team  {
         }
     }
 
+    __debugSeasonStats() {
+        Util.log("Debugging Season Stats: " + Object.keys(this.playerGameStats).length);
+        for (let g in this.playerGameStats) {
+            Util.log(`Game #${g}`, this.playerGameStats[g]);
+        }
+    }
 
     fromJSON(json) {
         this.uid = json.uid;
@@ -87,7 +97,7 @@ export default class Team  {
         }
     }
 
-    async _save() {
+    createSave() {
         let json = {
             uid: this.uid,
             name: this.name,
@@ -99,6 +109,13 @@ export default class Team  {
             gamesPlayed: this.gamesPlayed,
             roster: this.roster, //We'll lose some functions, but recreate on load,
         };
+        return json;  
+    }
+
+    async _save() {
+        let json = this.createSave();
+
+        console.log(`Saving Team: Team-${this.uid}`);
 
         Save.saveData(`Team-${this.uid}`,json);
     }

@@ -8,14 +8,9 @@ import {
   View,
   TextInput,
   KeyboardAvoidingView,
-  Switch,
-  FlatList,
-  Button,
-  Image,
-  ImageBackground,
-  TouchableOpacity,
 } from 'react-native';
 import Buttonish from '../components/Buttonish';
+import DatePicker from 'react-native-datepicker';
 
 import Team from '../model/Team.js';
 import LineUp from '../model/LineUp';
@@ -39,19 +34,20 @@ export default class PreGameScreen extends React.Component {
         this.myLineup = new LineUp(this.myTeam);
 
         
-        this.mGameDate = new Date().toISOString().slice(0,10);
+        let todaysDate = new Date().toISOString().slice(0,10);
 
 
 
         //We need to create our opponent. For now let's just default to 11:
-        var opponentTeam = new Team("");
+        let opponentTeam = new Team("Opponent");
         opponentTeam._createDefaultRoster();
         this.opponentLineUp = new LineUp(opponentTeam);
 
         this.state = {
             myTeamIsHome: true,
             startingLineUpReviewed: false,
-            opponentName: ""
+            opponentName: "",
+            date: todaysDate,
         }
     }
 
@@ -71,12 +67,6 @@ export default class PreGameScreen extends React.Component {
                 this.myLineup.fieldPositions[this.myLineup.team.roster[pid].currentPosition] = pid;
             }
         }
-
-        console.log("Post Build LineUP:");
-        console.log(this.myLineup.battingOrder);
-        console.log("---------------------------------------");
-        console.log(this.myLineup.fieldPositions);
-
     }
 
     onHomeAway = () => {
@@ -90,7 +80,7 @@ export default class PreGameScreen extends React.Component {
 
 
     onPlayBall = () => {
-         this.buildLineup();
+        this.buildLineup();
 
         console.log("Play Ball:");
 
@@ -106,12 +96,7 @@ export default class PreGameScreen extends React.Component {
         if (this.myLineup.battingOrder.length < 8) {
             console.log("We Don't have enough to play!!!");
             return;
-
         }
-
-        //Date is good
-
-        //console.log(this.myLineup);
 
         //TODO - save last lineup?
 
@@ -119,13 +104,11 @@ export default class PreGameScreen extends React.Component {
         let awayTeam = (!this.state.myTeamIsHome ? this.myLineup : this.opponentLineUp);
         let gameParams = new GameParams(this.myTeam);
 
-        this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameParams, date: this.mGameDate});
-
-
+        this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameParams, date: this.state.date});
     }
 
     render() {
-        //TODO - add load last linup?
+
         return (
             <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
                 <View style={{flex:10}}>
@@ -159,17 +142,21 @@ export default class PreGameScreen extends React.Component {
                             value={ this.state.opponentName}
                         />
 
-
-
                         {!this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Home)</Text>}
                         {this.state.myTeamIsHome && <Text style={{fontSize: 22}}>(Away)</Text>}
                     </View>
                     <View style={{flex: 2, alignItems: 'center', justifyContent: 'center'}}>
-                        <TextInput
-                            style={styles.dateInput}
-                            //onChangeText={(text) => this.opponentLineUp.teamName = text}
-                            placeholder = "date"
-                            value={ this.mGameDate}
+                        <DatePicker
+                            style={{width: 200}}
+                            date={this.state.date}
+                            mode="date"
+                            placeholder = "select date"
+                            format="YYYY-MM-DD"
+                            minDate="2019-01-01"
+                            maxDate="2025-12-31"
+                            confirmBtnText = "Confirm"
+                            cancelBtnText = "Cancel"
+                            onDateChange={(date) => {this.setState({date: date})}}
                         />
                     </View>
                 </View>
@@ -199,52 +186,32 @@ export default class PreGameScreen extends React.Component {
     }
 }
 
-/*
-
-                    <Text style={{fontSize: 24}}>Starting Line Up</Text>
-<Text style={{fontSize: 48, fontWeight: 'bold'}}>{this.opponentTeam.name}</Text>
-
-*/
-
-
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-
-  },
-  settings: {
-
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 15,
-  },
-  textInput: {
-      //flex: 1,
-      fontSize: 48,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      //backgroundColor: 'yellow',
-      borderStyle: 'solid',
-      borderColor: 'grey',
-      borderWidth: 1,
-  },
-  dateInput: {
-    //flex: 1,
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    //backgroundColor: 'yellow',
-    borderStyle: 'solid',
-    borderColor: 'grey',
-    borderWidth: 1,
-},
-  switch: {
-      flex: 1,
-      alignItems: 'center',
-      //backgroundColor: 'green',
-      transform: [{ scaleX: .7  }, { scaleY: .7}] ,
-  },
+    container: {
+        flex: 1,
+        flexDirection: 'column',
+    },
+    settings: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 15,
+    },
+    textInput: {
+        //flex: 1,
+        fontSize: 48,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        //backgroundColor: 'yellow',
+        borderStyle: 'solid',
+        borderColor: 'grey',
+        borderWidth: 1,
+    },
+    switch: {
+        flex: 1,
+        alignItems: 'center',
+        //backgroundColor: 'green',
+        transform: [{ scaleX: .7  }, { scaleY: .7}] ,
+    },
 });
 

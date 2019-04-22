@@ -162,8 +162,9 @@ export default class RosterScreen extends React.Component {
             player = this.team.team.roster[val];
             //console.log(`makeRow: ${ix}, ${val}`);
             //console.log(player);
-            //console.log(player.pitcherStats.pitches);
-            return this.rowJSX(ix, GameConst.fieldPosAbbrev[player.currentPosition], player.name, player.pitcherStats.pitches);
+            var playerStats = this.team.playerStats[player.uid];
+
+            return this.rowJSX(ix, GameConst.fieldPosAbbrev[player.currentPosition], player.name, PlayerStats.pitches(playerStats));
         } else if (this.view == "fielding" ) {
             player = this.team.team.roster[val];
             return this.rowJSX(ix, GameConst.fieldPosAbbrev[player.currentPosition], player.name, (player.battingOrder + 1));

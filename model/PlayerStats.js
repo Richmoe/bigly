@@ -10,9 +10,7 @@ class PitcherStats {
     hitBatter = 0;
     battersFaced = 0;
 
-    get pitches() {
-        return (this.balls + this.strikes);
-    }
+
 }
 
 class BatterStats {
@@ -27,12 +25,18 @@ class BatterStats {
     RBIs = 0;
     runs = 0;
 
-    get hits() {
-        return (this.singles + this.doubles + this.triples + this.homeRuns);
-    }
 }
 
 export default class PlayerStats {
+
+    static batterHits(stats) {
+        return (stats.batterStats.singles + stats.batterStats.doubles + stats.batterStats.triples + stats.batterStats.homeRuns);
+    }
+
+    static pitches(stats) {   
+        return (stats.pitcherStats.balls + stats.pitcherStats.strikes);
+    }
+
 
     constructor(uid) {
         this.uid = uid;

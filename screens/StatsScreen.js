@@ -2,11 +2,11 @@ import React, {Component} from 'react';
 import {
     StyleSheet, 
     Text, 
-
 } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import GameConst from "../constants/GameConst.js";
 import Buttonish from "../components/Buttonish";
+import PlayerStats from "../model/PlayerStats";
 
 
 /*
@@ -20,9 +20,6 @@ class PitcherStats {
     hitBatter = 0;
     battersFaced = 0;
 
-    get pitches() {
-        return (this.balls + this.strikes);
-    }
 }
 
 class BatterStats {
@@ -37,9 +34,6 @@ class BatterStats {
     RBIs = 0;
     runs = 0;
 
-    get hits() {
-        return (this.singles + this.doubles + this.triples + this.homeRuns);
-    }
 */
 
 
@@ -67,8 +61,6 @@ export default class StatsScreen extends React.Component {
 
 
     setView (view) {
-
-     
         if (view == "batting") {
             this.formatRow = [5,1,1,1,1,1,1,1,1,1,1];
             this.header = ["Name", "AB", "R", "H", "RBI", "2B","3B","HR","BB","SO","HBP"];
@@ -121,7 +113,7 @@ export default class StatsScreen extends React.Component {
                 player.name, 
                 playerStats.batterStats.atBats,
                 playerStats.batterStats.runs,
-                playerStats.batterStats.hits,
+                PlayerStats.batterHits(playerStats),
                 playerStats.batterStats.RBIs,
                 playerStats.batterStats.doubles,
                 playerStats.batterStats.triples,
@@ -140,7 +132,7 @@ export default class StatsScreen extends React.Component {
                 playerStats.pitcherStats.walks,
                 playerStats.pitcherStats.strikeOuts,
                 playerStats.pitcherStats.hitBatter,
-                playerStats.pitcherStats.pitches,
+                PlayerStats.pitches(playerStats),
                 playerStats.pitcherStats.balls,
                 playerStats.pitcherStats.strikes
 

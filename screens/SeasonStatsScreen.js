@@ -23,9 +23,6 @@ class PitcherStats {
     hitBatter = 0;
     battersFaced = 0;
 
-    get pitches() {
-        return (this.balls + this.strikes);
-    }
 }
 
 class BatterStats {
@@ -39,10 +36,6 @@ class BatterStats {
     homeRuns = 0;
     RBIs = 0;
     runs = 0;
-
-    get hits() {
-        return (this.singles + this.doubles + this.triples + this.homeRuns);
-    }
 */
 
 
@@ -55,6 +48,7 @@ export default class SeasonStatsScreen extends React.Component {
     formatRow;
     header;
     order;
+    seasonStats = {};
 
     constructor(props){
         console.log("Construct StatsScreen");
@@ -65,11 +59,14 @@ export default class SeasonStatsScreen extends React.Component {
 
         //create default order for now:
         this.order = Object.keys(this.team.roster);
-        Util.log(this.order);
+        //Util.log(this.order);
 
         this.buildSeasonStats();
 
-        this.state = { view: "batting" };
+        this.state = { 
+            view: "batting", 
+            currentGameIX: this.team.gamesPlayed.length, //start with Season view
+        };
         this.setView("batting");
     }
 
@@ -81,29 +78,25 @@ export default class SeasonStatsScreen extends React.Component {
         // create a new object that hold just the playerUIDs for the season
         var seasonStats = {};
 
+        //Build initial 0'ed array:
+        for (let playerUID in this.team.roster) {
+            seasonStats[playerUID] = new PlayerStats(playerUID);
+        }
 
         //We have this.team.gamesPlayed array to walk
-        debugger;
-    
-
         for (let i = 0;i < this.team.gamesPlayed.length;i++) {
             Util.log(`Getting stats for game UID: ${this.team.gamesPlayed[i].uid}`);
 
             //Get            
             let gameStats = this.team.playerGameStats[this.team.gamesPlayed[i].uid];
-            //debugger;
-
-            Util.log(gameStats);
+  
+            //Util.log(gameStats);
 
             //keep this functionality closer to the stats class itself so we can easily modify
             //For each game, sum the stats by player:
             for (let playerUID in gameStats) {
                 //get player's total from season stats or create if doesn't exist yet:
                 let playerSeasonStats = seasonStats[playerUID];
-                if (playerSeasonStats == null) {
-                    playerSeasonStats = new PlayerStats(playerUID);
-                }
-
                 playerSeasonStats.sumStats(gameStats[playerUID]);
                 seasonStats[playerUID] = playerSeasonStats;
             }
@@ -160,7 +153,14 @@ export default class SeasonStatsScreen extends React.Component {
         var uid = this.order[ix];
         var player = this.team.roster[uid];
         //var game = this.
-        var playerStats = this.seasonStats[player.uid];
+        var playerStats;
+        if (this.state.currentGameIX == this.team.gamesPlayed.length) {
+            playerStats = this.seasonStats[player.uid];
+        } else {
+            let gameUid = this.team.gamesPlayed[this.state.currentGameIX].uid;
+            let gameStats = this.team.playerGameStats[gameUid];
+            playerStats = gameStats[player.uid];
+        }
 
         if (this.state.view == "batting" ) {
             //this.header = ["Name", "AB", "R", "H", "RBI", "2B","3B","HR","BB","SO","HBP"];
@@ -169,7 +169,7 @@ export default class SeasonStatsScreen extends React.Component {
                 player.name, 
                 playerStats.batterStats.atBats,
                 playerStats.batterStats.runs,
-                playerStats.batterStats.hits,
+                PlayerStats.batterHits(playerStats), //.batterStats.hits,
                 playerStats.batterStats.RBIs,
                 playerStats.batterStats.doubles,
                 playerStats.batterStats.triples,
@@ -188,7 +188,7 @@ export default class SeasonStatsScreen extends React.Component {
                 playerStats.pitcherStats.walks,
                 playerStats.pitcherStats.strikeOuts,
                 playerStats.pitcherStats.hitBatter,
-                playerStats.pitcherStats.pitches,
+                PlayerStats.pitches(playerStats),
                 playerStats.pitcherStats.balls,
                 playerStats.pitcherStats.strikes
 
@@ -204,6 +204,24 @@ export default class SeasonStatsScreen extends React.Component {
         this.setView(pView);
     }
 
+    getGameName() {
+        if (this.state.currentGameIX == this.team.gamesPlayed.length) {
+            return "Season";
+        } else {
+            let gamePlayed = this.team.gamesPlayed[this.state.currentGameIX];
+
+            return gamePlayed.opponent;
+        }
+    }
+
+    switchGame() {
+        let nextGameIX = this.state.currentGameIX + 1;
+        if (nextGameIX > this.team.gamesPlayed.length) {
+            nextGameIX = 0;
+        }
+        this.setState({currentGameIX: nextGameIX});
+    }
+
     render() {
 
         //Create rows:
@@ -211,7 +229,14 @@ export default class SeasonStatsScreen extends React.Component {
             
         return (
             <Grid>
-                
+                <Row style={{height: 65}} >
+                    <Col >
+                    <Button 
+                        title={ this.getGameName() }
+                        onPress={() => {this.switchGame()}}
+                    />
+                    </Col >
+                </Row>
                 <Row key={99}>{this.makeHeader()}</Row>
                 {fullRows}
                 <Row style={{height: 65}} >

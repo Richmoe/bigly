@@ -3,13 +3,14 @@
 //Keeping TODOs here:
 
 //Todo - Fielder view
-
-
 //Todo - check out alignment across iphone / android
 //Todo - run experience
 //Todo - Gamelog
 //Todo - Undo last play
-
+//Todo - End inning - remove last player's atbat / pitcher's faced
+//Todo - End game - remove last player's at bat/pitcher's faced
+//Todo - fix bug where hit reset with dialog open
+//Todo - track fielding
 //Todo - what about tracking hit but thrown out at a 2nd?
 
 import PlayerStats from '../model/PlayerStats.js';
@@ -102,6 +103,10 @@ export default class Game {
     }
 
     newInning() {
+        //Save off positions for fielding team at the End of an inning:
+        this.fieldingTeam.saveFieldPositions(this.inning-1); //0 based
+
+
         this.currentInning += 1;
         //check for end of game
         if ((this.currentInning / 2) >= this.gameSettings.maxInnings) {

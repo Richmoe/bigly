@@ -13,6 +13,7 @@ export default class LineUp
     //TODO make this by inning.
     fieldPositions = []; //Array of field pos, 0 = pitcher. Value = player UID.
     playerStats = {}; //Object of player stats key = PlayerUID]
+    positionByInning = []; //array of field positions, by inning.
     
     constructor(team) {
         this.team = team;
@@ -81,6 +82,11 @@ export default class LineUp
         this.team.roster[playerUid].currentPosition = newPos;
         console.log("After:");
         console.log(this.fieldPositions);
+    }
+
+    saveFieldPositions(inning) {
+        this.positionByInning[inning] = this.fieldPositions;
+        Util.log("PositionsByInning : " + inning, this.positionByInning)
     }
 
     getPlayer(uid) {

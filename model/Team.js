@@ -1,3 +1,5 @@
+"use strict";
+
 import Player from '../model/Player.js';
 import * as Util from "../util/Misc";
 import * as Save from '../util/SaveLoad';
@@ -14,11 +16,13 @@ export default class Team  {
     machinePitch = true;
     gamesPlayed = [];   //array of games played where game = {UID, Date, Opponent, isHome, myScore, oppScore}
     playerGameStats = {}; //object of player game stats which can be summed for lifetime. [gameUid][PlayerUID]
-
+    recordWins = 0;
+    recordTies = 0;
+    recordLosses = 0;
     
     constructor(teamName, uid)
     {
-        console.log(`Team Constructor: ${teamName}, ${uid}`);
+        //console.log(`Team Constructor: ${teamName}, ${uid}`);
         this.name = teamName;
         if (uid !== undefined) {
             this.uid = uid;
@@ -26,7 +30,7 @@ export default class Team  {
             this.uid = Util.uid();
         }
         this.playerGameStats = {};
-        Util.log(this.playerGameStats);
+        //Util.log(this.playerGameStats);
 
     }
 
@@ -53,12 +57,18 @@ export default class Team  {
         //debugger;
         //Update player stats
         this.playerGameStats[gp.uid.toString()] = gameObject.myTeam.playerStats;
-
-       
-        Util.log("player game stats: ", this.playerGameStats);
+ 
+        //Update record:
+        if (gp.myScore > gp.oppScore) {
+            this.recordWins += 1;
+        } else if (gp.myScore < gp.oppScore) {
+            this.recordLosses += 1;
+        } else {
+            this.recordTies += 1;
+        }
+        //Util.log("player game stats: ", this.playerGameStats);
         //Update Win/loss/tie
         //NVM - we should walk GP to get this
-
     }
 
     __debugGamesPlayed() {
@@ -84,6 +94,9 @@ export default class Team  {
         this.machinePitch = json.machinePitch;
         this.playerGameStats = json.playerGameStats;
         this.gamesPlayed = json.gamesPlayed;
+        this.recordWins = json.recordWins;
+        this.recordLosses = json.recordLosses;
+        this.recordTies = json.recordTies;
 
         //rebuild roster array of Players:
         let r = json.roster;
@@ -108,6 +121,9 @@ export default class Team  {
             playerGameStats: this.playerGameStats,
             gamesPlayed: this.gamesPlayed,
             roster: this.roster, //We'll lose some functions, but recreate on load,
+            recordWins: this.recordWins,
+            recordLosses: this.recordLosses,
+            recordTies: this.recordTies,
         };
         return json;  
     }
@@ -123,23 +139,20 @@ export default class Team  {
 
     _createDefaultRoster(names) {
    
-        var defaultRoster = {};
+        let defaultRoster = {};
 
-        if (names) {
-            playerCount = names.length;
-        } else {
-            //default to 11
-            playerCount = 11;
-        }
+        let playerCount = 11; //default
+        if (names) playerCount = names.length;
     
         for (var i = 0; i < playerCount;i++)
         {
+            let name;
             if (names) {
                 name = names[i];
             } else {
                 name = "Player " + (i+1);
             }
-            player = new Player();
+            let player = new Player();
             player.setName(name);
             //console.log(`Created player ${name}, UID is ${player.uid}`);
 
@@ -167,5 +180,4 @@ export default class Team  {
             ]
         );
     }
-    
 }

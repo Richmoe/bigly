@@ -87,7 +87,6 @@ export default class HomeScreen extends React.Component {
 
     //this.teamList = null; //wipe
 
-
     if (this.teamList != null) {
       //get default team
       defaultTeamUid = await Util.retrieveData("DefaultTeam");
@@ -110,9 +109,8 @@ export default class HomeScreen extends React.Component {
         log("we have team:", defaultTeam.name);
 
 
-        defaultTeam.__debugGamesPlayed();
-
-        defaultTeam.__debugSeasonStats();
+        //defaultTeam.__debugGamesPlayed();
+        //defaultTeam.__debugSeasonStats();
       }
 
     } else {
@@ -188,66 +186,6 @@ export default class HomeScreen extends React.Component {
     }
   }
 
-  render() {
-    if (!this.state.isLoadingComplete) {
-      return (
-        <AppLoading
-
-        />
-      );
-    } else {
-      var startString = `Start Game (${this.state.defaultTeam.name})`;
-      return (
-        <View style={styles.container}>
-          <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-            <View style={styles.welcomeContainer}>
-              <Image
-                source={require('../assets/images/biglyLogo.png')}
-                style={styles.welcomeImage}
-              />
-            </View>
-
-            <View style={{flex: 1, justifyContent: "center", backgroundColor: 'red'}}>
-              <Picker
-                selectedValue={this.state.defaultUid}
-                onValueChange={this.pickerPick}
-                
-              >
-                {this.teamsPicker()}
-
-              </Picker>
-            </View>
-
-            <View style={{flex: 1}}>
-              <Button 
-                  title={startString} onPress={this._startGamePress}
-
-              />
-              <Button
-                  title="Settings" onPress={this._settingsPress}              
-
-              />
-              <Button
-                  title="Debug Home Game" onPress={this._debugHome}
-
-              />
-              <Button
-                  title="Debug Away Game" onPress={this._debugAway}
-
-              />
-              <Button
-                  title="Season Stats" onPress={this._seasonStats}
-
-              />
-            </View>
-
-    
-          </ScrollView>
-        </View>
-      );
-    }
-  }
-
   _startGamePress = () => {
     this.props.navigation.navigate('PreGame', {myTeam: this.state.defaultTeam});
  
@@ -279,10 +217,8 @@ export default class HomeScreen extends React.Component {
     var t1 = new Team("Dragons");
     t1._createDefaultMyRoster();
     t1.myTeam = true;
-    console.log("1*****************");
     var l1 = new LineUp(t1);
 
-    console.log("2*****************");
     var t2 = new Team("Opponent");
     t2._createDefaultRoster();
     var l2 = new LineUp(t2);
@@ -305,8 +241,72 @@ export default class HomeScreen extends React.Component {
     var date = new Date().toISOString().slice(0,10);
 
     this.props.navigation.navigate('Game', { homeLineUp: homeTeam, awayLineUp: awayTeam, gameParams: gameSettings, date: date});
-
   }
+
+  render() {
+    if (!this.state.isLoadingComplete) {
+      return (
+        <AppLoading        />
+      );
+    } else {
+      
+      return (
+        <View style={styles.container}>
+          <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+            <View style={styles.welcomeContainer}>
+              <Image
+                source={require('../assets/images/biglyLogo.png')}
+                style={styles.welcomeImage}
+              />
+            </View>
+            <View style={{fontWeight: "bold", flex: 1, justifyContent: "center", alignItems: "center"}}>
+              <Text style={{fontSize: 30}}>{this.state.defaultTeam.name}</Text>
+            </View>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+              <Text style={{fontSize: 22}}>{this.state.defaultTeam.recordWins}-{this.state.defaultTeam.recordLosses}-{this.state.defaultTeam.recordTies}</Text>
+            </View>
+            <View style={{height: 25}} />
+            {false && <View style={{flex: 1, justifyContent: "center", backgroundColor: 'red'}}>
+              <Picker
+                selectedValue={this.state.defaultUid}
+                onValueChange={this.pickerPick}
+                
+              >
+                {this.teamsPicker()}
+
+              </Picker>
+            </View>
+            }
+
+            <View style={{flex: 1}}>
+              <Button 
+                  title="New Game" onPress={this._startGamePress}
+
+              />
+              <Button
+                  title="Settings" onPress={this._settingsPress}              
+
+              />
+         
+              <Button
+                  title="Season Stats" onPress={this._seasonStats}
+
+              />
+              <Button
+                  title="Debug Home Game" onPress={this._debugHome}
+              />
+              <Button
+                  title="Debug Away Game" onPress={this._debugAway}
+              />
+            </View>
+
+    
+          </ScrollView>
+        </View>
+      );
+    }
+  }
+
 
 }
 

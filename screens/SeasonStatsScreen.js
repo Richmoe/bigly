@@ -229,7 +229,7 @@ export default class SeasonStatsScreen extends React.Component {
             
         return (
             <Grid>
-                <Row style={{height: 65}} >
+                <Row style={{height: 40}} >
                     <Col >
                     <Button 
                         title={ this.getGameName() }
@@ -237,9 +237,10 @@ export default class SeasonStatsScreen extends React.Component {
                     />
                     </Col >
                 </Row>
-                <Row key={99}>{this.makeHeader()}</Row>
+                <Row key={99} style={{height: 15}}>{this.makeHeader()}</Row>
+                <Row style={{height: 1, backgroundColor: "black"}} />
                 {fullRows}
-                <Row style={{height: 65}} >
+                <Row style={{height: 50}} >
                     <Col >
                     <Button 
                         title="Batting" 
@@ -277,7 +278,7 @@ export default class SeasonStatsScreen extends React.Component {
         backgroundColor: '#ddd',
     },
     headerText: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: 'bold',
         borderColor: 'black',
         borderBottomWidth: 2

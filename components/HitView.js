@@ -40,8 +40,11 @@ export default class HitView extends Component {
 
         for (var i = 0;i < this.stylesPos.length;i++)
         {
-          this.stylesPos[i].left *= REF_YSCALER/400;
-          this.stylesPos[i].top *= REF_XSCALER/400;
+          this.stylesPos[i].left = posBases[i][0] * REF_YSCALER/400;
+          this.stylesPos[i].top = posBases[i][1] * REF_XSCALER/400;
+          console.log("i: " + i);
+          console.log(this.stylesPos[i]);
+          console.log(posBases[i]);
         }
 
         console.log(`HitView onBase: ${this.props.baseRunners}`);
@@ -226,8 +229,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderStyle: 'solid',
     borderColor: 'black',
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderWidth: 2,
     borderRadius: 64,
   },
@@ -253,9 +256,39 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     textAlign: 'center',
     textAlignVertical: 'center',
-    fontSize: 18,  
+    fontSize: 14,  
   }
 });
+
+const posBases = Platform.select({
+  ios:  [
+    [153,319],
+    [276,192],
+    [153,68],
+    [30,192],
+    [100,355],
+    [69,355],
+    [38,355],
+    [7,355],
+    [7,320],
+    [38,320],
+    [69,320]
+  ],
+  android: [
+    [168,330],
+    [294,194],
+    [168,68],
+    [40,194],
+    [111,360],
+    [74,360],
+    [37,360],
+    [0,360],
+    [0,320],
+    [38,320],
+    [76,320]
+  ]
+})
+
 
 
 const stylesPosBase = [

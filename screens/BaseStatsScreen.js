@@ -96,7 +96,6 @@ export default class BaseStatsScreen extends React.Component {
 
         for (let i = 0; i < this.header.length; i++) {
             jsx = [...jsx, <Col key={i} size={this.formatRow[i]}><Text style={styles.headerText}>{this.header[i]}</Text></Col>];
-            console.log(this.header[i]);
         }
 
         return jsx;

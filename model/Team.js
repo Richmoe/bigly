@@ -86,6 +86,7 @@ export default class Team  {
     }
 
     fromJSON(json) {
+        //TODO need better error handling in case data is incomplete.
         this.uid = json.uid;
         this.name = json.name;
         this.maxInnings = json.maxInnings;
@@ -108,6 +109,7 @@ export default class Team  {
             this.roster[pid] = p;
             //console.log(p);
         }
+        Util.log("fromJSON:", this);
     }
 
     createSave() {

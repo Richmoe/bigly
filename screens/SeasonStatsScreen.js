@@ -99,8 +99,17 @@ export default class SeasonStatsScreen extends BaseStatsScreen {
             return "Season";
         } else {
             let gamePlayed = this.team.gamesPlayed[this.state.currentGameIX];
+            let gamename = gamePlayed.date;
+            gamename += (gamePlayed.isHome ? " vs " : " at ");
+            gamename += gamePlayed.opponent;
+            if (gamePlayed.myScore < gamePlayed.oppScore) {
+                gamename += ": L ";
+            } else {
+                gamename += ": W ";
+            }
+            gamename += gamePlayed.myScore + "-" + gamePlayed.oppScore;
 
-            return gamePlayed.opponent;
+            return gamename;
         }
     }
 
